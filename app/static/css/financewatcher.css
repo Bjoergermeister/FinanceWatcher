@@ -1,0 +1,34 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+nav {
+  display: block;
+  width: 100%;
+  height: 50px;
+  background: cornflowerblue;
+  box-shadow: 1px 1px 10px #333;
+}
+
+nav a {
+  display: inline-block;
+  height: 50px;
+  line-height: 50px;
+  padding: 0px 20px;
+  color: #eee !important;
+  cursor: pointer;
+}
+
+nav a:hover {
+  background: white;
+  color: black !important;
+}
+
+#content {
+  display: block;
+  width: 80%;
+  margin: auto;
+  padding: 25px;
+}
