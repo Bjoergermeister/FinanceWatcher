@@ -1,0 +1,78 @@
+{% extends "base.html" %} {% load crispy_forms_tags %} {% load static %} {% block js %}
+<script src="{% static 'js/bills.js' %}" defer></script>
+{% endblock %} {% block content %}
+<form id="bill-form">
+  <fieldset class="card shadow p-3 mb-5">
+    <div class="form-row">
+      <div class="col-md">{{ bill_form.date|as_crispy_field }}</div>
+      <div class="col-md">{{ bill_form.receipt|as_crispy_field }}</div>
+    </div>
+    <div class="form-row">
+      <div class="col-md">{{ bill_form.description|as_crispy_field }}</div>
+    </div>
+  </fieldset>
+
+  <fieldset id="bill-positions" class="card shadow p-3 mb-5">
+    {% comment %} Header for positions {% endcomment %}
+    <div class="form-row">
+      <div class="col-md-8">
+        <p>Name</p>
+      </div>
+      <div class="col-md-2">
+        <p>Preis</p>
+      </div>
+      <div class="col-md-1">
+        <p>Menge</p>
+      </div>
+      <div class="col-md-1"></div>
+    </div>
+
+    {% for position_form in position_formset %}
+    <div class="form-row">
+      <div class="col-md-8">{{ position_form.name|as_crispy_field }}</div>
+      <div class="col-md-2">{{ position_form.price|as_crispy_field }}</div>
+      <div class="col-md-1">{{ position_form.quantity|as_crispy_field }}</div>
+      <div class="col-md-1">
+        <i
+          class="fa-solid fa-xl fa-comment"
+          style="transform: translate(10px, 15px)"
+          data-index="{{ forloop.counter }}"
+          onclick="onPositionNoteClicked(event)"
+        ></i>
+      </div>
+      {{ position_form.note }}
+    </div>
+    {% endfor %}
+  </fieldset>
+
+  <fieldset class="card shadow p-3 mb-5">
+    <p>Summe: <span id="bill-sum">0 &euro;</span></p>
+  </fieldset>
+
+  <div class="form-controls">
+    <button class="btn btn-primary">Speichern</button>
+    <button class="btn btn-secondary">Zurücksetzen</button>
+    <button class="btn btn-danger">Abbrechen</button>
+  </div>
+</form>
+
+<dialog id="position-note-dialog" name="position-note">
+  <div class="content">
+    <header>
+      <h1>Titel</h1>
+    </header>
+    <div class="body form-row">
+      <textarea id="bill-position-note" rows="5" resizable="false"></textarea>
+    </div>
+    <footer>
+      <button class="btn btn-primary" onclick="onPositionNoteSaveClicked(event)">
+        Speichern
+      </button>
+      <button class="btn btn-danger" onclick="onPositionNoteAbortClicked(event)">
+        Abbrechen
+      </button>
+    </footer>
+  </div>
+</dialog>
+
+{% endblock %}

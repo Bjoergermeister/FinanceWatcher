@@ -4,6 +4,8 @@
   box-sizing: border-box;
 }
 
+/*** Navigation ***/
+
 nav {
   display: block;
   width: 100%;
@@ -31,4 +33,66 @@ nav a:hover {
   width: 80%;
   margin: auto;
   padding: 25px;
+}
+
+/*** Forms ***/
+.form-controls {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 10px;
+}
+
+/*** Dialogs ***/
+dialog {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  background: none;
+  border: none;
+}
+
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+dialog .content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 5px;
+  box-shadow: 1px 1px 10px #333;
+}
+
+dialog[name="position-note"] .content {
+  width: 600px;
+  height: 400px;
+}
+
+dialog header {
+  padding: 10px 20px;
+  text-align: center;
+  border-bottom: 1px solid #333;
+}
+
+dialog .body {
+  padding: 15px;
+}
+
+dialog footer {
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  height: 60px;
+  width: 100%;
+  padding: 10px;
+
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 10px;
+
+  border-top: 1px solid #666;
 }
