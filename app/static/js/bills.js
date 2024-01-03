@@ -75,6 +75,48 @@ async function onBillFormSubmitted(event) {
   return false;
 }
 
+async function onDeletePositionClicked(event) {
+  event.preventDefault();
+
+  // There must be at least one form row at all times.
+  const totalFormsInput = document.querySelector(
+    "#bill-positions input[name='form-TOTAL_FORMS']"
+  );
+  if (parseInt(totalFormsInput.value) == 1) return;
+
+  // Remove the form row
+  const element = event.target.parentElement.parentElement; // This will be the div.form-row
+  element.remove();
+
+  // Update the indices so that Django can correctly recognise the input values
+  const formRows = document.querySelector(
+    "#bill-positions .form-row:not(:first-of-type)"
+  );
+  updateFormRowIndices(formRows);
+
+  totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
+}
+
+function onNewPositionClicked(event) {
+  event.preventDefault();
+
+  const formRowContainer = event.target.parentElement; // This wil be the div#bill-positions
+  const formRows = formRowContainer.querySelectorAll(".form-row");
+
+  // Copy last form row and clear inputs
+  const formRowCopy = formRows[formRows.length - 1].cloneNode(true);
+
+  cloneFormRow(formRowCopy, formRows.length, {
+    price: 0.0,
+    quantity: 1.0,
+  });
+
+  formRows[formRows.length - 1].after(formRowCopy);
+
+  // There is one extra form row which contains the columns heading and should not be counted, therefore no +1
+  formRowContainer.querySelector("input[name='form-TOTAL_FORMS'").value = formRows.length;
+}
+
 /********************/
 /* Helper Functions */
 /********************/

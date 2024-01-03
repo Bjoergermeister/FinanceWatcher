@@ -1,4 +1,5 @@
 {% extends "base.html" %} {% load crispy_forms_tags %} {% load static %} {% block js %}
+<script src="{% static 'js/forms.js' %}" defer></script>
 <script src="{% static 'js/bills.js' %}" defer></script>
 {% endblock %} {% block content %}
 <form id="bill-form" onsubmit="onBillFormSubmitted(event)">
@@ -37,14 +38,21 @@
       <div class="col-md-1">
         <i
           class="fa-solid fa-xl fa-comment"
-          style="transform: translate(10px, 15px)"
+          style="transform: translate(10px, 10px)"
           data-index="{{ forloop.counter }}"
           onclick="onPositionNoteClicked(event)"
+        ></i>
+        <i
+          class="fa-solid fa-xl fa-trash"
+          style="transform: translate(10px, 10px)"
+          data-index="{{ forloop.counter }}"
+          onclick="onDeletePositionClicked(event)"
         ></i>
       </div>
       {{ position_form.note }}
     </div>
     {% endfor %}
+    <button class="btn btn-success" onclick="onNewPositionClicked(event)">+</button>
   </fieldset>
 
   <fieldset class="card shadow p-3 mb-5">
