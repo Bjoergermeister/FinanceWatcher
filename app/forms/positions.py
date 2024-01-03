@@ -11,3 +11,15 @@ class CreatePositionForm(forms.ModelForm):
     class Meta:
         model = Position
         exclude = ["bill"]
+
+class EditPositionForm(forms.ModelForm):
+    id = forms.IntegerField(widget=forms.HiddenInput())
+    bill = forms.IntegerField(widget=forms.HiddenInput())
+    name = forms.CharField(label="", min_length=1, widget=forms.TextInput(attrs={ 'required': True }))
+    price = forms.DecimalField(label="", decimal_places=2)
+    quantity = forms.DecimalField(label="", decimal_places=2)
+    note = forms.CharField(label="", required=False, widget=forms.HiddenInput())
+
+    class Meta:
+        model = Position
+        exclude = []

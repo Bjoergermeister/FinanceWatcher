@@ -3,6 +3,12 @@ class BillAPI {
     const options = getOptions("POST", data);
     return await makeRequest(CREATE_BILL_URL, options);
   }
+
+  static async edit(billId, data) {
+    const url = EDIT_BILL_URL.replace(/\d+/g, billId);
+    const options = getOptions("POST", data);
+    return await makeRequest(url, options);
+  }
 }
 
 function getOptions(method, data) {

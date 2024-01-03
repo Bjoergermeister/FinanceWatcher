@@ -2,10 +2,12 @@
 <script src="{% static 'js/forms.js' %}" defer></script>
 <script src="{% static 'js/bills.js' %}" defer></script>
 {% endblock %} {% block content %}
-<form id="bill-form" onsubmit="onCreateBillFormSubmitted(event)">
+<form id="bill-form" onsubmit="onEditBillFormSubmitted(event)">
   {% csrf_token %}
   <fieldset class="card shadow p-3 mb-5">
-    <div class="form-row">{{ bill_form.user }} {{ bill_form.total }}</div>
+    <div class="form-row">
+      {{ bill_form.id }} {{ bill_form.user }} {{ bill_form.total }}
+    </div>
     <div class="form-row">
       <div class="col-md-6">{{ bill_form.name|as_crispy_field }}</div>
       <div class="col-md-3">{{ bill_form.date|as_crispy_field }}</div>
@@ -50,7 +52,7 @@
           onclick="onDeletePositionClicked(event)"
         ></i>
       </div>
-      {{ position_form.note }}
+      {{ position_form.id }} {{ position_form.note }} {{ position_form.bill }}
     </div>
     {% endfor %}
     <button class="btn btn-success" onclick="onNewPositionClicked(event)">+</button>
@@ -87,7 +89,8 @@
 </dialog>
 
 <script>
-  const CREATE_BILL_URL = "{% url 'create_bill' %}";
+  const BILL_ID = "{{ bill_id }}";
+  const EDIT_BILL_URL = "{% url 'edit_bill' 12345 %}";
 </script>
 
 {% endblock %}

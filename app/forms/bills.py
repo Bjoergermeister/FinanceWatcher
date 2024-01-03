@@ -19,3 +19,16 @@ class CreateBillForm(forms.ModelForm):
     class Meta:
         model = Bill
         exclude = ["created"]
+
+class EditBillForm(forms.ModelForm):
+    id = forms.IntegerField(widget=forms.HiddenInput())
+    name = forms.CharField(label="Name")
+    user = forms.UUIDField(widget=forms.HiddenInput())
+    date = forms.DateField(label="Datum", widget=forms.DateInput(attrs={ 'type': 'date'}))
+    total = forms.DecimalField(widget=forms.HiddenInput())
+    description = forms.CharField(label="Beschreibung (optional)", required=False, widget=forms.Textarea(attrs={'rows': 3}))
+    receipt = forms.FileField(label="Kassenzettel (optional)", required=False)
+
+    class Meta:
+        model = Bill
+        exclude = ["created"]

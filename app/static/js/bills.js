@@ -64,11 +64,22 @@ function onPositionNoteAbortClicked(event) {
   positionNoteDialog.close();
 }
 
-async function onBillFormSubmitted(event) {
+async function onCreateBillFormSubmitted(event) {
   event.preventDefault();
 
   const data = new FormData(event.target);
   const result = await BillAPI.create(data);
+
+  alert(result.success);
+
+  return false;
+}
+
+async function onEditBillFormSubmitted(event) {
+  event.preventDefault();
+
+  const data = new FormData(event.target);
+  const result = await BillAPI.edit(BILL_ID, data);
 
   alert(result.success);
 
@@ -80,7 +91,7 @@ async function onDeletePositionClicked(event) {
 
   // There must be at least one form row at all times.
   const totalFormsInput = document.querySelector(
-    "#bill-positions input[name='form-TOTAL_FORMS']"
+    "#bill-positions input[name='position-TOTAL_FORMS']"
   );
   if (parseInt(totalFormsInput.value) == 1) return;
 
@@ -101,7 +112,7 @@ function onNewPositionClicked(event) {
   event.preventDefault();
 
   const formRowContainer = event.target.parentElement; // This wil be the div#bill-positions
-  const formRows = formRowContainer.querySelectorAll(".form-row");
+  const formRows = formRowContainer.querySelectorAll(".form-row:not(:first-of-type)");
 
   // Copy last form row and clear inputs
   const formRowCopy = formRows[formRows.length - 1].cloneNode(true);
@@ -111,10 +122,18 @@ function onNewPositionClicked(event) {
     quantity: 1.0,
   });
 
+  const priceInput = formRowCopy.querySelector("input[name$='price']");
+  priceInput.addEventListener("change", onPositionPriceChanged);
+  prices.push(priceInput.value);
+
+  const quantityInput = formRowCopy.querySelector("input[name$='quantity']");
+  quantityInput.addEventListener("change", onPositionPriceChanged);
+  quantities.push(quantityInput.value);
+
   formRows[formRows.length - 1].after(formRowCopy);
 
-  // There is one extra form row which contains the columns heading and should not be counted, therefore no +1
-  formRowContainer.querySelector("input[name='form-TOTAL_FORMS'").value = formRows.length;
+  const totalFormsInputSelector = "input[name='position-TOTAL_FORMS'";
+  formRowContainer.querySelector(totalFormsInputSelector).value = formRows.length + 1;
 }
 
 /********************/
@@ -128,6 +147,6 @@ function calculateBillTotal() {
   }
 
   const totalDisplaySpan = document.getElementById("bill-sum");
-  totalDisplaySpan.innerText = `${total} €`;
-  document.querySelector("#bill-form input[name$='total']").value = total;
+  totalDisplaySpan.innerText = `${total.toFixed(2)} €`;
+  document.querySelector("#bill-form input[name$='total']").value = total.toFixed(2);
 }
