@@ -3,6 +3,7 @@ from django.db import models
 import datetime
 
 class Bill(models.Model):
+    name = models.CharField(db_column="name", max_length=100)
     user = models.UUIDField(db_column="user")
     date = models.DateField(db_column="date")
     created = models.DateField(db_column="created", default=datetime.date.today)
