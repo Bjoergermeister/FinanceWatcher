@@ -64,6 +64,17 @@ function onPositionNoteAbortClicked(event) {
   positionNoteDialog.close();
 }
 
+async function onBillFormSubmitted(event) {
+  event.preventDefault();
+
+  const data = new FormData(event.target);
+  const result = await BillAPI.create(data);
+
+  alert(result.success);
+
+  return false;
+}
+
 /********************/
 /* Helper Functions */
 /********************/
@@ -76,4 +87,5 @@ function calculateBillTotal() {
 
   const totalDisplaySpan = document.getElementById("bill-sum");
   totalDisplaySpan.innerText = `${total} €`;
+  document.querySelector("#bill-form input[name$='total']").value = total;
 }

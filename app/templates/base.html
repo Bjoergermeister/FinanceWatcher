@@ -12,7 +12,10 @@
       href="{% static 'css/fontawesome.min.css' %}"
     />
     <link rel="stylesheet" type="text/css" href="{% static 'css/all.min.css' %}" />
-    {% block css %} {% endblock %} {% block js %} {% endblock %}
+    {% block css %} {% endblock %}
+
+    <script src="{% static 'js/api.js' %}"></script>
+    {% block js %} {% endblock %}
   </head>
 
   <body>

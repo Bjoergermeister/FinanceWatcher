@@ -21,5 +21,5 @@ from app.views import bills
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("bill/new", bills.create)
+    path("bill/new", bills.create, name="create_bill")
 ]
