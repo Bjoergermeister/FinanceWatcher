@@ -4,7 +4,12 @@ from django import forms
 
 from ..models.Bill import Bill
 
+def get_initial_name():
+    bill_count = Bill.objects.count()
+    return f"Rechnung #{bill_count + 1}"
+
 class CreateBillForm(forms.ModelForm):
+    name = forms.CharField(label="Name", initial=get_initial_name)
     user = forms.UUIDField(widget=forms.HiddenInput())
     date = forms.DateField(label="Datum", initial=datetime.date.today(), widget=forms.DateInput(attrs={ 'type': 'date'}))
     total = forms.DecimalField(widget=forms.HiddenInput(), initial=0.0)
