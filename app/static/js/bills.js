@@ -10,12 +10,12 @@ const positionNote = document.getElementById("bill-position-note");
 
   for (const priceInput of priceInputs) {
     priceInput.addEventListener("change", onPositionPriceChanged);
-    prices.push(priceInput.value);
+    prices.push(parseFloat(priceInput.value));
   }
 
   for (const quantityInput of quantityInputs) {
     quantityInput.addEventListener("change", onPositionQuantityChanged);
-    quantities.push(quantityInput.value);
+    quantities.push(parseFloat(quantityInput.value));
   }
 })();
 
@@ -99,6 +99,8 @@ async function onDeletePositionClicked(event) {
   const element = event.target.parentElement.parentElement; // This will be the div.form-row
   element.remove();
 
+  removePositionFromTotal(element);
+
   // Update the indices so that Django can correctly recognise the input values
   const formRows = document.querySelector(
     "#bill-positions .form-row:not(:first-of-type)"
@@ -149,4 +151,17 @@ function calculateBillTotal() {
   const totalDisplaySpan = document.getElementById("bill-sum");
   totalDisplaySpan.innerText = `${total.toFixed(2)} €`;
   document.querySelector("#bill-form input[name$='total']").value = total.toFixed(2);
+}
+
+function removePositionFromTotal(formRow) {
+  const price = parseFloat(formRow.querySelector("input[name$='price'").value);
+  const quantity = parseFloat(formRow.querySelector("input[name$='quantity']").value);
+
+  for (let i = 0; i < prices.length; i++) {
+    if (prices[i] === price && quantities[i] == quantity) {
+      prices.splice(i, 1);
+      quantities.splice(i, 1);
+    }
+  }
+  calculateBillTotal();
 }
