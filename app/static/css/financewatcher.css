@@ -72,6 +72,11 @@ dialog[name="position-note"] .content {
   height: 400px;
 }
 
+dialog[name="confirm-deletion"] .content {
+  width: 600px;
+  height: 250px;
+}
+
 dialog header {
   padding: 10px 20px;
   text-align: center;
@@ -95,4 +100,35 @@ dialog footer {
   gap: 10px;
 
   border-top: 1px solid #666;
+}
+
+/*** Buttons ***/
+button.loading {
+  position: relative;
+}
+
+button.loading:after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 15px;
+
+  width: 20px;
+  height: 20px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: white white transparent white;
+  border-radius: 50%;
+  animation: loader 2s linear 0s infinite forwards;
+}
+
+@keyframes loader {
+  0% {
+    transform: translateY(-50%) rotate(0deg);
+  }
+
+  100% {
+    transform: translateY(-50%) rotate(360deg);
+  }
 }
