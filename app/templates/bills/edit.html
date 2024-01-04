@@ -49,6 +49,7 @@
           class="fa-solid fa-xl fa-trash"
           style="transform: translate(10px, 10px)"
           data-index="{{ forloop.counter }}"
+          data-id="{{ position_form.id.value }}"
           onclick="onDeletePositionClicked(event)"
         ></i>
       </div>
@@ -88,9 +89,42 @@
   </div>
 </dialog>
 
+<dialog id="confirm-position-deletion-dialog" name="confirm-deletion">
+  <div class="content">
+    <header>
+      <h1>Position wirklich löschen?</h1>
+    </header>
+    <div class="body form-row">
+      <div class="col-md">
+        <p>
+          Die ausgewählte Position ist in der Datenbank gespeichert. Wenn Du sie löschst,
+          wird sie auch in der Datenbank gelöscht. Möchtest Du die Position wirklich
+          löschen?
+        </p>
+      </div>
+    </div>
+    <footer>
+      <button
+        class="btn btn-primary pl-5 pr-5"
+        onclick="onPositionDeletionConfirmClicked(event)"
+      >
+        Ja, löschen
+      </button>
+      <button
+        class="btn btn-danger pl-4 pr-4"
+        onclick="onPositionDeletionAbortClicked(event)"
+      >
+        Nein, abbrechen
+      </button>
+    </footer>
+  </div>
+</dialog>
+
 <script>
   const BILL_ID = "{{ bill_id }}";
   const EDIT_BILL_URL = "{% url 'edit_bill' 12345 %}";
+  const DELETE_POSITION_URL = "{% url 'delete_position' 1 2 %}";
+  const CSRF_MIDDLEWARE_TOKEN = "{{ csrf_token }}";
 </script>
 
 {% endblock %}

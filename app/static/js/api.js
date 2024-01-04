@@ -9,6 +9,12 @@ class BillAPI {
     const options = getOptions("POST", data);
     return await makeRequest(url, options);
   }
+
+  static async deletePosition(billId, positionId) {
+    const url = DELETE_POSITION_URL.replace(/1/g, billId).replace(/2/g, positionId);
+    const options = getOptions("POST", { csrfmiddlewaretoken: CSRF_MIDDLEWARE_TOKEN });
+    return await makeRequest(url, options);
+  }
 }
 
 function getOptions(method, data) {
@@ -16,10 +22,12 @@ function getOptions(method, data) {
 
   // Set default header values
   const headers = new Headers();
-  if (data.has("csrfmiddlewaretoken")) {
+  headers.append("X-CSRFToken", getCSRFToken(data));
+  /*
+  if (data !== undefined && data.has("csrfmiddlewaretoken")) {
     headers.append("X-CSRFToken", data.get("csrfmiddlewaretoken"));
     //headers.append("content-type", "multipart/form-data");
-  }
+  }*/
 
   return {
     method,
@@ -37,4 +45,9 @@ async function makeRequest(url, options) {
 
 function isJsonResponse(response) {
   return response.headers.get("content-type").indexOf("application/json") !== -1;
+}
+
+function getCSRFToken(data) {
+  if (data instanceof FormData) return data.get("csrfmiddlewaretoken");
+  return data["csrfmiddlewaretoken"];
 }

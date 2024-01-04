@@ -4,6 +4,12 @@ const quantities = [];
 const positionNoteDialog = document.getElementById("position-note-dialog");
 const positionNote = document.getElementById("bill-position-note");
 
+const confirmPositionDeletionDialog = document.getElementById(
+  "confirm-position-deletion-dialog"
+);
+
+let positionToDelete = null;
+
 (function registerEventListeners() {
   const priceInputs = document.querySelectorAll("#bill-form input[name$='price']");
   const quantityInputs = document.querySelectorAll("#bill-form input[name$='quantity']");
@@ -44,8 +50,7 @@ function onPositionNoteClicked(event) {
   positionNote.dataset.index = index;
   positionNote.value = currentPositionNote.value;
 
-  const noteDialog = document.getElementById("position-note-dialog");
-  noteDialog.showModal();
+  positionNoteDialog.showModal();
 }
 
 function onPositionNoteSaveClicked(event) {
@@ -95,19 +100,18 @@ async function onDeletePositionClicked(event) {
   );
   if (parseInt(totalFormsInput.value) == 1) return;
 
-  // Remove the form row
-  const element = event.target.parentElement.parentElement; // This will be the div.form-row
-  element.remove();
+  positionToDelete = event.target.parentElement.parentElement;
+  const idInput = positionToDelete.querySelector("input[name$='id']");
 
-  removePositionFromTotal(element);
+  // If the id input has a value, the position is saved in the database. Deleting it will also delete the database entry.
+  // In this case, display a dialog which ask the user for confirmation
+  if (idInput.value !== "") {
+    confirmPositionDeletionDialog.dataset.id = event.target.dataset.id;
+    confirmPositionDeletionDialog.showModal();
+    return;
+  }
 
-  // Update the indices so that Django can correctly recognise the input values
-  const formRows = document.querySelector(
-    "#bill-positions .form-row:not(:first-of-type)"
-  );
-  updateFormRowIndices(formRows);
-
-  totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
+  deletePosition();
 }
 
 function onNewPositionClicked(event) {
@@ -138,6 +142,26 @@ function onNewPositionClicked(event) {
   formRowContainer.querySelector(totalFormsInputSelector).value = formRows.length + 1;
 }
 
+function onPositionDeletionAbortClicked(event) {
+  event.preventDefault();
+  confirmPositionDeletionDialog.close();
+}
+
+async function onPositionDeletionConfirmClicked(event) {
+  event.preventDefault();
+  event.target.classList.add("loading");
+
+  const positionId = confirmPositionDeletionDialog.dataset.id;
+  const result = await BillAPI.deletePosition(BILL_ID, positionId);
+  if (result.success === false) {
+    return;
+  }
+
+  event.target.classList.remove("loading");
+  confirmPositionDeletionDialog.close();
+  deletePosition();
+}
+
 /********************/
 /* Helper Functions */
 /********************/
@@ -164,4 +188,18 @@ function removePositionFromTotal(formRow) {
     }
   }
   calculateBillTotal();
+}
+
+function deletePosition() {
+  positionToDelete.remove();
+  removePositionFromTotal(positionToDelete);
+  positionToDelete = null;
+
+  // Update the indices so that Django can correctly recognise the input values
+  const formRows = document.querySelector(
+    "#bill-positions .form-row:not(:first-of-type)"
+  );
+  updateFormRowIndices(formRows);
+
+  totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
 }

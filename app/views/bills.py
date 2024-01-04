@@ -1,3 +1,4 @@
+from django.db.models import F
 from django.forms import inlineformset_factory, modelformset_factory
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
@@ -78,3 +79,14 @@ def edit(request, id):
     }
 
     return render(request, "bills/edit.html", context)
+
+def delete_position(request, bill_id, position_id):
+
+    position = Position.objects.get(id=position_id)
+    price = position.price * position.quantity
+
+    Bill.objects.filter(id=position.bill_id).update(total=F("total") - price)
+
+    position.delete()
+
+    return HttpResponse(status=200)
