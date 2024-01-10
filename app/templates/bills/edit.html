@@ -1,6 +1,6 @@
 {% extends "base.html" %} {% load crispy_forms_tags %} {% load static %} {% block js %}
 <script src="{% static 'js/forms.js' %}" defer></script>
-<script src="{% static 'js/bills.js' %}" defer></script>
+<script src="{% static 'js/bill.js' %}" defer></script>
 {% endblock %} {% block content %}
 <form id="bill-form" onsubmit="onEditBillFormSubmitted(event)">
   {% csrf_token %}

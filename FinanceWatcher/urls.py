@@ -20,8 +20,10 @@ from django.urls import path
 from app.views import bills
 
 urlpatterns = [
+    path("", bills.bills, name="bills"),
     path("admin/", admin.site.urls),
     path("bill/new", bills.create, name="create_bill"),
     path("bill/<int:id>", bills.edit, name="edit_bill"),
+    path("bill/<int:id>/delete", bills.delete, name="delete_bill"),
     path("bill/<int:bill_id>/position/<int:position_id>/delete", bills.delete_position, name="delete_position")
 ]

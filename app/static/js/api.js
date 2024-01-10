@@ -10,6 +10,12 @@ class BillAPI {
     return await makeRequest(url, options);
   }
 
+  static async delete(billId) {
+    const url = DELETE_BILL_URL.replace(/\d+/g, billId);
+    const options = getOptions("DELETE", { csrfmiddlewaretoken: CSRF_MIDDLEWARE_TOKEN });
+    return await makeRequest(url, options);
+  }
+
   static async deletePosition(billId, positionId) {
     const url = DELETE_POSITION_URL.replace(/1/g, billId).replace(/2/g, positionId);
     const options = getOptions("POST", { csrfmiddlewaretoken: CSRF_MIDDLEWARE_TOKEN });

@@ -1,6 +1,6 @@
-from django.db.models import F
+from django.db.models import F, Count
 from django.forms import inlineformset_factory, modelformset_factory
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.shortcuts import render
 
 from ..models.Bill import Bill
@@ -80,6 +80,23 @@ def edit(request, id):
 
     return render(request, "bills/edit.html", context)
 
+def delete(request, id):
+    # Bills can only be deleted by admins or by the user who created them
+    # If the user is admin, just delete the bill
+    if request.user["isAdmin"]:
+        result = Bill.objects.filter(id=id).delete()
+            
+        if result[1]["app.Bill"] != 1:
+            return HttpResponseNotFound()
+        return HttpResponse(status=200)
+        
+    # If the user is not admin, check if he created the bill
+    result = Bill.objects.filter(id=id, user=request.user["id"]).delete()
+    if result[1]["app.Bill"] != 1:
+        return HttpResponseNotFound()
+
+    return HttpResponse(status=200)
+
 def delete_position(request, bill_id, position_id):
 
     position = Position.objects.get(id=position_id)
@@ -90,3 +107,7 @@ def delete_position(request, bill_id, position_id):
     position.delete()
 
     return HttpResponse(status=200)
+
+def bills(request):
+    bills = Bill.objects.filter(user=request.user["id"]).annotate(position_count=Count("positions"))
+    return render(request, "bills/bills.html", { "bills": bills })

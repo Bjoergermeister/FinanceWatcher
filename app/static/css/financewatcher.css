@@ -77,6 +77,11 @@ dialog[name="confirm-deletion"] .content {
   height: 250px;
 }
 
+dialog[name="bill-deletion"] .content {
+  width: 600px;
+  height: 225px;
+}
+
 dialog header {
   padding: 10px 20px;
   text-align: center;
