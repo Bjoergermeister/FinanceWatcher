@@ -3,6 +3,12 @@ from django.shortcuts import render
 
 from ..forms.groups import CreateGroupForm
 
+from ..models.Group import Group
+
+def groups(request):
+    groups = Group.objects.filter(user=request.user["id"])
+    return render(request, "groups/groups.html", { "groups": groups })
+
 def create(request):
     if request.method == "POST":
         form = CreateGroupForm(request.POST, request.FILES)

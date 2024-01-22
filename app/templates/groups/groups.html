@@ -1,0 +1,56 @@
+{% extends "base.html" %} {% load static %} {% block js %}
+<script src="{% static 'js/groups.js' %}" defer></script>
+{% endblock %} {% block content %}
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th data-width="10%">Name</th>
+      <th>Name</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for group in groups %}
+    <tr data-id="{{ group.pk }}">
+      <td>{{ group.name }}</td>
+      <td>
+        <a href="#">Bearbeiten</a>
+        <button
+          class="btn btn-danger"
+          data-id="{{ group.pk }}"
+          onclick="onDeleteGroupClicked(event)"
+        >
+          Löschen
+        </button>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<dialog id="confirm-group-deletion-dialog" name="group-deletion">
+  <div class="content">
+    <header>
+      <h1>Gruppe wirklich löschen?</h1>
+    </header>
+    <div class="body form-row">
+      <div class="col-md">
+        <p>
+          Bist Du sicher, dass Du diese Gruppe löschen willst? Diese Aktion ist dauerhaft
+          und kann nicht rückgängig gemacht werden.
+        </p>
+      </div>
+    </div>
+    <footer>
+      <button type="submit" class="btn btn-primary pl-5 pr-5">Ja, löschen</button>
+      <button type="cancel" class="btn btn-danger pl-4 pr-4">Nein, abbrechen</button>
+    </footer>
+  </div>
+</dialog>
+
+<script>
+  const CSRF_MIDDLEWARE_TOKEN = "{{ csrf_token }}";
+</script>
+
+{% endblock %}

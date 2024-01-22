@@ -29,6 +29,7 @@ urlpatterns = [
     path("bill/<int:id>/delete", bills.delete, name="delete_bill"),
     path("bill/<int:bill_id>/position/<int:position_id>/delete", bills.delete_position, name="delete_position"),
 
+    path("groups", groups.groups, name="groups"),
     path("group/new", groups.create, name="create_group")
 ]
 
