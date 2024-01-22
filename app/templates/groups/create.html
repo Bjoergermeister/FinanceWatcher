@@ -1,0 +1,24 @@
+{% extends "base.html" %} {% load crispy_forms_tags %} {% load static %} {% block js %}
+<script src="{% static 'js/groups.js' %}"></script>
+{% endblock %} {% block content %}
+<form
+  id="create-group-form"
+  onsubmit="onCreateGroupFormSubmitted(event)"
+  enctype="multipart/form-data"
+>
+  <div class="form-row">{% csrf_token %} {{ form.user|as_crispy_field }}</div>
+  <div class="form-row">
+    <div class="col-md">{{ form.name|as_crispy_field }}</div>
+  </div>
+  <div class="form-row">
+    <div class="col-md">{{ form.icon|as_crispy_field }}</div>
+  </div>
+  <button class="btn btn-primary" type="submit">Speichern</button>
+  <button class="btn btn-danger" type="cancel">Abbrechen</button>
+</form>
+
+<script>
+  const CREATE_GROUP_URL = "{% url 'create_group' %}";
+  const CSRF_MIDDLEWARE_TOKEN = "{{ csrf_token }}";
+</script>
+{% endblock %}

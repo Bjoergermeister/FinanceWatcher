@@ -23,6 +23,13 @@ class BillAPI {
   }
 }
 
+class GroupAPI {
+  static async create(data) {
+    const options = getOptions("POST", data);
+    return await makeRequest(CREATE_GROUP_URL, options);
+  }
+}
+
 function getOptions(method, data) {
   const body = data instanceof FormData ? data : JSON.stringify(data);
 
