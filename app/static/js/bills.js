@@ -20,6 +20,7 @@ async function onBillDeletionConfirmClicked(event) {
   const result = await BillAPI.delete(billId);
   if (result.success === false) {
     alert(`Failure`);
+    return;
   }
 
   event.target.classList.remove("loading");

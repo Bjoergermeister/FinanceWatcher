@@ -43,13 +43,26 @@
       </div>
     </div>
     <footer>
-      <button type="submit" class="btn btn-primary pl-5 pr-5">Ja, löschen</button>
-      <button type="cancel" class="btn btn-danger pl-4 pr-4">Nein, abbrechen</button>
+      <button
+        type="submit"
+        class="btn btn-primary pl-5 pr-5"
+        onclick="onDeleteGroupConfirmed(event)"
+      >
+        Ja, löschen
+      </button>
+      <button
+        type="cancel"
+        class="btn btn-danger pl-4 pr-4"
+        onclick="onDeleteGroupAborted(event)"
+      >
+        Nein, abbrechen
+      </button>
     </footer>
   </div>
 </dialog>
 
 <script>
+  const DELETE_GROUP_URL = "{% url 'delete_group' 1 %}";
   const CSRF_MIDDLEWARE_TOKEN = "{{ csrf_token }}";
 </script>
 

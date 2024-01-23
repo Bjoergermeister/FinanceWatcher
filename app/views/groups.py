@@ -20,3 +20,7 @@ def create(request):
 
     form = CreateGroupForm(user=request.user)
     return render(request, "groups/create.html", { "form": form })
+
+def delete(request, id):
+    Group.objects.filter(id=id, user=request.user["id"]).delete()
+    return HttpResponse(200)

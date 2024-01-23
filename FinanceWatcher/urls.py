@@ -30,7 +30,8 @@ urlpatterns = [
     path("bill/<int:bill_id>/position/<int:position_id>/delete", bills.delete_position, name="delete_position"),
 
     path("groups", groups.groups, name="groups"),
-    path("group/new", groups.create, name="create_group")
+    path("group/new", groups.create, name="create_group"),
+    path("group/<int:id>/delete", groups.delete, name="delete_group")
 ]
 
 if settings.DEBUG:
