@@ -1,33 +1,58 @@
 {% extends "base.html" %} {% load static %} {% block js %}
 <script src="{% static 'js/groups.js' %}" defer></script>
-{% endblock %} {% block content %}
-
-<table class="table table-bordered">
-  <thead>
-    <tr>
-      <th data-width="10%">Name</th>
-      <th>Name</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for group in groups %}
-    <tr data-id="{{ group.pk }}">
-      <td>{{ group.name }}</td>
-      <td>
-        <a href="#">Bearbeiten</a>
-        <button
-          class="btn btn-danger"
-          data-id="{{ group.pk }}"
-          onclick="onDeleteGroupClicked(event)"
-        >
-          Löschen
-        </button>
-      </td>
-    </tr>
+{% endblock %} {% block content %} {% if isAdmin %}
+<section class="card shadow p-5 mb-5">
+  <h2 class="text-center mb-3">Allgemeine Gruppen</h2>
+  <div id="group-container">
+    {% for group in global_groups %}
+    <div class="group card shadow" data-id="{{ group.id }}">
+      <img src="{{ group.icon.url }}" />
+      <div class="group-information">
+        <h2 class="mb-3">{{ group.name }}</h2>
+        <div>
+          <button
+            class="btn btn-danger pl-3 pr-3 pt-2 pb-2"
+            data-id="{{ group.id }}"
+            onclick="onDeleteGroupClicked(event)"
+          >
+            <i class="fa-solid fa-trash"></i>
+          </button>
+          <button class="btn btn-primary pl-3 pr-3 pt-2 pb-2">
+            <i class="fa-solid fa-pen"></i>
+          </button>
+        </div>
+      </div>
+    </div>
     {% endfor %}
-  </tbody>
-</table>
+  </div>
+</section>
+{% endif %}
+
+<section class="card shadow p-5">
+  <h2 class="text-center mb-3">Deine Gruppen</h2>
+  <div id="group-container">
+    {% for user_group in user_groups %}
+    <div class="group card shadow" data-id="{{ user_group.id }}">
+      <img src="{{ user_group.icon.url }}" />
+      <div class="group-information">
+        <h2 class="mb-3">{{ user_group.name }}</h2>
+        <div>
+          <button
+            class="btn btn-danger pl-3 pr-3 pt-2 pb-2"
+            data-id="{{ user_group.id }}"
+            onclick="onDeleteGroupClicked(event)"
+          >
+            <i class="fa-solid fa-trash"></i>
+          </button>
+          <button class="btn btn-primary pl-3 pr-3 pt-2 pb-2">
+            <i class="fa-solid fa-pen"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
 
 <dialog id="confirm-group-deletion-dialog" name="group-deletion">
   <div class="content">

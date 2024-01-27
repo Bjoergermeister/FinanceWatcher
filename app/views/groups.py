@@ -6,8 +6,14 @@ from ..forms.groups import CreateGroupForm
 from ..models.Group import Group
 
 def groups(request):
-    groups = Group.objects.filter(user=request.user["id"])
-    return render(request, "groups/groups.html", { "groups": groups })
+    user_groups = Group.objects.filter(user=request.user["id"])
+
+    global_groups = None
+    if request.user["isAdmin"]:
+        global_groups = Group.objects.filter(user=None)
+
+    context = { "user_groups": user_groups, "global_groups": global_groups, "isAdmin": request.user["isAdmin"] }
+    return render(request, "groups/groups.html", context)
 
 def create(request):
     if request.method == "POST":

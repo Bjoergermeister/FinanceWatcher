@@ -33,8 +33,8 @@ async function onDeleteGroupConfirmed(event) {
 
   event.target.classList.remove("loading");
 
-  const row = document.querySelector(`tr[data-id="${groupId}"]`);
-  row.remove();
+  const group = document.querySelector(`div[data-id="${groupId}"]`);
+  group.remove();
 
   deleteGroupDialog.close();
 }
