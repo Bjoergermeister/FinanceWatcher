@@ -17,7 +17,14 @@
           >
             <i class="fa-solid fa-trash"></i>
           </button>
-          <button class="btn btn-primary pl-3 pr-3 pt-2 pb-2">
+          <button
+            class="btn btn-primary pl-3 pr-3 pt-2 pb-2"
+            data-id="{{ group.id }}"
+            datauser="{{ group.user }}"
+            data-name="{{ group.name }}"
+            data-icon="{{ group.icon.url }}"
+            onclick="onEditGroupClicked(event)"
+          >
             <i class="fa-solid fa-pen"></i>
           </button>
         </div>
@@ -42,10 +49,17 @@
             data-id="{{ user_group.id }}"
             onclick="onDeleteGroupClicked(event)"
           >
-            <i class="fa-solid fa-trash"></i>
+            <i class="fa-solid fa-trash no-events"></i>
           </button>
-          <button class="btn btn-primary pl-3 pr-3 pt-2 pb-2">
-            <i class="fa-solid fa-pen"></i>
+          <button
+            class="btn btn-primary pl-3 pr-3 pt-2 pb-2"
+            data-id="{{ user_group.id }}"
+            data-user="{{ user_group.user }}"
+            data-name="{{ user_group.name }}"
+            data-icon="{{ user_group.icon.url }}"
+            onclick="onEditGroupClicked(event)"
+          >
+            <i class="fa-solid fa-pen no-events"></i>
           </button>
         </div>
       </div>
@@ -86,7 +100,53 @@
   </div>
 </dialog>
 
+<dialog id="edit-group-dialog">
+  <div class="content" style="height: 500px">
+    <header>
+      <h1>Gruppe bearbeiten</h1>
+    </header>
+    <form id="edit-group-form" class="body" onsubmit="onEditGroupFormSubmitted(event)">
+      <div class="form-row">
+        <input type="hidden" name="id" />
+        <input type="hidden" name="user" />
+      </div>
+      <div class="form-row">
+        <div class="col-md">
+          <div class="form-group">
+            <input type="text" name="name" />
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <input type="file" name="icon" />
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <img src="" style="width: 250px; height: 250px; display: inline-block" />
+          </div>
+        </div>
+      </div>
+    </form>
+    <footer>
+      <button type="submit" class="btn btn-primary pl-5 pr-5" form="edit-group-form">
+        <i class="fa-solid fa-save mr-3 no-events"></i>Speichern
+      </button>
+      <button
+        type="cancel"
+        class="btn btn-danger pl-4 pr-4"
+        onclick="onEditGroupAbortClicked(event)"
+      >
+        Abbrechen
+      </button>
+    </footer>
+  </div>
+</dialog>
+
 <script>
+  const EDIT_GROUP_URL = "{% url 'edit_group' 1 %}";
   const DELETE_GROUP_URL = "{% url 'delete_group' 1 %}";
   const CSRF_MIDDLEWARE_TOKEN = "{{ csrf_token }}";
 </script>

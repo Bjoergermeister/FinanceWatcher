@@ -13,3 +13,9 @@ class CreateGroupForm(forms.ModelForm):
     class Meta:
         model = Group
         exclude = []
+
+class EditGroupForm(forms.ModelForm):
+
+    class Meta:
+        model = Group
+        exclude = []

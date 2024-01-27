@@ -29,6 +29,14 @@ class GroupAPI {
     return await makeRequest(CREATE_GROUP_URL, options);
   }
 
+  static async edit(groupId, data) {
+    data.set("csrfmiddlewaretoken", CSRF_MIDDLEWARE_TOKEN);
+
+    const url = EDIT_GROUP_URL.replace(/1/g, groupId);
+    const options = getOptions("POST", data);
+    return await makeRequest(url, options);
+  }
+
   static async delete(groupId) {
     const url = DELETE_GROUP_URL.replace(/1/g, groupId);
     const options = getOptions("POST", { csrfmiddlewaretoken: CSRF_MIDDLEWARE_TOKEN });

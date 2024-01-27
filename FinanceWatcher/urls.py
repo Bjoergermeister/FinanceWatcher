@@ -31,7 +31,8 @@ urlpatterns = [
 
     path("groups", groups.groups, name="groups"),
     path("group/new", groups.create, name="create_group"),
-    path("group/<int:id>/delete", groups.delete, name="delete_group")
+    path("group/<int:id>/delete", groups.delete, name="delete_group"),
+    path("group/<int:id>/edit", groups.edit, name="edit_group")
 ]
 
 if settings.DEBUG:

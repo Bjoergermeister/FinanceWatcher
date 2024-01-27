@@ -3,6 +3,7 @@
 /******************/
 
 const deleteGroupDialog = document.getElementById("confirm-group-deletion-dialog");
+const editGroupDialog = document.getElementById("edit-group-dialog");
 
 let groupId = undefined;
 
@@ -44,4 +45,36 @@ function onDeleteGroupAborted(event) {
   groupId = undefined;
 
   deleteGroupDialog.close();
+}
+
+function onEditGroupClicked(event) {
+  event.preventDefault();
+
+  editGroupDialog.querySelector("input[name='id']").value = event.target.dataset.id;
+  editGroupDialog.querySelector("input[name='user']").value = event.target.dataset.user;
+  editGroupDialog.querySelector("input[name='name']").value = event.target.dataset.name;
+  editGroupDialog.querySelector("img").src = event.target.dataset.icon;
+  editGroupDialog.showModal();
+}
+
+function onEditGroupAbortClicked(event) {
+  event.preventDefault();
+
+  editGroupDialog.close();
+}
+
+async function onEditGroupFormSubmitted(event) {
+  event.preventDefault();
+
+  const data = new FormData(event.target);
+  const id = data.get("id");
+
+  const result = await GroupAPI.edit(id, data);
+  if (result.success == false) {
+    alert("Problem");
+    return;
+  }
+
+  alert("Saving");
+  editGroupDialog.close();
 }

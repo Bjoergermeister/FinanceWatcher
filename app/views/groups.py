@@ -1,7 +1,7 @@
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import render
 
-from ..forms.groups import CreateGroupForm
+from ..forms.groups import CreateGroupForm, EditGroupForm
 
 from ..models.Group import Group
 
@@ -26,6 +26,17 @@ def create(request):
 
     form = CreateGroupForm(user=request.user)
     return render(request, "groups/create.html", { "form": form })
+
+def edit(request, id):
+    group = Group.objects.get(id=id)
+
+    form = EditGroupForm(request.POST, request.FILES, instance=group)
+    if form.is_valid() == False:
+        return HttpResponseBadRequest()
+
+    form.save()
+
+    return HttpResponse(200)
 
 def delete(request, id):
     Group.objects.filter(id=id, user=request.user["id"]).delete()
