@@ -1,12 +1,12 @@
 {% extends "base.html" %} {% load static %} {% block js %}
 <script src="{% static 'js/groups.js' %}" defer></script>
-{% endblock %} {% block content %} {% if isAdmin %}
+{% endblock %} {% block content %} {% if is_admin %}
 <section class="card shadow p-5 mb-5">
   <h2 class="text-center mb-3">Allgemeine Gruppen</h2>
-  <div id="group-container">
+  <div id="global-groups" class="group-container">
     {% for group in global_groups %}
     <div class="group card shadow" data-id="{{ group.id }}">
-      <img src="{{ group.icon.url }}" />
+      <img src="{{ group.icon.url }}" alt="Gruppenlogo" />
       <div class="group-information">
         <h2 class="mb-3">{{ group.name }}</h2>
         <div>
@@ -15,29 +15,36 @@
             data-id="{{ group.id }}"
             onclick="onDeleteGroupClicked(event)"
           >
-            <i class="fa-solid fa-trash"></i>
+            <i class="fa-solid fa-trash no-events"></i>
           </button>
           <button
             class="btn btn-primary pl-3 pr-3 pt-2 pb-2"
             data-id="{{ group.id }}"
-            datauser="{{ group.user }}"
+            data-user="{{ group.user }}"
             data-name="{{ group.name }}"
             data-icon="{{ group.icon.url }}"
             onclick="onEditGroupClicked(event)"
           >
-            <i class="fa-solid fa-pen"></i>
+            <i class="fa-solid fa-pen no-events"></i>
           </button>
         </div>
       </div>
     </div>
     {% endfor %}
+    <div
+      id="add-global-group-button"
+      class="group card shadow"
+      onclick="onAddGlobalGroupButtonClicked(event)"
+    >
+      +
+    </div>
   </div>
 </section>
 {% endif %}
 
 <section class="card shadow p-5">
   <h2 class="text-center mb-3">Deine Gruppen</h2>
-  <div id="group-container">
+  <div id="user-groups" class="group-container">
     {% for user_group in user_groups %}
     <div class="group card shadow" data-id="{{ user_group.id }}">
       <img src="{{ user_group.icon.url }}" />
@@ -65,6 +72,13 @@
       </div>
     </div>
     {% endfor %}
+    <div
+      id="add-user-group-button"
+      class="group card shadow"
+      onclick="onAddUserGroupButtonClicked(event)"
+    >
+      +
+    </div>
   </div>
 </section>
 
@@ -98,6 +112,10 @@
       </button>
     </footer>
   </div>
+</dialog>
+
+<dialog id="create-group-dialog">
+  <div class="content" style="height: 600px">{% include "groups/create.html" %}</div>
 </dialog>
 
 <dialog id="edit-group-dialog">
@@ -146,9 +164,11 @@
 </dialog>
 
 <script>
+  const CREATE_GROUP_URL = "{% url 'create_group' %}";
   const EDIT_GROUP_URL = "{% url 'edit_group' 1 %}";
   const DELETE_GROUP_URL = "{% url 'delete_group' 1 %}";
   const CSRF_MIDDLEWARE_TOKEN = "{{ csrf_token }}";
+  const USER_ID = "{{ user_id }}";
 </script>
 
 {% endblock %}

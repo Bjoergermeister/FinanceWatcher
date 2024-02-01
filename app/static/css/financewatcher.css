@@ -48,7 +48,7 @@ nav a:hover {
 
 /*** Dialogs ***/
 dialog {
-  position: absolute;
+  position: fixed;
   top: 0px;
   left: 0px;
   min-width: 100% !important;
@@ -58,7 +58,7 @@ dialog {
 }
 
 dialog::backdrop {
-  background: rgba(0, 0, 0, 0.25);
+  background: rgba(0, 0, 0, 0.75);
 }
 
 dialog .content {
@@ -145,7 +145,7 @@ button.loading:after {
   }
 }
 
-#group-container {
+.group-container {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -161,6 +161,14 @@ button.loading:after {
   height: 250px;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
+
+  overflow: hidden;
+}
+.group:last-of-type {
+  font-size: 100px;
+  line-height: 250px;
+  text-align: center;
+  cursor: pointer;
 }
 
 .group img {
@@ -199,4 +207,28 @@ button.loading:after {
   line-height: 50px;
   font-size: 1.5rem;
   margin: 0;
+}
+
+input[type="file"] ~ label {
+  border: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  width: 250px;
+  height: 250px;
+  border-radius: 5%;
+
+  cursor: pointer;
+}
+
+input[type="file"] ~ label img {
+  display: block;
+  width: 150px;
+  height: 150px;
+}
+
+input[type="file"]:not(:empty) ~ label {
+  display: none;
 }

@@ -2,8 +2,11 @@
 /* EVENT HANDLERS */
 /******************/
 
-const deleteGroupDialog = document.getElementById("confirm-group-deletion-dialog");
+const createGroupDialog = document.getElementById("create-group-dialog");
 const editGroupDialog = document.getElementById("edit-group-dialog");
+const deleteGroupDialog = document.getElementById("confirm-group-deletion-dialog");
+const addUserGroupButton = document.getElementById("add-user-group-button");
+const addGlobalGroupButton = document.getElementById("add-global-group-button");
 
 let groupId = undefined;
 
@@ -12,7 +15,27 @@ async function onCreateGroupFormSubmitted(event) {
 
   const data = new FormData(event.target);
   const result = await GroupAPI.create(data);
-  console.log(result);
+  if (result.success == false) {
+    alert("Something went wrong");
+    console.log(result.content);
+    return;
+  }
+
+  const userIdInput = createGroupDialog.querySelector("input[name='user']");
+  const isGlobalGroup = userIdInput.value === "";
+
+  const groupContainerSelector = isGlobalGroup ? "global-groups" : "user-groups";
+  const groupContainer = document.getElementById(groupContainerSelector);
+  const groupClone = groupContainer
+    .querySelector(".group:nth-last-child(2)")
+    .cloneNode(true);
+
+  groupClone.querySelector("h2").innerText = result.content.name;
+  groupClone.querySelector("img").src = result.content.image;
+
+  groupContainer.insertBefore(groupClone, groupContainer.lastElementChild);
+
+  createGroupDialog.close();
 }
 
 async function onDeleteGroupClicked(event) {
@@ -77,4 +100,35 @@ async function onEditGroupFormSubmitted(event) {
 
   alert("Saving");
   editGroupDialog.close();
+}
+
+function onAddGlobalGroupButtonClicked(event) {
+  event.preventDefault();
+
+  createGroupDialog.querySelector("input[name='user']").value = "";
+  createGroupDialog.showModal();
+}
+
+function onAddUserGroupButtonClicked(event) {
+  event.preventDefault();
+
+  createGroupDialog.querySelector("input[name='user']").value = USER_ID;
+  createGroupDialog.showModal();
+}
+
+function onGroupImageChanged(event) {
+  event.preventDefault();
+
+  console.log(event.target.files.length);
+  const preview = document.getElementById("image-preview");
+  preview.src = URL.createObjectURL(event.target.files[0]);
+}
+
+function onCreateGroupAbortClicked(event) {
+  event.preventDefault();
+
+  createGroupDialog.querySelector("input[name='name']").value = "";
+  createGroupDialog.querySelector("input[name='icon']").value = "";
+  createGroupDialog.querySelector("#image-preview").src = "";
+  createGroupDialog.close();
 }

@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound, JsonResponse
 from django.shortcuts import render
 
 from ..forms.groups import CreateGroupForm, EditGroupForm
@@ -12,20 +12,28 @@ def groups(request):
     if request.user["isAdmin"]:
         global_groups = Group.objects.filter(user=None)
 
-    context = { "user_groups": user_groups, "global_groups": global_groups, "isAdmin": request.user["isAdmin"] }
+    form = CreateGroupForm(user=request.user)
+
+    context = { 
+        "user_groups": user_groups, 
+        "global_groups": global_groups, 
+        "create_form": form,
+        "is_admin": request.user["isAdmin"],
+        "user_id": request.user["id"]        
+    }
+
     return render(request, "groups/groups.html", context)
 
 def create(request):
-    if request.method == "POST":
-        form = CreateGroupForm(request.POST, request.FILES)
-        if form.is_valid() == False:
-            return JsonResponse(form.errors, status=400)
-        
-        form.save()
-        return HttpResponse(status=200)
+    if request.method != "POST":
+        return HttpResponse(status=405)
 
-    form = CreateGroupForm(user=request.user)
-    return render(request, "groups/create.html", { "form": form })
+    form = CreateGroupForm(request.POST, request.FILES)
+    if form.is_valid() == False:
+        return JsonResponse(form.errors, status=400)
+        
+    instance = form.save()
+    return JsonResponse(instance.to_dict(), status=200)
 
 def edit(request, id):
     group = Group.objects.get(id=id)
@@ -39,5 +47,14 @@ def edit(request, id):
     return HttpResponse(200)
 
 def delete(request, id):
-    Group.objects.filter(id=id, user=request.user["id"]).delete()
+    group = None
+    try:
+        group = Group.objects.get(id=id)
+    except Group.DoesNotExist:
+        return HttpResponseNotFound()
+
+    if group.user != request.user["id"] and request.user["isAdmin"] == False:
+        return HttpResponseForbidden()
+
+    group.delete()
     return HttpResponse(200)

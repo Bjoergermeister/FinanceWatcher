@@ -25,6 +25,13 @@ class Group(models.Model):
         image.save(image_bytes, 'JPEG', quality=70)
         self.icon = File(image_bytes, name=self.icon.name)
 
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "user": self.user,
+            "image": self.icon.url
+        }
+
     def save(self, *args, **kwargs):
         self.preprocess_image()
         super().save(*args, **kwargs)
