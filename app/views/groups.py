@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound, JsonResponse
 from django.shortcuts import render
 
@@ -23,6 +24,22 @@ def groups(request):
     }
 
     return render(request, "groups/groups.html", context)
+
+def list(request):
+    groups = Group.objects.filter(Q(user=request.user["id"]) | Q(user=None)).values("id", "user", "name", "icon")
+
+    user_groups = []
+    global_groups = []
+    for group in groups:
+        target_group = user_groups if group["user"] is not None else global_groups
+        target_group.append(group)
+
+    result = {
+        "user_groups": user_groups,
+        "global_groups": global_groups
+    }
+
+    return JsonResponse(result)
 
 def create(request):
     if request.method != "POST":

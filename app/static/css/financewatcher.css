@@ -89,6 +89,11 @@ dialog[name="bill-deletion"] .content {
   height: 225px;
 }
 
+dialog[name="choose-group"] .content {
+  width: 1000px;
+  height: 750px;
+}
+
 dialog header {
   padding: 10px 20px;
   text-align: center;
@@ -159,11 +164,18 @@ button.loading:after {
   display: block;
   width: 250px;
   height: 250px;
+  border-radius: 10px;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
 
   overflow: hidden;
 }
+
+.group.small {
+  width: 150px;
+  height: 150px;
+}
+
 .group:last-of-type {
   font-size: 100px;
   line-height: 250px;
@@ -176,6 +188,11 @@ button.loading:after {
   margin: 0px auto 5px auto;
   width: 250px;
   height: 250px;
+}
+
+.group.small img {
+  width: 150px;
+  height: 150px;
 }
 
 .group-information {
@@ -231,4 +248,18 @@ input[type="file"] ~ label img {
 
 input[type="file"]:not(:empty) ~ label {
   display: none;
+}
+
+/*** Position Group ***/
+.position-group header {
+  background: cornflowerblue;
+}
+
+.position-group header h2 {
+  line-height: 75px;
+}
+
+.position-group header img {
+  width: 75px;
+  height: 75px;
 }

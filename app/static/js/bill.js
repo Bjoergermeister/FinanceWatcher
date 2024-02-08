@@ -1,8 +1,12 @@
 const prices = [];
 const quantities = [];
 
+const chooseGroupDialog = document.getElementById("choose-group-dialog");
 const positionNoteDialog = document.getElementById("position-note-dialog");
 const positionNote = document.getElementById("bill-position-note");
+
+const groupTemplate = document.getElementById("group-template");
+const positionGroupTemplate = document.getElementById("position-group-template");
 
 const confirmPositionDeletionDialog = document.getElementById(
   "confirm-position-deletion-dialog"
@@ -162,9 +166,70 @@ async function onPositionDeletionConfirmClicked(event) {
   deletePosition();
 }
 
+async function onNewGroupButtonClicked(event) {
+  event.preventDefault();
+
+  chooseGroupDialog.showModal();
+
+  const result = await GroupAPI.getAll();
+  if (result.success === false) {
+    alert("Failure");
+  }
+
+  const userGroupList = document.getElementById("user-group-list");
+  for (const userGroup of result.content.user_groups) {
+    const groupElement = createGroupElement(userGroup);
+    userGroupList.appendChild(groupElement);
+  }
+
+  const globalGroupList = document.getElementById("global-group-list");
+  for (const globalGroup of result.content.global_groups) {
+    const groupElement = createGroupElement(globalGroup);
+    globalGroupList.appendChild(groupElement);
+  }
+
+  console.log(result.content);
+}
+
+function onGroupSelected(event) {
+  event.preventDefault();
+
+  // Copy group from template, fill with values and insert into DOM
+  const addGroupButton = document.getElementById("add-group-button");
+  const group = positionGroupTemplate.content.cloneNode(true);
+  group.querySelector("img").src = `/media/${event.target.dataset.icon}`;
+  group.querySelector("h2").innerText = event.target.dataset.name;
+
+  // Clone, reset and insert a form row
+  const formRowCopy = document
+    .querySelector("#bill-form fieldset:nth-child(3) .form-row:nth-of-type(2)")
+    .cloneNode(true);
+  const fieldset = group.children[0];
+  fieldset.insertBefore(formRowCopy, fieldset.children[fieldset.children.length - 1]);
+
+  const container = document.getElementById("bill-form");
+  container.insertBefore(group, addGroupButton.parentElement);
+
+  chooseGroupDialog.close();
+}
+
 /********************/
 /* Helper Functions */
 /********************/
+function createGroupElement(group) {
+  const container = groupTemplate.content.cloneNode(true);
+  container.children[0].dataset.id = group.id;
+  container.children[0].dataset.name = group.name;
+  container.children[0].dataset.icon = group.icon;
+
+  const image = container.querySelector("img");
+  image.src = `/media/${group.icon}`;
+  image.alt = `${group.name} Logo`;
+
+  container.querySelector("h2").innerText = group.name;
+
+  return container;
+}
 
 function calculateBillTotal() {
   let total = 0;

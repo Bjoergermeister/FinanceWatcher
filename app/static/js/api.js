@@ -42,6 +42,10 @@ class GroupAPI {
     const options = getOptions("POST", { csrfmiddlewaretoken: CSRF_MIDDLEWARE_TOKEN });
     return await makeRequest(url, options);
   }
+
+  static async getAll() {
+    return await makeRequest(ALL_GROUPS_URL);
+  }
 }
 
 function getOptions(method, data) {

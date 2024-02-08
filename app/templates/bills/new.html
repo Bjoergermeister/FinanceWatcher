@@ -56,6 +56,16 @@
     <button class="btn btn-success" onclick="onNewPositionClicked(event)">+</button>
   </fieldset>
 
+  <div class="d-flex justify-content-center mt-5 mb-5">
+    <button
+      id="add-group-button"
+      class="btn btn-primary"
+      onclick="onNewGroupButtonClicked(event)"
+    >
+      <i class="fa-solid fa-plus fa-lg no-event mr-2"></i>Gruppe hinzufügen
+    </button>
+  </div>
+
   <fieldset class="card shadow p-3 mb-5">
     <p>Summe: <span id="bill-sum">0 &euro;</span></p>
   </fieldset>
@@ -86,8 +96,59 @@
   </div>
 </dialog>
 
+<dialog id="choose-group-dialog" name="choose-group">
+  <div class="content">
+    <header>
+      <h1>Gruppe auswählen</h1>
+    </header>
+    <div
+      class="body form-row"
+      style="overflow-y: auto; display: block; height: calc(750px - 77px)"
+    >
+      <h2>Globale Gruppen</h2>
+      <ul id="global-group-list" class="d-flex flex-row flex-wrap" style="gap: 10px"></ul>
+      <h2 class="mt-3">Deine Gruppen</h2>
+      <ul id="user-group-list" class="d-flex flex-row flex-wrap" style="gap: 10px"></ul>
+    </div>
+  </div>
+</dialog>
+
+<template id="group-template">
+  <div class="group small" onclick="onGroupSelected(event)">
+    <img class="no-events" />
+    <div class="group-information no-events">
+      <h2></h2>
+    </div>
+  </div>
+</template>
+
+<template id="position-group-template">
+  <fieldset class="position-group card shadow p-3 mb-5">
+    {% comment %} Header for positions {% endcomment %}
+    <header class="mb-3 p-3 d-flex flex-row">
+      <img />
+      <h2 class="ml-3 mb-0"></h2>
+    </header>
+    <div class="form-row">
+      <div class="col-md-8">
+        <p>Name</p>
+      </div>
+      <div class="col-md-2">
+        <p>Preis</p>
+      </div>
+      <div class="col-md-1">
+        <p>Menge</p>
+      </div>
+      <div class="col-md-1"></div>
+    </div>
+
+    <button class="btn btn-success" onclick="onNewPositionClicked(event)">+</button>
+  </fieldset>
+</template>
+
 <script>
   const CREATE_BILL_URL = "{% url 'create_bill' %}";
+  const ALL_GROUPS_URL = "{% url 'all_groups' %}";
 </script>
 
 {% endblock %}
