@@ -1,9 +1,11 @@
+import json
 from django.db.models import F, Count
 from django.forms import inlineformset_factory, modelformset_factory
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.shortcuts import render
 
 from ..models.Bill import Bill
+from ..models.Group import Group
 from ..models.Position import Position
 
 from ..forms.bills import CreateBillForm, EditBillForm
@@ -17,12 +19,10 @@ def create(request):
         
         form_is_valid = bill_form.is_valid() and position_formset.is_valid()
         if form_is_valid == False:
-            return JsonResponse({ "bill_form": bill_form.errors, "position_formset": position_formset.errors}, status=400)
+            data = { "bill_form": bill_form.errors, "position_formset": position_formset.errors }
+            return JsonResponse(data, status=400)
         
         bill = bill_form.save()
-        for position_form in position_formset:
-            position_formset
-
         for position_form in position_formset.forms:
             position = position_form.save(commit=False)
             position.bill = bill

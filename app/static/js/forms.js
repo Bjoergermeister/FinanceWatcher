@@ -14,10 +14,10 @@ function cloneFormRow(formRow, newIndex, defaultValues) {
 
 function updateFormRowIndices(formRows) {
   for (let i = 0; i < formRows.length; i++) {
-    const inputs = formRows[i].querySelector("input");
+    const inputs = formRows[i].querySelectorAll("input");
     for (const input of inputs) {
-      input.name = input.name.replace(/\d+/g, newIndex);
-      input.id = input.id.replace(/\d+/g, newIndex);
+      input.name = input.name.replace(/\d+/g, i);
+      input.id = input.id.replace(/\d+/g, i);
     }
   }
 }

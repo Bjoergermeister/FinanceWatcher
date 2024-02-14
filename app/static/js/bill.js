@@ -12,6 +12,8 @@ const confirmPositionDeletionDialog = document.getElementById(
   "confirm-position-deletion-dialog"
 );
 
+const totalFormsInput = document.getElementById("id_position-TOTAL_FORMS");
+
 let positionToDelete = null;
 
 (function registerEventListeners() {
@@ -76,6 +78,10 @@ function onPositionNoteAbortClicked(event) {
 async function onCreateBillFormSubmitted(event) {
   event.preventDefault();
 
+  const form = event.target;
+  const formRows = form.querySelectorAll(".form-row.position");
+  updateFormRowIndices(formRows);
+
   const data = new FormData(event.target);
   const result = await BillAPI.create(data);
 
@@ -121,7 +127,7 @@ async function onDeletePositionClicked(event) {
 function onNewPositionClicked(event) {
   event.preventDefault();
 
-  const formRowContainer = event.target.parentElement; // This wil be the div#bill-positions
+  const formRowContainer = event.target.parentElement; // This will be the div#bill-positions
   const formRows = formRowContainer.querySelectorAll(".form-row:not(:first-of-type)");
 
   // Copy last form row and clear inputs
@@ -142,8 +148,11 @@ function onNewPositionClicked(event) {
 
   formRows[formRows.length - 1].after(formRowCopy);
 
-  const totalFormsInputSelector = "input[name='position-TOTAL_FORMS'";
-  formRowContainer.querySelector(totalFormsInputSelector).value = formRows.length + 1;
+  totalFormsInput.value = parseInt(totalFormsInput.value) + 1;
+
+  // Check if the position is part of a group. If so, set the group ID
+  formRowCopy.querySelector("input[name$='group']").value =
+    event.target.parentElement.dataset.groupid;
 }
 
 function onPositionDeletionAbortClicked(event) {
@@ -202,13 +211,17 @@ function onGroupSelected(event) {
 
   // Clone, reset and insert a form row
   const formRowCopy = document
-    .querySelector("#bill-form fieldset:nth-child(3) .form-row:nth-of-type(2)")
+    .querySelector("#bill-form fieldset:nth-of-type(2) .form-row:nth-of-type(2)")
     .cloneNode(true);
   const fieldset = group.children[0];
+  fieldset.dataset.groupid = event.target.dataset.id;
   fieldset.insertBefore(formRowCopy, fieldset.children[fieldset.children.length - 1]);
+  fieldset.querySelector("input[name$='group']").value = event.target.dataset.id;
 
   const container = document.getElementById("bill-form");
   container.insertBefore(group, addGroupButton.parentElement);
+
+  totalFormsInput.value = parseInt(totalFormsInput.value) + 1;
 
   chooseGroupDialog.close();
 }
@@ -259,12 +272,6 @@ function deletePosition() {
   positionToDelete.remove();
   removePositionFromTotal(positionToDelete);
   positionToDelete = null;
-
-  // Update the indices so that Django can correctly recognise the input values
-  const formRows = document.querySelector(
-    "#bill-positions .form-row:not(:first-of-type)"
-  );
-  updateFormRowIndices(formRows);
 
   totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
 }
