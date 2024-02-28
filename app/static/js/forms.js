@@ -3,8 +3,8 @@ function cloneFormRow(formRow, newIndex, defaultValues) {
 
   const inputs = formRow.querySelectorAll("input");
   for (const input of inputs) {
-    input.name = input.name.replace(/\d+/g, newIndex);
-    input.id = input.id.replace(/\d+/g, newIndex);
+    //input.name = input.name.replace(/\d+/g, newIndex);
+    input.id = "";
 
     const name = input.name.substring(input.name.lastIndexOf("-") + 1);
     input.value =

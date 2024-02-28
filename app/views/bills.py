@@ -47,7 +47,7 @@ def edit(request, id):
     if request.method == "POST":
         bill = Bill.objects.get(id=id)
 
-        PositionFormSet = inlineformset_factory(Bill, Position, form=EditPositionForm)
+        PositionFormSet = inlineformset_factory(Bill, Position, exclude=[], extra=0, can_delete=True)
         position_formset = PositionFormSet(request.POST, instance=bill, prefix="position")
         bill_form = EditBillForm(request.POST, instance=bill)
         
@@ -67,15 +67,20 @@ def edit(request, id):
         return HttpResponse(status=200)
 
     bill = Bill.objects.get(id=id)
-
     bill_form = EditBillForm(instance=bill)
-    PositionFormSet = modelformset_factory(Position, form=EditPositionForm, extra=0)
-    position_formset = PositionFormSet(queryset=Position.objects.filter(bill=bill), prefix="position")
+
+    positions = Position.objects.filter(bill=bill)
+    group_ids = positions.exclude(group=None).values_list("group", flat=True)
+    groups = Group.objects.filter(pk__in=group_ids)
+
+    PositionFormSet = modelformset_factory(Position, exclude=[], can_delete=True, extra=0, labels={"name": "", "price": "", "quantity": ""})
+    position_formset = PositionFormSet(queryset=positions, prefix="position")
 
     context = {
         'bill_id': id,
         'bill_form': bill_form,
-        'position_formset': position_formset
+        'position_formset': position_formset,
+        'groups': groups
     }
 
     return render(request, "bills/edit.html", context)

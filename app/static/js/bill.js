@@ -82,7 +82,7 @@ async function onCreateBillFormSubmitted(event) {
   const formRows = form.querySelectorAll(".form-row.position");
   updateFormRowIndices(formRows);
 
-  const data = new FormData(event.target);
+  const data = new FormData(form);
   const result = await BillAPI.create(data);
 
   alert(result.success);
@@ -93,7 +93,23 @@ async function onCreateBillFormSubmitted(event) {
 async function onEditBillFormSubmitted(event) {
   event.preventDefault();
 
-  const data = new FormData(event.target);
+  const form = event.target;
+  const formRows = form.querySelectorAll(".form-row.position");
+
+  const data = preprocessPositionFormRows(formRows);
+  data.append("csrfmiddlewaretoken", form.csrfmiddlewaretoken.value);
+  data.append("id", form.id.value);
+  data.append("name", form.name.value);
+  data.append("date", form.date.value);
+  data.append("receipt", form.receipt.files[0]);
+  data.append("description", form.description.value);
+  data.append("user", form.user.value);
+  data.append("total", form.total.value);
+  data.append("position-TOTAL_FORMS", form.elements["position-TOTAL_FORMS"].value);
+  data.append("position-INITIAL_FORMS", form.elements["position-INITIAL_FORMS"].value);
+  data.append("position-MIN_NUM_FORMS", form.elements["position-MIN_NUM_FORMS"].value);
+  data.append("position-MAX_NUM_FORMS", form.elements["position-MAX_NUM_FORMS"].value);
+
   const result = await BillAPI.edit(BILL_ID, data);
 
   alert(result.success);
@@ -103,6 +119,21 @@ async function onEditBillFormSubmitted(event) {
 
 async function onDeletePositionClicked(event) {
   event.preventDefault();
+
+  const button = event.currentTarget;
+  const id = button.dataset.id;
+  const formRow = event.currentTarget.parentElement.parentElement;
+
+  if (id === undefined) {
+    const totalFormInput = document.getElementById("id-position_TOTAL_FORMS");
+    totalFormInput.value = parseInt(totalFormsInput.value) - 1;
+    formRow.remove();
+  } else {
+    formRow.querySelector("input[name$='DELETE']").value = button.dataset.id;
+    formRow.style.display = "none";
+  }
+
+  return;
 
   // There must be at least one form row at all times.
   const totalFormsInput = document.querySelector(
@@ -151,8 +182,10 @@ function onNewPositionClicked(event) {
   totalFormsInput.value = parseInt(totalFormsInput.value) + 1;
 
   // Check if the position is part of a group. If so, set the group ID
-  formRowCopy.querySelector("input[name$='group']").value =
-    event.target.parentElement.dataset.groupid;
+  const groupId = event.target.parentElement.dataset.groupid;
+  if (groupId !== undefined) {
+    formRowCopy.querySelector("input[name$='group']").value = groupId;
+  }
 }
 
 function onPositionDeletionAbortClicked(event) {
@@ -274,4 +307,33 @@ function deletePosition() {
   positionToDelete = null;
 
   totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
+}
+
+function preprocessPositionFormRows(formRows) {
+  const positions = Array.from(formRows).map((formRow) => ({
+    id: formRow.querySelector("[name$='id']").value,
+    bill: formRow.querySelector("[name$='bill']").value,
+    group: formRow.querySelector("[name$='group']").value,
+    name: formRow.querySelector("[name$='name']").value,
+    price: formRow.querySelector("[name$='price']").value,
+    quantity: formRow.querySelector("[name$='quantity']").value,
+    note: formRow.querySelector("[name$='note']").value,
+    DELETE: formRow.querySelector("[name$='DELETE']").value,
+  }));
+
+  positions.sort((first, second) => {
+    if (first.id === "" && second.id !== "") return 1;
+    if (first.id !== "" && second.id === "") return -1;
+    if (first.id === "" && second.id === "") return 0;
+    return parseInt(first.id) - parseInt(second.id);
+  });
+
+  const data = new FormData();
+  for (let i = 0; i < positions.length; i++) {
+    for (const key of Object.keys(positions[i])) {
+      data.append(`position-${i}-${key}`, positions[i][key]);
+    }
+  }
+
+  return data;
 }

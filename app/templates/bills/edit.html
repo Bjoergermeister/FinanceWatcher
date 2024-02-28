@@ -1,4 +1,5 @@
-{% extends "base.html" %} {% load crispy_forms_tags %} {% load static %} {% block js %}
+{% extends "base.html" %} {% load crispy_forms_tags %} {% load static %} {% load groups %}
+{% block js %}
 <script src="{% static 'js/forms.js' %}" defer></script>
 <script src="{% static 'js/bill.js' %}" defer></script>
 {% endblock %} {% block content %}
@@ -33,31 +34,63 @@
       <div class="col-md-1"></div>
     </div>
 
-    {{ position_formset.management_form }} {% for position_form in position_formset %}
-    <div class="form-row">
+    {{ position_formset.management_form }}
+    {% for position_form in position_formset.forms|filter_by_group:None %}
+    <div class="form-row position">
       <div class="col-md-8">{{ position_form.name|as_crispy_field }}</div>
       <div class="col-md-2">{{ position_form.price|as_crispy_field }}</div>
       <div class="col-md-1">{{ position_form.quantity|as_crispy_field }}</div>
       <div class="col-md-1">
-        <i
-          class="fa-solid fa-xl fa-comment"
-          style="transform: translate(10px, 10px)"
-          data-index="{{ forloop.counter }}"
-          onclick="onPositionNoteClicked(event)"
-        ></i>
-        <i
-          class="fa-solid fa-xl fa-trash"
-          style="transform: translate(10px, 10px)"
-          data-index="{{ forloop.counter }}"
-          data-id="{{ position_form.id.value }}"
-          onclick="onDeletePositionClicked(event)"
-        ></i>
+        <i class="fa-solid fa-xl fa-comment" style="transform: translate(10px, 10px)" data-index="{{ forloop.counter }}"
+          onclick="onPositionNoteClicked(event)"></i>
+        <i class="fa-solid fa-xl fa-trash" style="transform: translate(10px, 10px)" data-index="{{ forloop.counter }}"
+          data-id="{{ position_form.id.value }}" onclick="onDeletePositionClicked(event)"></i>
       </div>
-      {{ position_form.id }} {{ position_form.note }} {{ position_form.bill }}
+      {{ position_form.id.as_hidden }} {{ position_form.note.as_hidden }} {{ position_form.bill.as_hidden }}
+      {{ position_form.group.as_hidden }} {{ position_form.DELETE.as_hidden }}
     </div>
     {% endfor %}
     <button class="btn btn-success" onclick="onNewPositionClicked(event)">+</button>
   </fieldset>
+
+  {% for group in groups %}
+  <fieldset class="position-group card shadow p-3 mb-5" data-groupid="{{ group.pk }}">
+    <header class="mb-3 p-3 d-flex flex-row">
+      <img src="{{ group.icon.url }}"></img>
+      <h2 class="ml-3 mb-0">{{ group.name }}</h2>
+    </header>
+    <div class="form-row">
+      <div class="col-md-8">
+        <p>Name</p>
+      </div>
+      <div class="col-md-2">
+        <p>Preis</p>
+      </div>
+      <div class="col-md-1">
+        <p>Menge</p>
+      </div>
+      <div class="col-md-1"></div>
+    </div>
+
+    {% for position_form in position_formset.forms|filter_by_group:group.pk %}
+    <div class="form-row position">
+      <div class="col-md-8">{{ position_form.name|as_crispy_field }}</div>
+      <div class="col-md-2">{{ position_form.price|as_crispy_field }}</div>
+      <div class="col-md-1">{{ position_form.quantity|as_crispy_field }}</div>
+      <div class="col-md-1">
+        <i class="fa-solid fa-xl fa-comment" style="transform: translate(10px, 10px)" data-index="{{ forloop.counter }}"
+          onclick="onPositionNoteClicked(event)"></i>
+        <i class="fa-solid fa-xl fa-trash" style="transform: translate(10px, 10px)" data-index="{{ forloop.counter }}"
+          onclick="onDeletePositionClicked(event)"></i>
+      </div>
+      {{ position_form.id.as_hidden }} {{ position_form.note.as_hidden }} {{ position_form.group.as_hidden }}
+      {{ position_form.DELETE.as_hidden }} {{ position_form.bill.as_hidden }}
+    </div>
+    {% endfor %}
+
+    <button class="btn btn-success" onclick="onNewPositionClicked(event)">+</button>
+  </fieldset>
+  {% endfor %}
 
   <fieldset class="card shadow p-3 mb-5">
     <p>Summe: <span id="bill-sum">{{ bill_form.total.value }} &euro;</span></p>
@@ -104,16 +137,10 @@
       </div>
     </div>
     <footer>
-      <button
-        class="btn btn-primary pl-5 pr-5"
-        onclick="onPositionDeletionConfirmClicked(event)"
-      >
+      <button class="btn btn-primary pl-5 pr-5" onclick="onPositionDeletionConfirmClicked(event)">
         Ja, löschen
       </button>
-      <button
-        class="btn btn-danger pl-4 pr-4"
-        onclick="onPositionDeletionAbortClicked(event)"
-      >
+      <button class="btn btn-danger pl-4 pr-4" onclick="onPositionDeletionAbortClicked(event)">
         Nein, abbrechen
       </button>
     </footer>
