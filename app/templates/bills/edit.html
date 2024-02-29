@@ -50,7 +50,11 @@
       {{ position_form.group.as_hidden }} {{ position_form.DELETE.as_hidden }}
     </div>
     {% endfor %}
-    <button class="btn btn-success" onclick="onNewPositionClicked(event)">+</button>
+
+    <div class="d-flex justify-content-center">
+      <button class="btn btn-success" onclick="onNewPositionClicked(event)">
+        <i class="fa-solid fa-plus fa-lg no-event mr-2"></i>Position hinzufügen</button>
+    </div>
   </fieldset>
 
   {% for group in groups %}
@@ -88,9 +92,18 @@
     </div>
     {% endfor %}
 
-    <button class="btn btn-success" onclick="onNewPositionClicked(event)">+</button>
+    <div class="d-flex justify-content-center">
+      <button class="btn btn-success" onclick="onNewPositionClicked(event)">
+        <i class=" fa-solid fa-plus fa-lg no-event mr-2"></i>Position hinzufügen</button>
+    </div>
   </fieldset>
   {% endfor %}
+
+  <div class="d-flex justify-content-center mt-5 mb-5">
+    <button id="add-group-button" class="btn btn-primary" onclick="onNewGroupButtonClicked(event)">
+      <i class="fa-solid fa-plus fa-lg no-event mr-2"></i>Gruppe hinzufügen
+    </button>
+  </div>
 
   <fieldset class="card shadow p-3 mb-5">
     <p>Summe: <span id="bill-sum">{{ bill_form.total.value }} &euro;</span></p>
