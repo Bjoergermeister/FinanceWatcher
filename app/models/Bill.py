@@ -10,6 +10,7 @@ class Bill(models.Model):
     total = models.DecimalField(db_column="total", max_digits=13, decimal_places=2)
     description = models.TextField(db_column="description", blank=True, null=True)
     receipt = models.ImageField(db_column="receipt", blank=True, null=True)
+    paid = models.BooleanField(db_column="paid", blank=True, null=False, default=True)
 
     class Meta:
         db_table = "Bill"
