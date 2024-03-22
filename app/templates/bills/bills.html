@@ -1,7 +1,6 @@
 {% extends "base.html" %} {% load static %} {% block js %}
 <script src="{% static 'js/bills.js' %}" defer></script>
 {% endblock %} {% block content %}
-
 <table class="table table-bordered">
   <thead>
     <tr>
@@ -21,11 +20,7 @@
       <td>{{ bill.total }}&euro;</td>
       <td>
         <a href="{% url 'edit_bill' bill.pk %}">Bearbeiten</a>
-        <button
-          class="btn btn-danger"
-          data-id="{{ bill.pk }}"
-          onclick="onDeleteBillClicked(event)"
-        >
+        <button class="btn btn-danger" data-id="{{ bill.pk }}" onclick="onDeleteBillClicked(event)">
           Löschen
         </button>
       </td>
@@ -33,6 +28,11 @@
     {% endfor %}
   </tbody>
 </table>
+
+
+<div class="d-flex justify-content-center">
+  <a class="btn btn-primary" href="{% url 'create_bill' %}"><i class="fa fa-plus fa-lg mr-3"></i>Neue Ausgabe</a>
+</div>
 
 <dialog id="confirm-bill-deletion-dialog" name="bill-deletion">
   <div class="content">
@@ -48,18 +48,10 @@
       </div>
     </div>
     <footer>
-      <button
-        type="submit"
-        class="btn btn-primary pl-5 pr-5"
-        onclick="onBillDeletionConfirmClicked(event)"
-      >
+      <button type="submit" class="btn btn-primary pl-5 pr-5" onclick="onBillDeletionConfirmClicked(event)">
         Ja, löschen
       </button>
-      <button
-        type="cancel"
-        class="btn btn-danger pl-4 pr-4"
-        onclick="onBillDeletionAbortClicked(event)"
-      >
+      <button type="cancel" class="btn btn-danger pl-4 pr-4" onclick="onBillDeletionAbortClicked(event)">
         Nein, abbrechen
       </button>
     </footer>

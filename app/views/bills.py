@@ -1,5 +1,5 @@
 import json
-from django.db.models import F, Count
+from django.db.models import F, Count, Sum
 from django.forms import inlineformset_factory, modelformset_factory
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.shortcuts import render
@@ -115,4 +115,8 @@ def delete_position(request, bill_id, position_id):
 
 def bills(request):
     bills = Bill.objects.filter(user=request.user["id"]).annotate(position_count=Count("positions"))
+
+    sum = bills.aggregate(sum=Sum("total"))["sum"]
+    print(sum)
+
     return render(request, "bills/bills.html", { "bills": bills })
