@@ -2,21 +2,25 @@
 <script src="{% static 'js/forms.js' %}" defer></script>
 <script src="{% static 'js/bill.js' %}" defer></script>
 {% endblock %} {% block content %}
-<form id="bill-form" onsubmit="onCreateBillFormSubmitted(event)">
-  {% csrf_token %} {{ position_formset.management_form }}
+<form id="bill-form" onsubmit="onBillFormSubmitted(event)">
+  {% csrf_token %}
   <fieldset class="card shadow p-3 mb-5">
-    <div class="form-row">{{ bill_form.user }} {{ bill_form.total }}</div>
+    <div class="form-row">
+      {{ bill_form.id }} {{ bill_form.user }} {{ bill_form.total }}
+    </div>
     <div class="form-row">
       <div class="col-md-6">{{ bill_form.name|as_crispy_field }}</div>
-      <div class="col-md-3">{{ bill_form.date|as_crispy_field }}</div>
-      <div class="col-md-3">{{ bill_form.receipt|as_crispy_field }}</div>
+      <div class="col-md-2">{{ bill_form.date|as_crispy_field }}</div>
+      <div class="col-md-2">{{ bill_form.paid|as_crispy_field }}</div>
+      <div class="col-md-2">{{ bill_form.receipt|as_crispy_field }}</div>
     </div>
     <div class="form-row">
       <div class="col-md">{{ bill_form.description|as_crispy_field }}</div>
     </div>
   </fieldset>
 
-  <fieldset id="bill-positions" class="card shadow p-3 mb-5">
+  <fieldset id="bill-positions" class="card shadow p-3 mb-5 positions-formset">
+    {{ position_formset.management_form }}
     {% comment %} Header for positions {% endcomment %}
     <div class="form-row">
       <div class="col-md-8">
@@ -32,15 +36,24 @@
     </div>
 
     {% for position_form in position_formset %}
-    <div class="form-row position">
+    <div class="form-row position" data-uuid="{{ position_form.uuid.value }}">
+      {{ position_form.id }} {{ position_form.uuid }} {{ position_form.DELETE.as_hidden }}
       <div class="col-md-8">{{ position_form.name|as_crispy_field }}</div>
       <div class="col-md-2">{{ position_form.price|as_crispy_field }}</div>
       <div class="col-md-1">{{ position_form.quantity|as_crispy_field }}</div>
       <div class="col-md-1">
-        <i class="fa-solid fa-xl fa-comment" style="transform: translate(10px, 10px)" data-index="{{ forloop.counter }}"
-          onclick="onPositionNoteClicked(event)"></i>
-        <i class="fa-solid fa-xl fa-trash" style="transform: translate(10px, 10px)" data-index="{{ forloop.counter }}"
-          onclick="onDeletePositionClicked(event)"></i>
+        <i
+          class="fa-solid fa-xl fa-comment"
+          style="transform: translate(10px, 10px)"
+          data-index="{{ forloop.counter }}"
+          onclick="onPositionNoteClicked(event)"
+        ></i>
+        <i
+          class="fa-solid fa-xl fa-trash"
+          style="transform: translate(10px, 10px)"
+          data-index="{{ forloop.counter }}"
+          onclick="onDeletePositionClicked(event)"
+        ></i>
       </div>
       {{ position_form.note }} {{ position_form.group }}
     </div>
@@ -53,7 +66,11 @@
   </fieldset>
 
   <div class="d-flex justify-content-center mt-5 mb-5">
-    <button id="add-group-button" class="btn btn-primary" onclick="onNewGroupButtonClicked(event)">
+    <button
+      id="add-group-button"
+      class="btn btn-primary"
+      onclick="onNewGroupButtonClicked(event)"
+    >
       <i class="fa-solid fa-plus fa-lg no-event mr-2"></i>Gruppe hinzufügen
     </button>
   </div>
@@ -93,7 +110,10 @@
     <header>
       <h1>Gruppe auswählen</h1>
     </header>
-    <div class="body form-row" style="overflow-y: auto; display: block; height: calc(750px - 77px)">
+    <div
+      class="body form-row"
+      style="overflow-y: auto; display: block; height: calc(750px - 77px)"
+    >
       <h2>Globale Gruppen</h2>
       <ul id="global-group-list" class="d-flex flex-row flex-wrap" style="gap: 10px"></ul>
       <h2 class="mt-3">Deine Gruppen</h2>
@@ -131,12 +151,15 @@
       <div class="col-md-1"></div>
     </div>
 
-    <button class="btn btn-success" onclick="onNewPositionClicked(event)">Neue Position <span>+</span></button>
+    <button class="btn btn-success" onclick="onNewPositionClicked(event)">
+      Neue Position <span>+</span>
+    </button>
   </fieldset>
 </template>
 
 <script>
   const CREATE_BILL_URL = "{% url 'create_bill' %}";
+  const EDIT_BILL_URL = "{% url 'edit_bill' 0 %}";
   const ALL_GROUPS_URL = "{% url 'all_groups' %}";
 </script>
 

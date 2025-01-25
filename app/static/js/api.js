@@ -4,6 +4,12 @@ class BillAPI {
     return await makeRequest(CREATE_BILL_URL, options);
   }
 
+  /**
+   *
+   * @param {number} billId - The id of the bill that should be edited
+   * @param {*} data
+   * @returns
+   */
   static async edit(billId, data) {
     const url = EDIT_BILL_URL.replace(/\d+/g, billId);
     const options = getOptions("POST", data);

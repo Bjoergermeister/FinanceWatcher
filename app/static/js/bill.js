@@ -75,6 +75,7 @@ function onPositionNoteAbortClicked(event) {
   positionNoteDialog.close();
 }
 
+/*
 async function onCreateBillFormSubmitted(event) {
   event.preventDefault();
 
@@ -85,7 +86,28 @@ async function onCreateBillFormSubmitted(event) {
   const data = new FormData(form);
   const result = await BillAPI.create(data);
 
-  alert(result.success);
+  if (result.success === false) {
+    alert("Ein Fehler ist aufgetreten");
+    return;
+  }
+
+  // Set IDs of the bill and the positions
+  const billIdInput = document.querySelector("input[name='id']");
+  billIdInput.value = result.content.bill;
+
+  const billPositions = document.getElementById("bill-positions");
+
+  for (const uuid of Object.keys(result.content.positions)) {
+    const positionIdInput = billPositions.querySelector(
+      `div[data-uuid='${uuid}'] input[name$="id"]`
+    );
+
+    const id = result.content.positions[uuid];
+    positionIdInput.value = id;
+  }
+
+  const currentFormCount = getTotalFormCount(billPositions);
+  setInitialFormCount(billPositions, currentFormCount);
 
   return false;
 }
@@ -116,55 +138,111 @@ async function onEditBillFormSubmitted(event) {
 
   return false;
 }
+*/
+
+async function onBillFormSubmitted(event) {
+  event.preventDefault();
+
+  const form = event.target;
+  const positionFormRows = form.querySelectorAll("#bill-positions .form-row.position");
+
+  let result = undefined;
+  if (form.id.value === "") {
+    // The bill does not exist in the database yet. A new one needs to be created.
+
+    updateFormRowIndices(positionFormRows);
+
+    const data = new FormData(form);
+    result = await BillAPI.create(data);
+  } else {
+    // The bill already exists in the database. It needs to be updated
+    const data = preprocessPositionFormRows(positionFormRows);
+    data.append("csrfmiddlewaretoken", form.csrfmiddlewaretoken.value);
+    data.append("id", form.id.value);
+    data.append("name", form.name.value);
+    data.append("date", form.date.value);
+    data.append("receipt", form.receipt.files[0]);
+    data.append("description", form.description.value);
+    data.append("user", form.user.value);
+    data.append("total", form.total.value);
+    data.append("position-TOTAL_FORMS", form.elements["position-TOTAL_FORMS"].value);
+    data.append("position-INITIAL_FORMS", form.elements["position-INITIAL_FORMS"].value);
+    data.append("position-MIN_NUM_FORMS", form.elements["position-MIN_NUM_FORMS"].value);
+    data.append("position-MAX_NUM_FORMS", form.elements["position-MAX_NUM_FORMS"].value);
+
+    result = await BillAPI.edit(form.id.value, data);
+  }
+
+  if (result.success === false) {
+    alert("Ein Fehler ist aufgetreten");
+    return;
+  }
+
+  // Set IDs of the bill and the positions
+  const billIdInput = document.querySelector("input[name='id']");
+  billIdInput.value = result.content.bill;
+
+  const billPositions = document.getElementById("bill-positions");
+
+  for (const uuid of Object.keys(result.content.positions)) {
+    const positionIdInput = billPositions.querySelector(
+      `div[data-uuid='${uuid}'] input[name$="id"]`
+    );
+
+    const id = result.content.positions[uuid];
+    positionIdInput.value = id;
+  }
+
+  const currentFormCount = getTotalFormCount(billPositions);
+  setInitialFormCount(billPositions, currentFormCount);
+
+  // Remove deleted form rows
+  const deletedFormRows = billPositions.querySelectorAll(".form-row.deleted");
+  for (const deletedFormRow of deletedFormRows) {
+    deletedFormRow.remove();
+    decreaseFormCount(billPositions);
+  }
+
+  setInitialFormCount(billPositions, getTotalFormCount(billPositions));
+
+  return false;
+}
 
 async function onDeletePositionClicked(event) {
   event.preventDefault();
 
   const button = event.currentTarget;
-  const id = button.dataset.id;
-  const formRow = event.currentTarget.parentElement.parentElement;
+  const formRow = findFormRow(button);
+  const positionId = formRow.querySelector("input[name$='id']").value;
 
-  if (id === undefined) {
-    const totalFormInput = document.getElementById("id-position_TOTAL_FORMS");
-    totalFormInput.value = parseInt(totalFormsInput.value) - 1;
+  const formsetContainer = findFormsetContainer(formRow);
+
+  if (positionId === "") {
+    decreaseFormCount(formsetContainer);
     formRow.remove();
   } else {
     formRow.querySelector("input[name$='DELETE']").value = button.dataset.id;
+    formRow.classList.add("deleted");
     formRow.style.display = "none";
   }
-
-  return;
-
-  // There must be at least one form row at all times.
-  const totalFormsInput = document.querySelector(
-    "#bill-positions input[name='position-TOTAL_FORMS']"
-  );
-  if (parseInt(totalFormsInput.value) == 1) return;
-
-  positionToDelete = event.target.parentElement.parentElement;
-  const idInput = positionToDelete.querySelector("input[name$='id']");
-
-  // If the id input has a value, the position is saved in the database. Deleting it will also delete the database entry.
-  // In this case, display a dialog which ask the user for confirmation
-  if (idInput.value !== "") {
-    confirmPositionDeletionDialog.dataset.id = event.target.dataset.id;
-    confirmPositionDeletionDialog.showModal();
-    return;
-  }
-
-  deletePosition();
 }
 
 function onNewPositionClicked(event) {
   event.preventDefault();
 
-  const formRowContainer = event.target.parentElement; // This will be the div#bill-positions
+  const formRowContainer = findFormsetContainer(event.target);
   const formRows = formRowContainer.querySelectorAll(".form-row:not(:first-of-type)");
 
   // Copy last form row and clear inputs
-  const formRowCopy = formRows[formRows.length - 1].cloneNode(true);
+  const formRowCopy = getLastElement(
+    formRows,
+    (formRow) => formRow.style.display !== "none"
+  ).cloneNode(true);
 
+  const uuid = generateUUID();
+  formRowCopy.dataset.uuid = uuid;
   cloneFormRow(formRowCopy, formRows.length, {
+    uuid: uuid,
     price: 0.0,
     quantity: 1.0,
   });
@@ -179,7 +257,8 @@ function onNewPositionClicked(event) {
 
   formRows[formRows.length - 1].after(formRowCopy);
 
-  totalFormsInput.value = parseInt(totalFormsInput.value) + 1;
+  const positionContainer = document.getElementById("bill-positions");
+  increaseFormCount(positionContainer);
 
   // Check if the position is part of a group. If so, set the group ID
   const groupId = event.target.parentElement.dataset.groupid;
@@ -306,13 +385,14 @@ function deletePosition() {
   removePositionFromTotal(positionToDelete);
   positionToDelete = null;
 
-  totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
+  const positionsContainer = document.getElementById("bill-positions");
+  decreaseFormCount(positionsContainer);
 }
 
 function preprocessPositionFormRows(formRows) {
   const positions = Array.from(formRows).map((formRow) => ({
     id: formRow.querySelector("[name$='id']").value,
-    bill: formRow.querySelector("[name$='bill']").value,
+    uuid: formRow.querySelector("[name$='uuid']").value,
     group: formRow.querySelector("[name$='group']").value,
     name: formRow.querySelector("[name$='name']").value,
     price: formRow.querySelector("[name$='price']").value,
@@ -336,4 +416,10 @@ function preprocessPositionFormRows(formRows) {
   }
 
   return data;
+}
+
+function generateUUID() {
+  return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c) =>
+    (+c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (+c / 4)))).toString(16)
+  );
 }

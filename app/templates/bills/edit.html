@@ -11,8 +11,9 @@
     </div>
     <div class="form-row">
       <div class="col-md-6">{{ bill_form.name|as_crispy_field }}</div>
-      <div class="col-md-3">{{ bill_form.date|as_crispy_field }}</div>
-      <div class="col-md-3">{{ bill_form.receipt|as_crispy_field }}</div>
+      <div class="col-md-2">{{ bill_form.date|as_crispy_field }}</div>
+      <div class="col-md-2">{{ bill_form.paid|as_crispy_field }}</div>
+      <div class="col-md-2">{{ bill_form.receipt|as_crispy_field }}</div>
     </div>
     <div class="form-row">
       <div class="col-md">{{ bill_form.description|as_crispy_field }}</div>
