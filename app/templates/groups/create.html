@@ -8,10 +8,10 @@
   <form
     id="create-group-form"
     class="p-5"
-    onsubmit="onCreateGroupFormSubmitted(event)"
+    onsubmit="onGroupFormSubmitted(event)"
     enctype="multipart/form-data"
   >
-    <div class="form-row">{% csrf_token %} {{ create_form.user|as_crispy_field }}</div>
+    <div class="form-row">{% csrf_token %} {{ create_form.is_global }}</div>
     <div class="form-row">
       <div class="col-md">{{ create_form.name|as_crispy_field }}</div>
     </div>
@@ -50,7 +50,7 @@
   <button class="btn btn-primary" form="create-group-form" type="submit">
     Speichern
   </button>
-  <button class="btn btn-danger" type="cancel" onclick="onCreateGroupAbortClicked(event)">
+  <button class="btn btn-danger" type="cancel" onclick="onGroupAbortClicked(event)">
     Abbrechen
   </button>
 </footer>

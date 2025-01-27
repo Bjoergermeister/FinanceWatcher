@@ -10,19 +10,25 @@ const addGlobalGroupButton = document.getElementById("add-global-group-button");
 
 let groupId = undefined;
 
-async function onCreateGroupFormSubmitted(event) {
+async function onGroupFormSubmitted(event) {
   event.preventDefault();
 
   const data = new FormData(event.target);
-  const result = await GroupAPI.create(data);
+  const id = data.get("id");
+
+  const result =
+    id === null || id === ""
+      ? await GroupAPI.create(data)
+      : await GroupAPI.edit(id, data);
+
   if (result.success == false) {
     alert("Something went wrong");
     console.log(result.content);
     return;
   }
 
-  const userIdInput = createGroupDialog.querySelector("input[name='user']");
-  const isGlobalGroup = userIdInput.value === "";
+  const isGlobalGroupInput = createGroupDialog.querySelector("input[name='is_global']");
+  const isGlobalGroup = isGlobalGroupInput.value === "true";
 
   const groupContainerSelector = isGlobalGroup ? "global-groups" : "user-groups";
   const groupContainer = document.getElementById(groupContainerSelector);
@@ -86,40 +92,25 @@ function onEditGroupAbortClicked(event) {
   editGroupDialog.close();
 }
 
-async function onEditGroupFormSubmitted(event) {
+function onAddGlobalGroupClicked(event) {
   event.preventDefault();
 
-  const data = new FormData(event.target);
-  const id = data.get("id");
-
-  const result = await GroupAPI.edit(id, data);
-  if (result.success == false) {
-    alert("Problem");
-    return;
-  }
-
-  alert("Saving");
-  editGroupDialog.close();
-}
-
-function onAddGlobalGroupButtonClicked(event) {
-  event.preventDefault();
-
-  createGroupDialog.querySelector("input[name='user']").value = "";
+  createGroupDialog.querySelector("input[name='is_global']").value = true;
   createGroupDialog.showModal();
 }
 
-function onAddUserGroupButtonClicked(event) {
+function onAddUserGroupClicked(event) {
   event.preventDefault();
 
-  createGroupDialog.querySelector("input[name='user']").value = USER_ID;
+  createGroupDialog.querySelector("input[name='is_global']").value = false;
   createGroupDialog.showModal();
 }
 
 function onGroupImageChanged(event) {
   event.preventDefault();
 
-  console.log(event.target.files.length);
+  if (event.target.files.length === 0) return;
+
   const preview = document.getElementById("image-preview");
   preview.src = URL.createObjectURL(event.target.files[0]);
 }

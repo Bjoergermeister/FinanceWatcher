@@ -13,7 +13,7 @@ def groups(request):
     if request.user["isAdmin"]:
         global_groups = Group.objects.filter(user=None)
 
-    form = CreateGroupForm(user=request.user)
+    form = CreateGroupForm(request.user)
 
     context = { 
         "user_groups": user_groups, 
@@ -45,11 +45,24 @@ def create(request):
     if request.method != "POST":
         return HttpResponse(status=405)
 
-    form = CreateGroupForm(request.POST, request.FILES)
+    groups_query = Q(user=request.user["id"])
+    if request.user["isAdmin"]:
+        groups_query |= Q(user=None)
+    user_groups = Group.objects.filter(groups_query).values_list("name", flat=True)
+
+    form = CreateGroupForm(request.user, request.POST,request.FILES, user_groups=user_groups)
     if form.is_valid() == False:
         return JsonResponse(form.errors, status=400)
-        
-    instance = form.save()
+    
+    instance: Group = form.save(commit=False)
+    
+    # Only admins are allowed to create global groups.
+    # If the user tried to create a global group but is not an administrator, send an 403 response
+    if instance.user is None and request.user["isAdmin"] == False:
+        return HttpResponseForbidden()
+    
+    instance.save()
+
     return JsonResponse(instance.to_dict(), status=200)
 
 def edit(request, id):
@@ -59,7 +72,7 @@ def edit(request, id):
     if form.is_valid() == False:
         return HttpResponseBadRequest()
 
-    form.save()
+    form.save(commit=False)
 
     return HttpResponse(200)
 
