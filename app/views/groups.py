@@ -45,10 +45,7 @@ def create(request):
     if request.method != "POST":
         return HttpResponse(status=405)
 
-    groups_query = Q(user=request.user["id"])
-    if request.user["isAdmin"]:
-        groups_query |= Q(user=None)
-    user_groups = Group.objects.filter(groups_query).values_list("name", flat=True)
+    user_groups = Group.get_all_for_user(request.user)
 
     form = CreateGroupForm(request.user, request.POST,request.FILES, user_groups=user_groups)
     if form.is_valid() == False:
@@ -66,15 +63,23 @@ def create(request):
     return JsonResponse(instance.to_dict(), status=200)
 
 def edit(request, id):
-    group = Group.objects.get(id=id)
+    group = None
+    try:
+        group = Group.objects.get(id=id)
+    except Group.DoesNotExist:
+        return HttpResponseNotFound(f"Eine Gruppe mit der ID {id} existiert nicht")
 
-    form = EditGroupForm(request.POST, request.FILES, instance=group)
+    user_groups = Group.get_all_for_user(request.user, exclude_id=id)
+
+    form = EditGroupForm(request.user, request.POST, request.FILES, instance=group, user_groups=user_groups)
     if form.is_valid() == False:
-        return HttpResponseBadRequest()
+        return JsonResponse(form.errors, status=400)
 
-    form.save(commit=False)
+    instance: Group = form.save(commit=False)
 
-    return HttpResponse(200)
+    instance.save()
+
+    return JsonResponse(instance.to_dict(), status=200)
 
 def delete(request, id):
     group = None

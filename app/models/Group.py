@@ -1,6 +1,7 @@
 from io import BytesIO
 from django.core.files import File
 from django.db import models
+from django.db.models import Q, QuerySet
 
 from PIL import Image
 
@@ -9,9 +10,33 @@ class Group(models.Model):
     user = models.UUIDField(db_column="user", null=True)
     icon = models.ImageField(db_column="icon", null=True, upload_to="groups")
 
-    def preprocess_image(self):
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "user": self.user,
+            "image": self.icon.url
+        }
+
+    @staticmethod
+    def get_all_for_user(user: dict[str, any], **kwargs) -> QuerySet:
+        exclude_id: int = kwargs.pop("exclude_id", None)
+
+        groups_query = Q(user=user["id"])
+        if user["isAdmin"]:
+            groups_query |= Q(user=None)
+
+        groups = Group.objects.filter(groups_query)
+        if exclude_id is not None:
+            groups = groups.exclude(id=exclude_id)
+        
+        return groups.values_list("name", flat=True)
+
+    def save(self, *args, **kwargs):
         image = Image.open(self.icon)
         
+        if self.icon.name.startswith("groups"):
+            self.icon.name = self.icon.name.lstrip("groups/")
+
         smaller_side = min(image.width, image.height)
         ratio = 1 / (smaller_side / 250)
         size = (int(image.width * ratio), int(image.height * ratio))
@@ -25,15 +50,6 @@ class Group(models.Model):
         image.save(image_bytes, 'JPEG', quality=70)
         self.icon = File(image_bytes, name=self.icon.name)
 
-    def to_dict(self):
-        return {
-            "name": self.name,
-            "user": self.user,
-            "image": self.icon.url
-        }
-
-    def save(self, *args, **kwargs):
-        self.preprocess_image()
         super().save(*args, **kwargs)
 
     class Meta:
