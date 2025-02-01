@@ -176,6 +176,19 @@
         </div>
     </dialog>
 
+    <template id="group-template">
+        <div class="group card shadow">
+            <img src="" />
+            <div lass="group-information">
+                <h2 class="mb-3"></h2>
+                <div>
+                    <button><i class="fa-solid fa-trash no-events"></i></button>
+                    <button><i class="fa-solid fa-pen no-events"></i></button>
+                </div>
+            </div>
+        </div>
+    </template>
+
     <script>
         const CREATE_GROUP_URL = "{% url 'create_group' %}";
         const EDIT_GROUP_URL = "{% url 'edit_group' 1 %}";

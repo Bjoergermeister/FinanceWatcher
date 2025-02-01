@@ -12,6 +12,7 @@ class Group(models.Model):
 
     def to_dict(self):
         return {
+            "id": self.id,
             "name": self.name,
             "user": self.user,
             "image": self.icon.url

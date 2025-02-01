@@ -32,12 +32,12 @@ async function onGroupFormSubmitted(event) {
 
   const groupContainerSelector = isGlobalGroup ? "global-groups" : "user-groups";
   const groupContainer = document.getElementById(groupContainerSelector);
-  const groupClone = groupContainer
-    .querySelector(".group:nth-last-child(2)")
-    .cloneNode(true);
+  const groupClone = document.getElementById("group-template").content.cloneNode(true)
+    .children[0];
 
   groupClone.querySelector("h2").innerText = result.content.name;
   groupClone.querySelector("img").src = result.content.image;
+  groupClone.dataset.id = result.content.id;
 
   groupContainer.insertBefore(groupClone, groupContainer.lastElementChild);
 
