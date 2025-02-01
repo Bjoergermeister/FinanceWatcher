@@ -11,12 +11,17 @@ class Group(models.Model):
     icon = models.ImageField(db_column="icon", null=True, upload_to="groups")
 
     def to_dict(self):
-        return {
+        group = {
             "id": self.id,
             "name": self.name,
-            "user": self.user,
             "image": self.icon.url
         }
+        
+        if self.user is not None:
+            group["user"] = self.user
+        
+        
+        return group
 
     @staticmethod
     def get_all_for_user(user: dict[str, any], **kwargs) -> QuerySet:

@@ -30,7 +30,7 @@
                                     data-user="{{ group.user }}"
                                     data-name="{{ group.name }}"
                                     data-icon="{{ group.icon.url }}"
-                                    onclick="onEditGlobalGroupClicked(event)"
+                                    onclick="onEditGroupClicked(event)"
                                 >
                                     <i class="fa-solid fa-pen no-events"></i>
                                 </button>
@@ -128,31 +128,51 @@
     </dialog>
 
     <dialog id="edit-group-dialog">
-        <div class="content" style="height: 500px">
+        <div class="content" style="height: 600px">
             <header>
                 <h1>Gruppe bearbeiten</h1>
             </header>
-            <form id="edit-group-form" class="body" onsubmit="onGroupFormSubmitted(event)">
+            <form id="edit-group-form" class="body p-5" onsubmit="onGroupFormSubmitted(event)">
                 <div class="form-row">
                     <input type="hidden" name="id" />
                     <input type="hidden" name="user" />
+                    <input type="hidden" name="is_global" />
                 </div>
                 <div class="form-row">
                     <div class="col-md">
                         <div class="form-group">
-                            <input type="text" name="name" />
+                            <label for="id_name"></label>
+                            <div>
+                                <input id="id_name" class="textinput form-control" type="text" name="name" required/>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <input type="file" name="icon" />
+                            <label class="requiredField">Bild<span class="asterisk">*</span></label>
+                            <div>
+                              <input
+                                id="id_icon"
+                                class="clearablefileinput form-control-file"
+                                style="display: none"
+                                type="file"
+                                name="icon"
+                                accept="image/*"
+                                onchange="onGroupImageChanged(event)"
+                              />
+                              <label for="id_icon">
+                                <h3>Bild auswählen</h3>
+                                <img src="{% static 'images/upload.png' %}" alt="Bild auswählen" />
+                              </label>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <img src="" style="width: 250px; height: 250px; display: inline-block" />
+                            <label>Vorschau</label>
+                            <img id="image-preview" src="" style="width: 250px; height: 250px; display: inline-block" />
                         </div>
                     </div>
                 </div>
@@ -168,7 +188,7 @@
                 <button
                     type="cancel"
                     class="btn btn-danger pl-4 pr-4"
-                    onclick="onEditGroupAbortClicked(event)"
+                    onclick="onGroupAbortClicked(event)"
                 >
                     Abbrechen
                 </button>
@@ -179,11 +199,11 @@
     <template id="group-template">
         <div class="group card shadow">
             <img src="" />
-            <div lass="group-information">
+            <div class="group-information">
                 <h2 class="mb-3"></h2>
                 <div>
-                    <button><i class="fa-solid fa-trash no-events"></i></button>
-                    <button><i class="fa-solid fa-pen no-events"></i></button>
+                    <button class="btn btn-danger" onclick="onDeleteGroupClicked(event)"><i class="fa-solid fa-trash no-events"></i></button>
+                    <button class="btn btn-primary" onclick="onEditGroupClicked(event)"><i class="fa-solid fa-pen no-events"></i></button>
                 </div>
             </div>
         </div>
