@@ -35,3 +35,16 @@ function findParentElement(element, tagName) {
     parent = parent.parentElement;
   }
 }
+
+/**
+ * Removes all child elements
+ * @param {HTMLElement} container
+ */
+function removeAllChildren(container) {
+  const childElementCount = container.children.length;
+  if (childElementCount === 0) return;
+
+  for (let i = childElementCount - 1; i >= 0; i--) {
+    container.children[i].remove();
+  }
+}

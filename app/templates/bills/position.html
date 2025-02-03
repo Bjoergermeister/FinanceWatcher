@@ -1,0 +1,23 @@
+{% load crispy_forms_tags %}
+
+<div class="form-row position" data-uuid="{{ position_form.uuid.value }}">
+  {{ position_form.id }} {{ position_form.uuid }} {{ position_form.DELETE.as_hidden }}
+  <div class="col-md-7">{{ position_form.name|as_crispy_field }}</div>
+  <div class="col-md-2">{{ position_form.price|as_crispy_field }}</div>
+  <div class="col-md-2">{{ position_form.quantity|as_crispy_field }}</div>
+  <div class="col-md-1">
+    <i
+    class="fa-solid fa-xl fa-comment"
+    style="transform: translate(10px, 10px)"
+    data-index="{{ forloop.counter }}"
+    onclick="onPositionNoteClicked(event)"
+    ></i>
+    <i
+    class="fa-solid fa-xl fa-trash"
+    style="transform: translate(10px, 10px)"
+    data-index="{{ forloop.counter }}"
+    onclick="onDeletePositionClicked(event)"
+    ></i>
+  </div>
+  {{ position_form.note }} {{ position_form.group }}
+</div>

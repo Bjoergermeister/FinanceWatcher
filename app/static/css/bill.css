@@ -1,0 +1,11 @@
+#group-container fieldset {
+  flex-basis: 48%;
+}
+
+#group-container fieldset:nth-child(2n) {
+  margin-left: 2%;
+}
+
+#group-container fieldset:nth-child(2n + 1) {
+  margin-right: 2%;
+}

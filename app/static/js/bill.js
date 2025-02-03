@@ -1,5 +1,4 @@
-const prices = [];
-const quantities = [];
+const positions = {};
 
 const chooseGroupDialog = document.getElementById("choose-group-dialog");
 const positionNoteDialog = document.getElementById("position-note-dialog");
@@ -16,34 +15,53 @@ const totalFormsInput = document.getElementById("id_position-TOTAL_FORMS");
 
 let positionToDelete = null;
 
-(function registerEventListeners() {
-  const priceInputs = document.querySelectorAll("#bill-form input[name$='price']");
-  const quantityInputs = document.querySelectorAll("#bill-form input[name$='quantity']");
+/**
+ * Registers event listeners for all events
+ * @param {HTMLElement[]} positionFormRows - The position form rows for which event listeners should be registered
+ */
+function registerEventListeners(positionFormRows) {
+  if (positionFormRows === undefined) {
+    positionFormRows = document.querySelectorAll("div.position.form-row");
+  }
 
-  for (const priceInput of priceInputs) {
+  for (const positionFormRow of positionFormRows) {
+    const uuid = positionFormRow.dataset.uuid;
+
+    const priceInput = positionFormRow.querySelector("input[name$='price']");
     priceInput.addEventListener("change", onPositionPriceChanged);
-    prices.push(parseFloat(priceInput.value));
-  }
 
-  for (const quantityInput of quantityInputs) {
+    const quantityInput = positionFormRow.querySelector("input[name$='quantity']");
     quantityInput.addEventListener("change", onPositionQuantityChanged);
-    quantities.push(parseFloat(quantityInput.value));
+
+    positions[uuid] = {
+      price: parseFloat(priceInput.value),
+      quantity: parseFloat(quantityInput.value),
+    };
   }
-})();
+}
+
+// I could have used an IIFE here, but it seems like those don't work with JSDoc, so I'm doing it this way.
+registerEventListeners();
 
 /******************/
 /* Event handlers */
 /******************/
 
 function onPositionPriceChanged(event) {
-  const index = parseInt(event.target.name.split("-")[1]);
-  prices[index] = event.target.value;
+  const formRow = findFormRow(event.target);
+  const uuid = formRow.dataset.uuid;
+
+  positions[uuid].price = parseFloat(event.target.value);
+
   calculateBillTotal();
 }
 
 function onPositionQuantityChanged(event) {
-  const index = parseInt(event.target.name.split("-")[1]);
-  quantities[index] = event.target.value;
+  const formRow = findFormRow(event.target);
+  const uuid = formRow.dataset.uuid;
+
+  positions[uuid].quantity = parseFloat(event.target.value);
+
   calculateBillTotal();
 }
 
@@ -74,71 +92,6 @@ function onPositionNoteAbortClicked(event) {
   positionNote.value = "";
   positionNoteDialog.close();
 }
-
-/*
-async function onCreateBillFormSubmitted(event) {
-  event.preventDefault();
-
-  const form = event.target;
-  const formRows = form.querySelectorAll(".form-row.position");
-  updateFormRowIndices(formRows);
-
-  const data = new FormData(form);
-  const result = await BillAPI.create(data);
-
-  if (result.success === false) {
-    alert("Ein Fehler ist aufgetreten");
-    return;
-  }
-
-  // Set IDs of the bill and the positions
-  const billIdInput = document.querySelector("input[name='id']");
-  billIdInput.value = result.content.bill;
-
-  const billPositions = document.getElementById("bill-positions");
-
-  for (const uuid of Object.keys(result.content.positions)) {
-    const positionIdInput = billPositions.querySelector(
-      `div[data-uuid='${uuid}'] input[name$="id"]`
-    );
-
-    const id = result.content.positions[uuid];
-    positionIdInput.value = id;
-  }
-
-  const currentFormCount = getTotalFormCount(billPositions);
-  setInitialFormCount(billPositions, currentFormCount);
-
-  return false;
-}
-
-async function onEditBillFormSubmitted(event) {
-  event.preventDefault();
-
-  const form = event.target;
-  const formRows = form.querySelectorAll(".form-row.position");
-
-  const data = preprocessPositionFormRows(formRows);
-  data.append("csrfmiddlewaretoken", form.csrfmiddlewaretoken.value);
-  data.append("id", form.id.value);
-  data.append("name", form.name.value);
-  data.append("date", form.date.value);
-  data.append("receipt", form.receipt.files[0]);
-  data.append("description", form.description.value);
-  data.append("user", form.user.value);
-  data.append("total", form.total.value);
-  data.append("position-TOTAL_FORMS", form.elements["position-TOTAL_FORMS"].value);
-  data.append("position-INITIAL_FORMS", form.elements["position-INITIAL_FORMS"].value);
-  data.append("position-MIN_NUM_FORMS", form.elements["position-MIN_NUM_FORMS"].value);
-  data.append("position-MAX_NUM_FORMS", form.elements["position-MAX_NUM_FORMS"].value);
-
-  const result = await BillAPI.edit(BILL_ID, data);
-
-  alert(result.success);
-
-  return false;
-}
-*/
 
 async function onBillFormSubmitted(event) {
   event.preventDefault();
@@ -225,6 +178,8 @@ async function onDeletePositionClicked(event) {
     formRow.classList.add("deleted");
     formRow.style.display = "none";
   }
+
+  removePositionFromTotal(formRow);
 }
 
 function onNewPositionClicked(event) {
@@ -298,42 +253,48 @@ async function onNewGroupButtonClicked(event) {
   }
 
   const userGroupList = document.getElementById("user-group-list");
+  removeAllChildren(userGroupList);
   for (const userGroup of result.content.user_groups) {
     const groupElement = createGroupElement(userGroup);
     userGroupList.appendChild(groupElement);
   }
 
   const globalGroupList = document.getElementById("global-group-list");
+  removeAllChildren(globalGroupList);
   for (const globalGroup of result.content.global_groups) {
     const groupElement = createGroupElement(globalGroup);
     globalGroupList.appendChild(groupElement);
   }
-
-  console.log(result.content);
 }
 
 function onGroupSelected(event) {
   event.preventDefault();
 
   // Copy group from template, fill with values and insert into DOM
-  const addGroupButton = document.getElementById("add-group-button");
-  const group = positionGroupTemplate.content.cloneNode(true);
-  group.querySelector("img").src = `/media/${event.target.dataset.icon}`;
-  group.querySelector("h2").innerText = event.target.dataset.name;
+  const groupCopy = positionGroupTemplate.content.cloneNode(true).children[0];
+  groupCopy.querySelector("img").src = `/media/${event.target.dataset.icon}`;
+  groupCopy.querySelector("h2").innerText = event.target.dataset.name;
 
-  // Clone, reset and insert a form row
-  const formRowCopy = document
-    .querySelector("#bill-form fieldset:nth-of-type(2) .form-row:nth-of-type(2)")
-    .cloneNode(true);
-  const fieldset = group.children[0];
-  fieldset.dataset.groupid = event.target.dataset.id;
-  fieldset.insertBefore(formRowCopy, fieldset.children[fieldset.children.length - 1]);
-  fieldset.querySelector("input[name$='group']").value = event.target.dataset.id;
+  groupCopy.dataset.groupid = event.target.dataset.id;
 
-  const container = document.getElementById("bill-form");
-  container.insertBefore(group, addGroupButton.parentElement);
+  // We need to make sure that the UUIDs of all positions are unique, so we need
+  // to replace the copied ones by newly generated ones.
+  const positionFormRows = groupCopy.querySelectorAll("div.form-row.position");
+  for (const positionFormRow of positionFormRows) {
+    const newUUID = generateUUID();
+    positionFormRow.dataset.uuid = newUUID;
+    positionFormRow.querySelector("input[name$='uuid']").value = newUUID;
 
-  totalFormsInput.value = parseInt(totalFormsInput.value) + 1;
+    // Also set group id for the position
+    positionFormRow.querySelector("input[name$='grou']").value = event.target.dataset.id;
+  }
+
+  registerEventListeners(positionFormRows);
+
+  const container = document.getElementById("group-container");
+  container.appendChild(groupCopy);
+
+  totalFormsInput.value = parseInt(totalFormsInput.value) + 5;
 
   chooseGroupDialog.close();
 }
@@ -356,33 +317,34 @@ function createGroupElement(group) {
   return container;
 }
 
+/**
+ * Calculates the sum of all items on the bill
+ */
 function calculateBillTotal() {
-  let total = 0;
-  for (let i = 0; i < prices.length; i++) {
-    total += prices[i] * quantities[i];
-  }
+  const total = Object.values(positions).reduce((previousValue, currentValue) => {
+    return previousValue + currentValue.price * currentValue.quantity;
+  }, 0);
 
   const totalDisplaySpan = document.getElementById("bill-sum");
   totalDisplaySpan.innerText = `${total.toFixed(2)} €`;
   document.querySelector("#bill-form input[name$='total']").value = total.toFixed(2);
 }
 
+/**
+ * Removes a position from the bill total
+ * @param {HTMLDivElement} formRow - The form row which represents the position
+ */
 function removePositionFromTotal(formRow) {
-  const price = parseFloat(formRow.querySelector("input[name$='price'").value);
-  const quantity = parseFloat(formRow.querySelector("input[name$='quantity']").value);
+  const uuid = formRow.dataset.uuid;
 
-  for (let i = 0; i < prices.length; i++) {
-    if (prices[i] === price && quantities[i] == quantity) {
-      prices.splice(i, 1);
-      quantities.splice(i, 1);
-    }
-  }
+  delete positions[uuid];
+
   calculateBillTotal();
 }
 
 function deletePosition() {
-  positionToDelete.remove();
   removePositionFromTotal(positionToDelete);
+  positionToDelete.remove();
   positionToDelete = null;
 
   const positionsContainer = document.getElementById("bill-positions");
@@ -418,6 +380,10 @@ function preprocessPositionFormRows(formRows) {
   return data;
 }
 
+/**
+ * Generates a UUID
+ * @returns {string} A UUID
+ */
 function generateUUID() {
   return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c) =>
     (+c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (+c / 4)))).toString(16)
