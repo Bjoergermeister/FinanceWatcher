@@ -245,6 +245,13 @@ async function onPositionDeletionConfirmClicked(event) {
 async function onNewGroupButtonClicked(event) {
   event.preventDefault();
 
+  // Remove all groups so that they are not selectable anymore.
+  // This is done before new groups are fetched to avoid them being visible for a short time due to the round-trip to the server
+  const userGroupList = document.getElementById("user-group-list");
+  const globalGroupList = document.getElementById("global-group-list");
+  removeAllChildren(userGroupList);
+  removeAllChildren(globalGroupList);
+
   chooseGroupDialog.showModal();
 
   const result = await GroupAPI.getAll();
@@ -252,19 +259,20 @@ async function onNewGroupButtonClicked(event) {
     alert("Failure");
   }
 
-  const userGroupList = document.getElementById("user-group-list");
-  removeAllChildren(userGroupList);
   for (const userGroup of result.content.user_groups) {
     const groupElement = createGroupElement(userGroup);
     userGroupList.appendChild(groupElement);
   }
 
-  const globalGroupList = document.getElementById("global-group-list");
-  removeAllChildren(globalGroupList);
   for (const globalGroup of result.content.global_groups) {
     const groupElement = createGroupElement(globalGroup);
     globalGroupList.appendChild(groupElement);
   }
+}
+
+function onAbortChoosingGroupClicked(event) {
+  const dialog = findParentElement(event.target, "DIALOG");
+  dialog.close();
 }
 
 function onGroupSelected(event) {
