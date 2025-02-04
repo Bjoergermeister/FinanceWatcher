@@ -174,13 +174,13 @@ button.loading:after {
 .group.small {
   width: 150px;
   height: 150px;
+  cursor: pointer;
 }
 
 .group:last-of-type {
   font-size: 100px;
   line-height: 250px;
   text-align: center;
-  cursor: pointer;
 }
 
 .group img {
