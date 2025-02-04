@@ -254,7 +254,11 @@ async function onNewGroupButtonClicked(event) {
 
   chooseGroupDialog.showModal();
 
-  const result = await GroupAPI.getAll();
+  const alreadyChoosenGroups = Array.from(
+    document.querySelectorAll(".position-group")
+  ).map((groupContainer) => parseInt(groupContainer.dataset.groupid));
+
+  const result = await GroupAPI.getAll(alreadyChoosenGroups);
   if (result.success === false) {
     alert("Failure");
   }
@@ -294,7 +298,7 @@ function onGroupSelected(event) {
     positionFormRow.querySelector("input[name$='uuid']").value = newUUID;
 
     // Also set group id for the position
-    positionFormRow.querySelector("input[name$='grou']").value = event.target.dataset.id;
+    positionFormRow.querySelector("input[name$='group']").value = event.target.dataset.id;
   }
 
   registerEventListeners(positionFormRows);

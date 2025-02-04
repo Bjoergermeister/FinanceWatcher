@@ -36,7 +36,7 @@ class GroupAPI {
   }
 
   static async edit(groupId, data) {
-    data.set("csrfmiddlewaretoken", CSRF_MIDDLEWARE_TOKEN);
+    data.set("X-CSRFToken", CSRF_MIDDLEWARE_TOKEN);
 
     const url = EDIT_GROUP_URL.replace(/1/g, groupId);
     const options = getOptions("POST", data);
@@ -49,22 +49,44 @@ class GroupAPI {
     return await makeRequest(url, options);
   }
 
-  static async getAll() {
-    return await makeRequest(ALL_GROUPS_URL);
+  /**
+   *
+   * @param {*} alreadyChoosenGroups
+   * @returns
+   */
+  static async getAll(alreadyChosenGroups) {
+    const headers = {
+      "Content-Type": "application/json",
+      "X-CSRFToken": CSRF_MIDDLEWARE_TOKEN,
+    };
+    const data = {
+      csrfmiddlewaretoken: CSRF_MIDDLEWARE_TOKEN,
+      alreadyChosenGroups,
+    };
+    const options = getOptions("POST", data, headers);
+
+    return await makeRequest(ALL_GROUPS_URL, options);
   }
 }
 
-function getOptions(method, data) {
+/**
+ *
+ * @param {string} method
+ * @param {*} data
+ * @param {*} headers
+ * @returns
+ */
+function getOptions(method, data, headers) {
+  const contentType =
+    headers !== undefined && "Content-Type" in headers
+      ? headers["Content-Type"]
+      : "application/x-www-form-urlencoded; charset=UTF-8";
+
+  headers = headers ?? new Headers({ "Content-Type": contentType });
+
   const body = data instanceof FormData ? data : JSON.stringify(data);
 
-  // Set default header values
-  const headers = new Headers();
-  headers.append("X-CSRFToken", getCSRFToken(data));
-  /*
-  if (data !== undefined && data.has("csrfmiddlewaretoken")) {
-    headers.append("X-CSRFToken", data.get("csrfmiddlewaretoken"));
-    //headers.append("content-type", "multipart/form-data");
-  }*/
+  //headers.append("X-CSRFToken", getCSRFToken(data));
 
   return {
     method,

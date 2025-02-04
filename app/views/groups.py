@@ -1,5 +1,8 @@
+import json
+
+from django.core.handlers.wsgi import WSGIRequest
 from django.db.models import Q
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound, JsonResponse
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotFound, JsonResponse
 from django.shortcuts import render
 
 from ..forms.groups import CreateGroupForm, EditGroupForm
@@ -25,8 +28,18 @@ def groups(request):
 
     return render(request, "groups/groups.html", context)
 
-def list(request):
-    groups = Group.objects.filter(Q(user=request.user["id"]) | Q(user=None)).values("id", "user", "name", "icon")
+def list(request: WSGIRequest):
+
+    body = json.loads(request.body)
+    already_chosen_groups = body["alreadyChosenGroups"]
+
+    groups = Group.objects.filter(Q(user=request.user["id"]) | Q(user=None))
+    if len(already_chosen_groups) > 0:
+        groups = groups.exclude(id__in=already_chosen_groups)
+
+    # We need an standard python object so that they can be JSON-serialized. 
+    # Otherwise, calling values() here with all members would be unnecessary
+    groups = groups.values("id", "user", "name", "icon")
 
     user_groups = []
     global_groups = []
