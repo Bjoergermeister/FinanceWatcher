@@ -1,6 +1,8 @@
 class BillAPI {
   static async create(data) {
-    const options = getOptions("POST", data);
+    const options = getOptions("POST", data, {
+      csrfmiddlewaretoken: CSRF_MIDDLEWARE_TOKEN,
+    });
     return await makeRequest(CREATE_BILL_URL, options);
   }
 
@@ -19,12 +21,6 @@ class BillAPI {
   static async delete(billId) {
     const url = DELETE_BILL_URL.replace(/\d+/g, billId);
     const options = getOptions("DELETE", { csrfmiddlewaretoken: CSRF_MIDDLEWARE_TOKEN });
-    return await makeRequest(url, options);
-  }
-
-  static async deletePosition(billId, positionId) {
-    const url = DELETE_POSITION_URL.replace(/1/g, billId).replace(/2/g, positionId);
-    const options = getOptions("POST", { csrfmiddlewaretoken: CSRF_MIDDLEWARE_TOKEN });
     return await makeRequest(url, options);
   }
 }
@@ -84,7 +80,8 @@ function getOptions(method, data, headers) {
 
   headers = headers ?? new Headers({ "Content-Type": contentType });
 
-  const body = data instanceof FormData ? data : JSON.stringify(data);
+  const body =
+    data instanceof FormData ? new URLSearchParams(data) : JSON.stringify(data);
 
   //headers.append("X-CSRFToken", getCSRFToken(data));
 

@@ -97,7 +97,7 @@ async function onBillFormSubmitted(event) {
   event.preventDefault();
 
   const form = event.target;
-  const positionFormRows = form.querySelectorAll("#bill-positions .form-row.position");
+  const positionFormRows = form.querySelectorAll(".form-row.position");
 
   let result = undefined;
   if (form.id.value === "") {
@@ -135,7 +135,7 @@ async function onBillFormSubmitted(event) {
   const billIdInput = document.querySelector("input[name='id']");
   billIdInput.value = result.content.bill;
 
-  const billPositions = document.getElementById("bill-positions");
+  const billPositions = document.getElementById("group-container");
 
   for (const uuid of Object.keys(result.content.positions)) {
     const positionIdInput = billPositions.querySelector(
@@ -185,7 +185,7 @@ async function onDeletePositionClicked(event) {
 function onNewPositionClicked(event) {
   event.preventDefault();
 
-  const formRowContainer = findFormsetContainer(event.target);
+  const formRowContainer = findParentElement(event.target, "FIELDSET");
   const formRows = formRowContainer.querySelectorAll(".form-row:not(:first-of-type)");
 
   // Copy last form row and clear inputs
@@ -204,15 +204,18 @@ function onNewPositionClicked(event) {
 
   const priceInput = formRowCopy.querySelector("input[name$='price']");
   priceInput.addEventListener("change", onPositionPriceChanged);
-  prices.push(priceInput.value);
 
   const quantityInput = formRowCopy.querySelector("input[name$='quantity']");
   quantityInput.addEventListener("change", onPositionPriceChanged);
-  quantities.push(quantityInput.value);
+
+  positions[uuid] = {
+    price: 0.0,
+    quantity: 1.0,
+  };
 
   formRows[formRows.length - 1].after(formRowCopy);
 
-  const positionContainer = document.getElementById("bill-positions");
+  const positionContainer = document.getElementById("group-container");
   increaseFormCount(positionContainer);
 
   // Check if the position is part of a group. If so, set the group ID
@@ -359,7 +362,7 @@ function deletePosition() {
   positionToDelete.remove();
   positionToDelete = null;
 
-  const positionsContainer = document.getElementById("bill-positions");
+  const positionsContainer = document.getElementById("group-container");
   decreaseFormCount(positionsContainer);
 }
 

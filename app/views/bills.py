@@ -1,4 +1,3 @@
-import json
 from django.db.models import F, Count, Sum
 from django.forms import inlineformset_factory, modelformset_factory
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
@@ -88,18 +87,28 @@ def edit(request, id):
     bill = Bill.objects.get(id=id)
     bill_form = EditBillForm(instance=bill)
 
-    positions = Position.objects.filter(bill=bill)
-    group_ids = positions.exclude(group=None).values_list("group", flat=True)
-    groups = Group.objects.filter(pk__in=group_ids)
+    positions = Position.objects.filter(bill=bill).select_related("group")
+    group_ids = positions.exclude(group=None).distinct().values_list("group", flat=True)
+    groups = { group.pk: group for group in Group.objects.filter(pk__in=group_ids)}
 
     PositionFormSet = modelformset_factory(Position, EditPositionForm, exclude=[], can_delete=True, extra=0, labels={"name": "", "price": "", "quantity": ""})
     position_formset = PositionFormSet(queryset=positions, prefix="position")
+
+    group_positions = {}
+    for position_form in position_formset:
+        group_id = position_form.instance.group.pk if position_form.instance.group is not None else None
+        if group_id not in group_positions:
+            group_positions[group_id] = []
+
+        group_positions[group_id].append(position_form)
 
     context = {
         'bill_id': id,
         'bill_form': bill_form,
         'position_formset': position_formset,
-        'groups': groups
+        'group_positions': group_positions,
+        'groups': groups,
+        'group_ids': group_ids
     }
 
     return render(request, "bills/new.html", context)
