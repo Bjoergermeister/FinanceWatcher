@@ -163,4 +163,5 @@ cython_debug/
 .wakatime-project
 *.env
 .vscode
+.devcontainer
 media
