@@ -35,7 +35,7 @@ urlpatterns = [
     path("group/<int:id>/edit", groups.edit, name="edit_group"),
 
     # API Endpoints
-    path("api/groups", groups.list, name="all_groups")
+    path("api/groups", groups.list_all, name="all_groups")
 ]
 
 if settings.DEBUG:

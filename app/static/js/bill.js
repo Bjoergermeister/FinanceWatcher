@@ -324,7 +324,7 @@ function createGroupElement(group) {
   container.children[0].dataset.icon = group.icon;
 
   const image = container.querySelector("img");
-  image.src = `/media/${group.icon}`;
+  image.src = group.icon;
   image.alt = `${group.name} Logo`;
 
   container.querySelector("h2").innerText = group.name;
