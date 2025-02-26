@@ -9,3 +9,7 @@
 #group-container fieldset:nth-child(2n + 1) {
   margin-right: 2%;
 }
+
+.position-group header img:hover {
+  cursor: pointer;
+}

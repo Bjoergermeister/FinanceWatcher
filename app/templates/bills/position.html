@@ -1,23 +1,72 @@
 {% load crispy_forms_tags %}
 
-<div class="form-row position" data-uuid="{{ position_form.uuid.value }}">
-  {{ position_form.id }} {{ position_form.uuid }} {{ position_form.DELETE.as_hidden }}
-  <div class="col-md-7">{{ position_form.name|as_crispy_field }}</div>
-  <div class="col-md-2">{{ position_form.price|as_crispy_field }}</div>
-  <div class="col-md-2">{{ position_form.quantity|as_crispy_field }}</div>
-  <div class="col-md-1">
-    <i
-    class="fa-solid fa-xl fa-comment"
-    style="transform: translate(10px, 10px)"
-    data-index="{{ forloop.counter }}"
-    onclick="onPositionNoteClicked(event)"
-    ></i>
-    <i
-    class="fa-solid fa-xl fa-trash"
-    style="transform: translate(10px, 10px)"
-    data-index="{{ forloop.counter }}"
-    onclick="onDeletePositionClicked(event)"
-    ></i>
+{% if position is not None %}
+  {% comment %} If the form is specified, we want to render an actual position {% endcomment %}
+  <div class="form-row position" data-uuid="{{ position.uuid.value }}">
+    {{ position.id }} {{ position.uuid }} {{ position.DELETE.as_hidden }}
+    <div class="col-md-7">{{ position.name|as_crispy_field }}</div>
+    <div class="col-md-2">{{ position.price|as_crispy_field }}</div>
+    <div class="col-md-2">{{ position.quantity|as_crispy_field }}</div>
+    <div class="col-md-1">
+      <i
+      class="fa-solid fa-xl fa-comment"
+      style="transform: translate(10px, 10px)"
+      data-index="{{ forloop.counter }}"
+      onclick="onPositionNoteClicked(event)"
+      ></i>
+      <i
+      class="fa-solid fa-xl fa-trash"
+      style="transform: translate(10px, 10px)"
+      data-index="{{ forloop.counter }}"
+      onclick="onDeletePositionClicked(event)"
+      ></i>
+    </div>
+    {{ position.note }} {{ position.group }}
   </div>
-  {{ position_form.note }} {{ position_form.group }}
-</div>
+{% else %}
+  {% comment %} If not form is specified, we want to render an empty dummy position that can be cloned late {% endcomment %}
+  <div class="form-row position" data-uuid="{{ position.uuid.value }}">
+    <input type="hidden" name="position-0-id" value="">
+    <input type="hidden" name="position-0-uuid" value="">
+    <input type="hidden" name="position-0-DELETE" value="">
+    <input type="hidden" name="position-0-note" value="">
+    <input type="hidden" name="position-0-group" value="">
+
+
+    <div class="col-md-7">
+      <div class="form-group">
+        <div>
+          <input class="textinput form-control" type="text" name="position-0-name" value="" required minlength="1">
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <div>
+          <input class="numberinput form-control" type="number" name="position-0-price" value="0.00" step="0.01" required>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <div>
+          <input class="numberinput form-control" type="text" name="position-0-quantity" value="1.0" step="0.01" required>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-1">
+      <i
+        class="fa-solid fa-xl fa-comment"
+        style="transform: translate(10px, 10px)"
+        data-index="{{ forloop.counter }}"
+        onclick="onPositionNoteClicked(event)"
+      ></i>
+      <i
+        class="fa-solid fa-xl fa-trash"
+        style="transform: translate(10px, 10px)"
+        data-index="{{ forloop.counter }}"
+        onclick="onDeletePositionClicked(event)"
+      ></i>
+    </div>
+  </div>
+{% endif %}

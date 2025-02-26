@@ -14,6 +14,7 @@ const confirmPositionDeletionDialog = document.getElementById(
 const totalFormsInput = document.getElementById("id_position-TOTAL_FORMS");
 
 let positionToDelete = null;
+let categoryChosenCallback = null;
 
 /**
  * Registers event listeners for all events
@@ -248,8 +249,6 @@ async function onPositionDeletionConfirmClicked(event) {
 async function onNewGroupButtonClicked(event) {
   event.preventDefault();
 
-  // Remove all groups so that they are not selectable anymore.
-  // This is done before new groups are fetched to avoid them being visible for a short time due to the round-trip to the server
   const userGroupList = document.getElementById("user-group-list");
   const globalGroupList = document.getElementById("global-group-list");
   removeAllChildren(userGroupList);
@@ -275,6 +274,37 @@ async function onNewGroupButtonClicked(event) {
     const groupElement = createGroupElement(globalGroup);
     globalGroupList.appendChild(groupElement);
   }
+
+  groupChosenCallback = function (event) {
+    // Copy group from template, fill with values and insert into DOM
+    const groupCopy = positionGroupTemplate.content.cloneNode(true).children[0];
+    groupCopy.querySelector("img").src = `${event.target.dataset.icon}`;
+    groupCopy.querySelector("h2").innerText = event.target.dataset.name;
+
+    groupCopy.dataset.groupid = event.target.dataset.id;
+
+    // We need to make sure that the UUIDs of all positions are unique, so we need
+    // to replace the copied ones by newly generated ones.
+    const positionFormRows = groupCopy.querySelectorAll("div.form-row.position");
+    for (const positionFormRow of positionFormRows) {
+      const newUUID = generateUUID();
+      positionFormRow.dataset.uuid = newUUID;
+      positionFormRow.querySelector("input[name$='uuid']").value = newUUID;
+
+      // Also set group id for the position
+      const groupIdInput = positionFormRow.querySelector("input[name$='group']");
+      groupIdInput.value = event.target.dataset.id;
+    }
+
+    registerEventListeners(positionFormRows);
+
+    const container = document.getElementById("group-container");
+    container.appendChild(groupCopy);
+
+    totalFormsInput.value = parseInt(totalFormsInput.value) + 5;
+
+    chooseGroupDialog.close();
+  };
 }
 
 function onAbortChoosingGroupClicked(event) {
@@ -284,39 +314,59 @@ function onAbortChoosingGroupClicked(event) {
 
 function onGroupSelected(event) {
   event.preventDefault();
+  groupChosenCallback(event);
+}
 
-  // Copy group from template, fill with values and insert into DOM
-  const groupCopy = positionGroupTemplate.content.cloneNode(true).children[0];
-  groupCopy.querySelector("img").src = `/media/${event.target.dataset.icon}`;
-  groupCopy.querySelector("h2").innerText = event.target.dataset.name;
+async function onEditGroupClicked(event) {
+  event.preventDefault();
 
-  groupCopy.dataset.groupid = event.target.dataset.id;
+  const groupHeader = findParentElement(event.target, "HEADER");
+  const groupContainer = groupHeader.parentElement;
 
-  // We need to make sure that the UUIDs of all positions are unique, so we need
-  // to replace the copied ones by newly generated ones.
-  const positionFormRows = groupCopy.querySelectorAll("div.form-row.position");
-  for (const positionFormRow of positionFormRows) {
-    const newUUID = generateUUID();
-    positionFormRow.dataset.uuid = newUUID;
-    positionFormRow.querySelector("input[name$='uuid']").value = newUUID;
+  const userGroupList = document.getElementById("user-group-list");
+  const globalGroupList = document.getElementById("global-group-list");
+  removeAllChildren(userGroupList);
+  removeAllChildren(globalGroupList);
 
-    // Also set group id for the position
-    positionFormRow.querySelector("input[name$='group']").value = event.target.dataset.id;
+  chooseGroupDialog.showModal();
+
+  const alreadyChoosenGroups = Array.from(
+    document.querySelectorAll(".position-group")
+  ).map((groupContainer) => parseInt(groupContainer.dataset.groupid));
+
+  const result = await GroupAPI.getAll(alreadyChoosenGroups);
+  if (result.success === false) {
+    alert("Failure");
   }
 
-  registerEventListeners(positionFormRows);
+  for (const userGroup of result.content.user_groups) {
+    const groupElement = createGroupElement(userGroup);
+    userGroupList.appendChild(groupElement);
+  }
 
-  const container = document.getElementById("group-container");
-  container.appendChild(groupCopy);
+  for (const globalGroup of result.content.global_groups) {
+    const groupElement = createGroupElement(globalGroup);
+    globalGroupList.appendChild(groupElement);
+  }
 
-  totalFormsInput.value = parseInt(totalFormsInput.value) + 5;
+  groupChosenCallback = function (groupSelectedEvent) {
+    groupHeader.querySelector("img").src = groupSelectedEvent.target.dataset.icon;
+    groupHeader.querySelector("h2").innerText = groupSelectedEvent.target.dataset.name;
 
-  chooseGroupDialog.close();
+    const positionFormRows = groupContainer.querySelectorAll(".form-row.position");
+    for (const positionFormRow of positionFormRows) {
+      const groupInput = positionFormRow.querySelector("input[name$='group']");
+      groupInput.value = groupSelectedEvent.target.dataset.id;
+    }
+
+    chooseGroupDialog.close();
+  };
 }
 
 /********************/
 /* Helper Functions */
 /********************/
+
 function createGroupElement(group) {
   const container = groupTemplate.content.cloneNode(true);
   container.children[0].dataset.id = group.id;
