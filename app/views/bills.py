@@ -43,9 +43,14 @@ def create(request):
     PositionFormSet = modelformset_factory(Position, form=CreatePositionForm, extra=5, can_delete=True)
     position_formset = PositionFormSet(queryset=Position.objects.none(), prefix="position")
 
+    group_positions = {
+        None: position_formset
+    }
+
     context = {
         'bill_form': bill_form,
-        'position_formset': position_formset
+        'position_formset': position_formset,
+        'group_positions': group_positions
     }
 
     return render(request, "bills/new.html", context)
