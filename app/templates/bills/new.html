@@ -91,11 +91,7 @@
   <fieldset class="card shadow p-3 mb-5">
     <p>Summe: 
       <span id="bill-sum">
-       {% if bill_form.instance is not None %}
-        {{ bill_form.instance.total }}&euro;
-       {% else %}
-        0,00&euro;
-       {% endif %}
+        {{ bill_form.total.value }}&nbsp;&euro;
       </span>
     </p>
   </fieldset>
