@@ -12,6 +12,7 @@
       href="{% static 'css/fontawesome.min.css' %}"
     />
     <link rel="stylesheet" type="text/css" href="{% static 'css/all.min.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/navigation.css' %}"/>
     {% block css %} {% endblock %}
 
     <script src="{% static 'js/api.js' %}"></script>
@@ -20,12 +21,9 @@
   </head>
 
   <body>
-    <nav>
-      <a>Dashboard</a>
-      <a href="{% url 'bills' %}">Meine Ausgaben</a>
-      <a href="{% url 'groups' %}">Meine Gruppen</a>
-    </nav>
+    <header></header>
+    {% include "navigation.html" %}
 
-    <div id="content">{% block content %} {% endblock %}</div>
+    <div id="content" class="card">{% block content %} {% endblock %}</div>
   </body>
 </html>

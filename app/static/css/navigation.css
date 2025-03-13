@@ -1,0 +1,26 @@
+nav {
+  display: block;
+  width: 100%;
+}
+
+nav a {
+  display: block;
+  width: 80%;
+  height: 50px;
+  line-height: 50px;
+  padding: 0px 20px;
+  color: #333 !important;
+  cursor: pointer;
+  margin: auto;
+}
+
+nav a:hover {
+  background: white;
+  color: black !important;
+}
+
+nav a img {
+  height: 30px;
+  width: 30px;
+  margin-right: 1rem;
+}

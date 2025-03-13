@@ -1,0 +1,16 @@
+{% load static %}
+
+<nav>
+  <a>
+    <img src="{% static 'images/dashboard.png' %}">
+    Dashboard
+  </a>
+  <a href="{% url 'bills' %}">
+    <img src="{% static 'images/bills.png' %}">
+    Meine Ausgaben
+  </a>
+  <a href="{% url 'groups' %}">
+    <img src="{% static 'images/tag.png' %}">
+    Meine Gruppen
+  </a>
+</nav>

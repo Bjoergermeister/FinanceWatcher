@@ -4,39 +4,30 @@
   box-sizing: border-box;
 }
 
+body {
+  display: grid;
+  grid-template-rows: 100px 1fr;
+  grid-template-columns: 15% 1fr 15%;
+  background: #f9fbfc;
+}
+
+header {
+  height: 100px;
+  grid-row: 1;
+  grid-column: 1 / 4;
+}
+
 .no-events {
   pointer-events: none;
 }
 
-/*** Navigation ***/
-
-nav {
-  display: block;
-  width: 100%;
-  height: 50px;
-  background: cornflowerblue;
-  box-shadow: 1px 1px 10px #333;
-}
-
-nav a {
-  display: inline-block;
-  height: 50px;
-  line-height: 50px;
-  padding: 0px 20px;
-  color: #eee !important;
-  cursor: pointer;
-}
-
-nav a:hover {
-  background: white;
-  color: black !important;
-}
-
 #content {
   display: block;
-  width: 80%;
+  width: 100%;
   margin: auto;
-  padding: 25px;
+  padding: 5rem;
+  background: #fff;
+  border-radius: 2rem;
 }
 
 /*** Forms ***/

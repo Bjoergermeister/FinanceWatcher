@@ -1,6 +1,12 @@
-{% extends "base.html" %} {% load static %} {% block js %}
-<script src="{% static 'js/bills.js' %}" defer></script>
-{% endblock %} {% block content %}
+{% extends "base.html" %} 
+
+{% load static %} 
+
+{% block js %}
+  <script src="{% static 'js/bills.js' %}" defer></script>
+{% endblock %} 
+
+{% block content %}
 <table class="table table-bordered">
   <thead>
     <tr>
