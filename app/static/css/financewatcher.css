@@ -254,3 +254,29 @@ input[type="file"]:not(:empty) ~ label {
   width: 75px;
   height: 75px;
 }
+
+#bills-table th {
+  padding: 1.25rem 1rem;
+  background: cornflowerblue;
+}
+
+#bills-table td {
+  vertical-align: middle;
+  padding: 0rem 1rem;
+  line-height: 1rem;
+}
+
+#bills-table img {
+  width: 32px;
+  height: 32px;
+}
+
+#bills-table .btn-link img {
+  width: 2rem;
+  height: 2rem;
+  margin: 0;
+}
+
+#bills-table .btn.view img {
+  fill: green;
+}

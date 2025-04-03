@@ -7,27 +7,36 @@
 {% endblock %} 
 
 {% block content %}
-<table class="table table-bordered">
+<table id="bills-table" class="table table-bordered">
   <thead>
     <tr>
+      <th data-width="5%"><input type="checkbox"></th>
       <th data-width="10%">Name</th>
       <th>Datum</th>
       <th>Positionen</th>
       <th>Total</th>
+      <th>Kategorien</th>
       <th></th>
     </tr>
   </thead>
   <tbody>
     {% for bill in bills %}
     <tr data-id="{{ bill.pk }}">
+      <td><input type="checkbox"></td>
       <td>{{ bill.name }}</td>
       <td>{{ bill.date|date:"d.m.Y" }}</td>
       <td>{{ bill.position_count }}</td>
       <td>{{ bill.total }}&euro;</td>
       <td>
-        <a href="{% url 'edit_bill' bill.pk %}">Bearbeiten</a>
-        <button class="btn btn-danger" data-id="{{ bill.pk }}" onclick="onDeleteBillClicked(event)">
-          Löschen
+        {% for icon in bill_groups|get_item:bill.pk %}
+          <img src="{% get_media_prefix %}{{ icon }}">
+        {% endfor %}
+      </td>
+      <td>
+        <button class="btn btn-link view"><img src="{% static 'images/view.svg' %}"></button>
+        <a class="btn btn-link edit" href="{% url 'edit_bill' bill.pk %}"><img src="{% static 'images/edit.svg' %}"></a>
+        <button class="btn btn-link delete" data-id="{{ bill.pk }}" onclick="onDeleteBillClicked(event)">
+          <img src="{% static 'images/delete.svg' %}">
         </button>
       </td>
     </tr>

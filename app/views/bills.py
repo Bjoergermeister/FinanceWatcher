@@ -1,4 +1,5 @@
 from django.db.models import F, Count, Sum
+from django.contrib.postgres.aggregates import ArrayAgg
 from django.forms import inlineformset_factory, modelformset_factory
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.shortcuts import render
@@ -148,8 +149,23 @@ def delete_position(request, bill_id, position_id):
 
 def bills(request):
     bills = Bill.objects.filter(user=request.user["id"]).annotate(position_count=Count("positions"))
+    
+    groups = Position.objects.filter(bill__in=bills, group__icon__isnull=False).values("bill", icon=F("group__icon"))
+    bill_groups = {}
+    for group in groups:
+        bill = group["bill"]
+        icon = group["icon"]
 
-    sum = bills.aggregate(sum=Sum("total"))["sum"]
-    print(sum)
+        if bill not in bill_groups:
+            bill_groups[bill] = []
+        if icon in bill_groups[bill]:
+            continue
 
-    return render(request, "bills/bills.html", { "bills": bills })
+        bill_groups[bill].append(group["icon"])
+
+    context = {
+        "bills": bills,
+        "bill_groups": bill_groups
+    }
+
+    return render(request, "bills/bills.html", context)
