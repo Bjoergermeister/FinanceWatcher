@@ -15,14 +15,15 @@ class CreateBillForm(forms.ModelForm):
     receipt = forms.FileField(label="Kassenzettel (optional)", required=False)
     paid = forms.BooleanField(label="Bezahlt", required=False)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, user, *args, **kwargs):
         super(CreateBillForm, self).__init__(*args, **kwargs)
 
         if self.is_bound is False:
             self.fields["date"].initial = datetime.date.today()
 
-            bill_count = Bill.objects.order_by("pk").last().pk
-            self.fields["name"].initial = f"Rechnung #{bill_count + 1}"
+            latest_bill = Bill.objects.filter(user=user["id"]).order_by("pk").last()
+            new_bill_number = latest_bill.pk + 1 if latest_bill is not None else 1
+            self.fields["name"].initial = f"Rechnung #{new_bill_number + 1}"
 
     class Meta:
         model = Bill

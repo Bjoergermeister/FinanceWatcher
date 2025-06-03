@@ -15,7 +15,7 @@ def create(request):
     if request.method == "POST":
         PositionFormSet = modelformset_factory(Position, form=CreatePositionForm, can_delete=True)
         position_formset = PositionFormSet(request.POST, prefix="position")
-        bill_form = CreateBillForm(request.POST)
+        bill_form = CreateBillForm(request.user, request.POST)
         
         form_is_valid = bill_form.is_valid() and position_formset.is_valid()
         if form_is_valid == False:
@@ -39,7 +39,7 @@ def create(request):
         return JsonResponse(ids, status=200)
 
     initial_form_values = { "user": request.user["id"] }
-    bill_form = CreateBillForm(initial=initial_form_values)
+    bill_form = CreateBillForm(request.user, initial=initial_form_values)
 
     PositionFormSet = modelformset_factory(Position, form=CreatePositionForm, extra=5, can_delete=True)
     position_formset = PositionFormSet(queryset=Position.objects.none(), prefix="position")
