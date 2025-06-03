@@ -2,6 +2,7 @@ from io import BytesIO
 from django.core.files import File
 from django.db import models
 from django.db.models import Q, QuerySet
+from django.templatetags.static import static
 
 from PIL import Image
 
@@ -14,13 +15,11 @@ class Group(models.Model):
         group = {
             "id": self.id,
             "name": self.name,
-            "image": self.icon.url
+            "icon": self.get_url()
         }
         
-        if self.user is not None:
-            group["user"] = self.user
-        
-        
+        group["user"] = self.user if self.user is not None else None
+                
         return group
 
     @staticmethod
@@ -37,24 +36,32 @@ class Group(models.Model):
         
         return groups.values_list("name", flat=True)
 
-    def save(self, *args, **kwargs):
-        image = Image.open(self.icon)
+    def get_url(self) -> str:
+        if self.icon is not None and self.icon != "":
+            return self.icon.file
         
-        if self.icon.name.startswith("groups"):
-            self.icon.name = self.icon.name.lstrip("groups/")
+        static_image_name = f"images/groups/{self.name}.webp"
+        return static(static_image_name)
 
-        smaller_side = min(image.width, image.height)
-        ratio = 1 / (smaller_side / 250)
-        size = (int(image.width * ratio), int(image.height * ratio))
-        image.thumbnail(size)
+    def save(self, *args, **kwargs):
+        if self.icon:
+            image = Image.open(self.icon)
+            
+            if self.icon.name.startswith("groups"):
+                self.icon.name = self.icon.name.lstrip("groups/")
 
-        x = (image.width - 250) / 2
-        y = (image.height - 250) / 2
+            smaller_side = min(image.width, image.height)
+            ratio = 1 / (smaller_side / 250)
+            size = (int(image.width * ratio), int(image.height * ratio))
+            image.thumbnail(size)
 
-        image = image.crop((x, y, image.width - x, image.height - y))
-        image_bytes = BytesIO()
-        image.save(image_bytes, 'JPEG', quality=70)
-        self.icon = File(image_bytes, name=self.icon.name)
+            x = (image.width - 250) / 2
+            y = (image.height - 250) / 2
+
+            image = image.crop((x, y, image.width - x, image.height - y))
+            image_bytes = BytesIO()
+            image.save(image_bytes, 'JPEG', quality=70)
+            self.icon = File(image_bytes, name=self.icon.name)
 
         super().save(*args, **kwargs)
 

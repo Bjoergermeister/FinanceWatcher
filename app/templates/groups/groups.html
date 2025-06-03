@@ -13,7 +13,7 @@
             <div id="global-groups" class="group-container">
                 {% for group in global_groups %}
                     <div class="group card shadow" data-id="{{ group.id }}">
-                        <img src="{{ group.icon.url }}" alt="Gruppenlogo" />
+                        <img src="{{ group.get_url }}" alt="Gruppenlogo" />
                         <div class="group-information">
                             <h2 class="mb-3">{{ group.name }}</h2>
                             <div>
@@ -29,7 +29,7 @@
                                     data-id="{{ group.id }}"
                                     data-user="{{ group.user }}"
                                     data-name="{{ group.name }}"
-                                    data-icon="{{ group.icon.url }}"
+                                    data-icon="{{ group.get_url }}"
                                     onclick="onEditGroupClicked(event)"
                                 >
                                     <i class="fa-solid fa-pen no-events"></i>
@@ -55,7 +55,7 @@
         <div id="user-groups" class="group-container">
             {% for user_group in user_groups %}
                 <div class="group card shadow" data-id="{{ user_group.id }}">
-                    <img src="{{ user_group.icon.url }}" />
+                    <img src="{{ user_group.get_url }}" />
                     <div class="group-information">
                         <h2 class="mb-3">{{ user_group.name }}</h2>
                         <div>
@@ -71,7 +71,7 @@
                                 data-id="{{ user_group.id }}"
                                 data-user="{{ user_group.user }}"
                                 data-name="{{ user_group.name }}"
-                                data-icon="{{ user_group.icon.url }}"
+                                data-icon="{{ user_group.get_url }}"
                                 onclick="onEditGroupClicked(event)"
                             >
                                 <i class="fa-solid fa-pen no-events"></i>

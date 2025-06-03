@@ -41,9 +41,7 @@ def list_all(request: WSGIRequest):
 
     # We need an standard python object so that it can be JSON-serialized. 
     # Otherwise, calling values() here with all members would be unnecessary
-    groups = groups.values("id", "user", "icon", "name")
-    for group in groups:
-        group["icon"] = f"{settings.MEDIA_URL}{group['icon']}"
+    groups = [group.to_dict() for group in groups]
 
     user_groups = []
     global_groups = []
