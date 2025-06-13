@@ -150,18 +150,19 @@ def delete_position(request, bill_id, position_id):
 def bills(request):
     bills = Bill.objects.filter(user=request.user["id"]).annotate(position_count=Count("positions"))
     
-    groups = Position.objects.filter(bill__in=bills, group__icon__isnull=False).values("bill", icon=F("group__icon"))
+    positions = Position.objects.filter(bill__in=bills).select_related("group").only("bill", "group")
+
     bill_groups = {}
-    for group in groups:
-        bill = group["bill"]
-        icon = group["icon"]
+    for position in positions:
+        bill = position.bill_id
+        group = position.group
 
         if bill not in bill_groups:
             bill_groups[bill] = []
-        if icon in bill_groups[bill]:
+        if group in bill_groups[bill]:
             continue
 
-        bill_groups[bill].append(group["icon"])
+        bill_groups[bill].append(position.group)
 
     context = {
         "bills": bills,

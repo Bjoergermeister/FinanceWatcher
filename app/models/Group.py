@@ -37,11 +37,15 @@ class Group(models.Model):
         return groups.values_list("name", flat=True)
 
     def get_url(self) -> str:
-        if self.icon is not None and self.icon != "":
-            return self.icon.file
+        if self.icon is None:
+            return static(f"images/group/Uncategorized.webp")
         
-        static_image_name = f"images/groups/{self.name}.webp"
-        return static(static_image_name)
+        if self.icon.name == "":
+            static_image_name = f"images/groups/{self.name}.webp"
+            return static(static_image_name)
+        
+        return self.icon.file
+        
 
     def save(self, *args, **kwargs):
         if self.icon:

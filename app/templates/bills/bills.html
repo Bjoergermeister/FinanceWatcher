@@ -29,7 +29,9 @@
       <td>{{ bill.total }}&euro;</td>
       <td>
         {% for icon in bill_groups|get_item:bill.pk %}
-          <img src="{{ icon.get_url }}">
+          {% if icon is not None %}
+            <img src="{{ icon.get_url }}" title="{{ icon.get_name }}">
+          {% endif %}
         {% endfor %}
       </td>
       <td>
