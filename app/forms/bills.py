@@ -23,7 +23,7 @@ class CreateBillForm(forms.ModelForm):
 
             latest_bill = Bill.objects.filter(user=user["id"]).order_by("pk").last()
             new_bill_number = latest_bill.pk + 1 if latest_bill is not None else 1
-            self.fields["name"].initial = f"Rechnung #{new_bill_number + 1}"
+            self.fields["name"].initial = f"Rechnung #{new_bill_number}"
 
     class Meta:
         model = Bill
