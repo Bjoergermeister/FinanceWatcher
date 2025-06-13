@@ -4,6 +4,10 @@
   box-sizing: border-box;
 }
 
+[popover] {
+  background: transparent;
+}
+
 body {
   display: grid;
   grid-template-rows: 100px 1fr;
@@ -24,10 +28,11 @@ header {
 #content {
   display: block;
   width: 100%;
-  margin: auto;
+  height: 100%;
   padding: 5rem;
   background: #fff;
-  border-radius: 2rem;
+  border-top-left-radius: 2rem;
+  border-top-right-radius: 2rem;
 }
 
 /*** Forms ***/
@@ -279,4 +284,19 @@ input[type="file"]:not(:empty) ~ label {
 
 #bills-table .btn.view img {
   fill: green;
+}
+
+#no-bills-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#no-bills-hint img {
+  width: 20rem;
+  height: 20rem;
+}
+
+#no-bills-hint p {
+  font-size: 2rem;
 }

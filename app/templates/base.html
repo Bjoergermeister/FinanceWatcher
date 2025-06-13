@@ -13,10 +13,12 @@
     />
     <link rel="stylesheet" type="text/css" href="{% static 'css/all.min.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'css/navigation.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/notifications.css' %}"/>
     {% block css %} {% endblock %}
 
     <script src="{% static 'js/api.js' %}"></script>
     <script src="{% static 'js/utils.js' %}"></script>
+    <script defer src="{% static 'js/notifications.js' %}"></script>
     {% block js %} {% endblock %}
   </head>
 
@@ -25,5 +27,28 @@
     {% include "navigation.html" %}
 
     <div id="content" class="card">{% block content %} {% endblock %}</div>
+
+    <div id="notification-bell" data-count="0"> 
+      <img src="{% static 'images/notification_bell.png' %}" onclick="onNotificationBellClicked(event)">
+    </div>
+    <div id="notification-drawer" class="no-events" popover="manual"></div>
+    <div id="notifications" class="no-events" popover="manual"></div>
   </body>
+
+  <script>
+    const setupCallbacks = [];
+
+    window.onload = function(){
+      for (const setupCallback of setupCallbacks){
+        setupCallback();
+      }
+    }
+
+    document.onkeydown = function(event){
+      console.log(event);
+      if (event.key !== "Enter") return;
+
+      sendNotification("Test", "test", NOTIFICATION_TYPE_SUCCESS);
+    }
+  </script>
 </html>

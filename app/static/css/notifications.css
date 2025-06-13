@@ -1,0 +1,65 @@
+#notifications {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100vw;
+  height: 100vh;
+  z-index: 10;
+  overflow: hidden;
+}
+
+#notifications:popover-open {
+  display: block;
+  border: none;
+}
+.notification {
+  pointer-events: initial;
+  position: absolute;
+  top: 0px;
+  left: 10px;
+  max-width: 30vw;
+  translate: 0px 100vh;
+  transition: translate 1s ease-out;
+}
+
+.notification header {
+  position: relative;
+}
+
+.notification header h4 {
+  margin-right: 1.5rem;
+}
+
+.notification header i {
+  cursor: pointer;
+  position: absolute;
+  top: 8px;
+  right: -5px;
+}
+
+#notification-bell {
+  position: absolute;
+  left: 1rem;
+  bottom: 1rem;
+}
+
+#notification-bell img {
+  width: 3.5rem;
+  height: 3.5rem;
+}
+
+#notification-bell::after {
+  content: attr(data-count);
+  position: absolute;
+  display: block;
+  color: white;
+  background: red;
+  width: 1.5rem;
+  height: 1.5rem;
+  text-align: center;
+  line-height: 1.5rem;
+  outline: 0.125rem solid white;
+  left: 50%;
+  bottom: 50%;
+  border-radius: 50%;
+}
