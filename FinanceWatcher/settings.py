@@ -113,6 +113,45 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "filters": {
+        "require_debug_false": {
+            "{}": "django.utils.log.RequireDebugFalse"
+        }
+    },
+    "formatters": {
+        "simple": {
+            "format": "{asctime} {name} {levelname} {message}",
+            "style": "{"
+        }
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "simple"
+        },
+        "file": {
+            "class": "logging.FileHandler",
+            "filename": "financewatcher.log",
+            "level": "INFO",
+            "formatter": "simple"
+        }
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "WARNING"
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": False
+        }
+    }
+}
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
