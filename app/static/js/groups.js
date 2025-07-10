@@ -2,11 +2,9 @@
 /* EVENT HANDLERS */
 /******************/
 
-const createGroupDialog = document.getElementById("create-group-dialog");
-const editGroupDialog = document.getElementById("edit-group-dialog");
+const groupDialog = document.getElementById("group-dialog");
 const deleteGroupDialog = document.getElementById("confirm-group-deletion-dialog");
-const addUserGroupButton = document.getElementById("add-user-group-button");
-const addGlobalGroupButton = document.getElementById("add-global-group-button");
+const addGroupButton = document.getElementById("add-group-button");
 
 let groupId = undefined;
 
@@ -27,16 +25,11 @@ async function onGroupFormSubmitted(event) {
     return;
   }
 
-  const isGlobalGroupInput = createGroupDialog.querySelector("input[name='is_global']");
-  const isGlobalGroup = isGlobalGroupInput.value === "true";
-
-  const groupContainerSelector = isGlobalGroup ? "global-groups" : "user-groups";
-  const groupContainer = document.getElementById(groupContainerSelector);
-
+  const groupContainer = document.getElementById("user-groups");
   const newGroup = createNewGroup(result.content);
   groupContainer.insertBefore(newGroup, groupContainer.lastElementChild);
 
-  createGroupDialog.close();
+  groupDialog.close();
 }
 
 async function onDeleteGroupClicked(event) {
@@ -71,37 +64,20 @@ function onDeleteGroupAborted(event) {
   deleteGroupDialog.close();
 }
 
+function onAddGroupClicked(event) {
+  event.preventDefault();
+  groupDialog.querySelector("input[name='icon']").required = true;
+  groupDialog.showModal();
+}
+
 function onEditGroupClicked(event) {
   event.preventDefault();
 
-  const button = event.target;
-  const isGlobalGroup = button.dataset.user === undefined;
-
-  if (isGlobalGroup) {
-    editGroupDialog.querySelector("input[name='is_global']").value = true;
-    editGroupDialog.querySelector("input[name='user']").value = event.target.dataset.user;
-  } else {
-    editGroupDialog.querySelector("input[name='is_global']").value = false;
-  }
-
-  editGroupDialog.querySelector("input[name='id']").value = event.target.dataset.id;
-  editGroupDialog.querySelector("input[name='name']").value = event.target.dataset.name;
-  editGroupDialog.querySelector("#image-preview").src = event.target.dataset.icon;
-  editGroupDialog.showModal();
-}
-
-function onAddGlobalGroupClicked(event) {
-  event.preventDefault();
-
-  createGroupDialog.querySelector("input[name='is_global']").value = true;
-  createGroupDialog.showModal();
-}
-
-function onAddUserGroupClicked(event) {
-  event.preventDefault();
-
-  createGroupDialog.querySelector("input[name='is_global']").value = false;
-  createGroupDialog.showModal();
+  groupDialog.querySelector("input[name='id']").value = event.target.dataset.id;
+  groupDialog.querySelector("input[name='name']").value = event.target.dataset.name;
+  groupDialog.querySelector("input[name='icon']").required = false;
+  groupDialog.querySelector(".image-preview").src = event.target.dataset.icon;
+  groupDialog.showModal();
 }
 
 function onGroupImageChanged(event) {
@@ -109,18 +85,20 @@ function onGroupImageChanged(event) {
 
   if (event.target.files.length === 0) return;
 
-  const preview = document.getElementById("image-preview");
-  preview.src = URL.createObjectURL(event.target.files[0]);
+  const form = findParentElement(event.target, "FORM");
+  const imagePreview = form.querySelector(".image-preview");
+  imagePreview.src = URL.createObjectURL(event.target.files[0]);
 }
 
 function onGroupAbortClicked(event) {
   event.preventDefault();
 
   const dialog = findParentElement(event.target, "DIALOG");
+  if (dialog === null) return;
 
   dialog.querySelector("input[name='name']").value = "";
   dialog.querySelector("input[name='icon']").value = "";
-  dialog.querySelector("#image-preview").src = "";
+  dialog.querySelector(".image-preview").removeAttribute("src");
   dialog.close();
 }
 
@@ -130,7 +108,7 @@ function onGroupAbortClicked(event) {
 
 /**
  *
- * @param {Object} newInstance - An object representing the group
+ * @param {Object} newGroupInstance - An object representing the group
  * @returns {HTMLElement} - The new group element
  */
 function createNewGroup(newGroupInstance) {
@@ -138,17 +116,13 @@ function createNewGroup(newGroupInstance) {
     .children[0];
 
   groupClone.querySelector("h2").innerText = newGroupInstance.name;
-  groupClone.querySelector("img").src = newGroupInstance.image;
+  groupClone.querySelector("img").src = newGroupInstance.icon;
   groupClone.dataset.id = newGroupInstance.id;
 
   const editGroupButton = groupClone.querySelector("button.btn-primary");
   editGroupButton.dataset.id = newGroupInstance.id;
-  editGroupButton.dataset.icon = newGroupInstance.image;
+  editGroupButton.dataset.icon = newGroupInstance.icon;
   editGroupButton.dataset.name = newGroupInstance.name;
-
-  if (newGroupInstance.user !== undefined) {
-    editGroupButton.dataset.user = newGroupInstance.user;
-  }
 
   const deleteGroupButton = groupClone.querySelector("button.btn-danger");
   deleteGroupButton.dataset.id = newGroupInstance.id;

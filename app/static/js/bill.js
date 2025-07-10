@@ -115,7 +115,7 @@ async function onBillFormSubmitted(event) {
     data.append("id", form.id.value);
     data.append("name", form.name.value);
     data.append("date", form.date.value);
-    data.append("receipt", form.receipt.files[0]);
+    data.append("receipt", form.receipt.files.length > 0 ? form.receipt.files[0] : "");
     data.append("description", form.description.value);
     data.append("user", form.user.value);
     data.append("total", form.total.value);

@@ -3,6 +3,7 @@ import uuid
 from django import forms
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.db.models.fields.files import ImageFieldFile
 
 from ..models.Group import Group
 
@@ -73,12 +74,13 @@ class EditGroupForm(forms.ModelForm):
         self.user = user
         self.groups = user_groups
 
-    def clean_is_global(self):
-        is_global = self.cleaned_data.get("is_global", None)
-        if is_global and self.user["isAdmin"] == False:
-            raise ValidationError("You are not allowed to create groups that are globally accessible")
+    def clean_icon(self):
+        data = self.cleaned_data
 
-        return is_global
+        icon: ImageFieldFile = data.get("icon")
+        icon.name = self.instance.icon.name
+
+        return icon
 
     def clean_name(self):
         name = self.cleaned_data.get("name", None)
@@ -86,7 +88,7 @@ class EditGroupForm(forms.ModelForm):
             raise ValidationError("Du hast schon eine Gruppe mit dem Namen %(group_name)s", params={ 'group_name': name })
         
         return name
-
+            
     class Meta:
         model = Group
         exclude = ['user'] 

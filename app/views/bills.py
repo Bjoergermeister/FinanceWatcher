@@ -62,14 +62,14 @@ def edit(request, id):
 
         PositionFormSet = inlineformset_factory(Bill, Position, EditPositionForm, exclude=[], extra=0, can_delete=True)
         position_formset = PositionFormSet(request.POST, instance=bill, prefix="position")
-        bill_form = EditBillForm(request.POST, instance=bill)
+        bill_form = EditBillForm(request.POST, request.FILES, instance=bill)
         
         form_is_valid = bill_form.is_valid() and position_formset.is_valid()
         if form_is_valid == False:
             return JsonResponse({ "bill_form": bill_form.errors, "position_formset": position_formset.errors}, status=400)
         
         ids = {}
-        bill: Bill = bill_form.save()
+        bill: Bill = bill_form.save(was_file_uploaded=len(request.FILES) > 0)
         ids["bill"] = bill.pk
 
         deleted_position_ids = [position_form.initial.get("id") for position_form in position_formset.deleted_forms]

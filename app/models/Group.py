@@ -1,3 +1,5 @@
+import os
+
 from io import BytesIO
 from django.core.files import File
 from django.db import models
@@ -40,15 +42,22 @@ class Group(models.Model):
         if self.icon is None:
             return static(f"images/group/Uncategorized.webp")
         
-        if self.icon.name == "":
+        if self.user is None:
             static_image_name = f"images/groups/{self.name}.webp"
             return static(static_image_name)
         
-        return self.icon.file
+        return self.icon.url
         
 
-    def save(self, *args, **kwargs):
-        if self.icon:
+    def save(self, file_was_uploaded: bool, *args, **kwargs):
+        if self.icon and file_was_uploaded:
+            
+            # If there already exists a file with the given name, we need to delete it because otherwise
+            # Django generate a new name and uses that one.
+            full_path = os.path.join(self.icon.storage.location, "groups", self.icon.name)
+            if os.path.isfile(full_path):
+                os.remove(full_path)
+
             image = Image.open(self.icon)
             
             if self.icon.name.startswith("groups"):

@@ -11,7 +11,10 @@
     onsubmit="onGroupFormSubmitted(event)"
     enctype="multipart/form-data"
   >
-    <div class="form-row">{% csrf_token %} {{ create_form.is_global }}</div>
+    <div class="form-row">
+      {% csrf_token %} 
+      <input type="hidden" name="id">
+    </div>
     <div class="form-row">
       <div class="col-md">{{ create_form.name|as_crispy_field }}</div>
     </div>
@@ -40,7 +43,7 @@
       <div class="col-md-6">
         <div class="form-group">
           <label>Vorschau</label>
-          <img id="image-preview" src="" style="width: 250px; height: 250px" />
+          <img class="image-preview" src="" style="width: 250px; height: 250px" />
         </div>
       </div>
     </div>

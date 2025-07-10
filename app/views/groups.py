@@ -4,7 +4,7 @@ import json
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models import Q, F
-from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotFound, JsonResponse
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound, JsonResponse
 from django.shortcuts import render
 
 from ..forms.groups import CreateGroupForm, EditGroupForm
@@ -56,9 +56,12 @@ def list_all(request: WSGIRequest):
 
     return JsonResponse(result)
 
-def create(request):
+def create(request: WSGIRequest):
     if request.method != "POST":
         return HttpResponse(status=405)
+
+    if len(request.FILES) == 0:
+        return HttpResponseBadRequest()
 
     user_groups = Group.get_all_for_user(request.user)
 
@@ -77,7 +80,7 @@ def create(request):
 
     return JsonResponse(instance.to_dict(), status=200)
 
-def edit(request, id):
+def edit(request: WSGIRequest, id: int):
     group = None
     try:
         group = Group.objects.get(id=id)
@@ -92,7 +95,7 @@ def edit(request, id):
 
     instance: Group = form.save(commit=False)
 
-    instance.save()
+    instance.save(file_was_uploaded=len(request.FILES) > 0)
 
     return JsonResponse(instance.to_dict(), status=200)
 
