@@ -1,4 +1,8 @@
+from __future__ import annotations
+
 import os
+
+from typing import Any, Dict
 
 from io import BytesIO
 from django.core.files import File
@@ -13,9 +17,9 @@ class Group(models.Model):
     user = models.UUIDField(db_column="user", null=True)
     icon = models.ImageField(db_column="icon", null=True, upload_to="groups")
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         group = {
-            "id": self.id,
+            "id": self.pk,
             "name": self.name,
             "icon": self.get_url()
         }
@@ -25,7 +29,7 @@ class Group(models.Model):
         return group
 
     @staticmethod
-    def get_all_for_user(user: dict[str, any], **kwargs) -> QuerySet:
+    def get_all_for_user(user: dict[str, Any], **kwargs) -> QuerySet[Group, str]:
         exclude_id: int = kwargs.pop("exclude_id", None)
 
         groups_query = Q(user=user["id"])
@@ -38,7 +42,7 @@ class Group(models.Model):
         
         return groups.values_list("name", flat=True)
 
-    def get_url(self) -> str:
+    def get_url(self: Group) -> str:
         if self.icon is None:
             return static(f"images/group/Uncategorized.webp")
         
@@ -49,7 +53,7 @@ class Group(models.Model):
         return self.icon.url
         
 
-    def save(self, file_was_uploaded: bool, *args, **kwargs):
+    def save(self, file_was_uploaded: bool, *args, **kwargs) -> None:
         if self.icon and file_was_uploaded:
             
             # If there already exists a file with the given name, we need to delete it because otherwise

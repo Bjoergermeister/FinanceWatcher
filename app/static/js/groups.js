@@ -14,10 +14,9 @@ async function onGroupFormSubmitted(event) {
   const data = new FormData(event.target);
   const id = data.get("id");
 
-  const result =
-    id === null || id === ""
-      ? await GroupAPI.create(data)
-      : await GroupAPI.edit(id, data);
+  const isCreating = id === null || id === "";
+
+  const result = isCreating ? await GroupAPI.create(data) : await GroupAPI.edit(id, data);
 
   if (result.success == false) {
     alert("Something went wrong");
@@ -25,9 +24,22 @@ async function onGroupFormSubmitted(event) {
     return;
   }
 
-  const groupContainer = document.getElementById("user-groups");
-  const newGroup = createNewGroup(result.content);
-  groupContainer.insertBefore(newGroup, groupContainer.lastElementChild);
+  // If a new group was created, we need to create an HTML element for it and add it to the user groups container
+  // Otherwise (if a group was edited) we need to update its HTML element so display the changes (if any)
+  if (isCreating) {
+    const groupContainer = document.getElementById("user-groups");
+    const newGroup = createNewGroup(result.content);
+    groupContainer.insertBefore(newGroup, groupContainer.lastElementChild);
+  } else {
+    const id = result.content.id;
+    const formRow = document.querySelector(`div.group[data-id='${id}']`);
+    formRow.querySelector("img").src = `${result.content.icon}#${Date.now()}`;
+    formRow.querySelector("h2").innerText = result.content.name;
+
+    const editButton = formRow.querySelectorAll("button")[1];
+    editButton.dataset.icon = result.content.icon;
+    editButton.dataset.name = result.content.name;
+  }
 
   groupDialog.close();
 }
