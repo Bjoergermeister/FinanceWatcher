@@ -65,6 +65,7 @@ dialog .content {
   background: white;
   border-radius: 5px;
   box-shadow: 1px 1px 10px #333;
+  padding-bottom: 60px;
 
   min-height: 250px;
   width: 600px;

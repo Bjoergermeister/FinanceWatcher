@@ -1,9 +1,7 @@
-import os
 import json
 
-from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
-from django.db.models import Q, F
+from django.db.models import Q
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound, JsonResponse
 from django.shortcuts import render
 
@@ -11,7 +9,7 @@ from ..forms.groups import CreateGroupForm, EditGroupForm
 
 from ..models.Group import Group
 
-def groups(request):
+def groups(request: WSGIRequest) -> HttpResponse:
     user_groups = Group.objects.filter(user=request.user["id"])
 
     global_groups = None
@@ -30,7 +28,7 @@ def groups(request):
 
     return render(request, "groups/groups.html", context)
 
-def list_all(request: WSGIRequest):
+def list_all(request: WSGIRequest) -> HttpResponse:
 
     body = json.loads(request.body)
     already_chosen_groups = body["alreadyChosenGroups"]
@@ -56,7 +54,7 @@ def list_all(request: WSGIRequest):
 
     return JsonResponse(result)
 
-def create(request: WSGIRequest):
+def create(request: WSGIRequest) -> HttpResponse:
     if request.method != "POST":
         return HttpResponse(status=405)
 
@@ -80,7 +78,7 @@ def create(request: WSGIRequest):
 
     return JsonResponse(instance.to_dict(), status=200)
 
-def edit(request: WSGIRequest, id: int):
+def edit(request: WSGIRequest, id: int) -> HttpResponse:
     group = None
     try:
         group = Group.objects.get(id=id)
@@ -99,7 +97,7 @@ def edit(request: WSGIRequest, id: int):
 
     return JsonResponse(instance.to_dict(), status=200)
 
-def delete(request, id):
+def delete(request: WSGIRequest, id: int) -> HttpResponse:
     group = None
     try:
         group = Group.objects.get(id=id)

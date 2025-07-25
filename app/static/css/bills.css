@@ -1,0 +1,23 @@
+#position-table img {
+  width: 50px;
+  height: 50px;
+}
+
+.bill-preview-category {
+  display: block;
+  width: 95%;
+  margin: auto;
+}
+
+#position-table .group-header {
+  padding: 5px;
+  background: cornflowerblue;
+}
+
+#position-table .group-header h3 {
+  display: inline-block;
+  height: 50px;
+  line-height: 50px;
+  color: white;
+  margin: 0px 0px 0px 10px;
+}

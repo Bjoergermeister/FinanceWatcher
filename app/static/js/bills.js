@@ -30,3 +30,25 @@ async function onBillDeletionConfirmClicked(event) {
 
   confirmBillDeletionDialog.close();
 }
+
+async function onBillPreviewClicked(event) {
+  event.preventDefault();
+
+  const billId = event.currentTarget.dataset.id;
+  const billName = event.currentTarget.dataset.name;
+  const result = await BillAPI.preview(billId);
+  if (result.success === false) return;
+
+  const billPreviewContainer = document.getElementById("bill-preview");
+  billPreviewContainer.innerHTML = result.content;
+
+  const billPreviewDialog = document.getElementById("bill-preview-dialog");
+  billPreviewDialog.querySelector("#preview-bill-name").innerText = billName;
+  billPreviewDialog.showModal();
+}
+
+async function onCloseBillPreviewClicked(event) {
+  event.preventDefault();
+  const dialog = document.getElementById("bill-preview-dialog");
+  dialog.close();
+}

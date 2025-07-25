@@ -2,6 +2,10 @@
 
 {% load static %} 
 
+{% block css %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/bills.css' %}">
+{% endblock %}
+
 {% block js %}
   <script src="{% static 'js/bills.js' %}" defer></script>
 {% endblock %} 
@@ -35,7 +39,14 @@
         {% endfor %}
       </td>
       <td>
-        <button class="btn btn-link view"><img src="{% static 'images/view.svg' %}"></button>
+        <button 
+          class="btn btn-link view" 
+          data-id="{{ bill.pk }}" 
+          data-name="{{ bill.name }}"
+          onclick="onBillPreviewClicked(event)"
+        >
+          <img src="{% static 'images/view.svg' %}">
+        </button>
         <a class="btn btn-link edit" href="{% url 'edit_bill' bill.pk %}"><img src="{% static 'images/edit.svg' %}"></a>
         <button class="btn btn-link delete" data-id="{{ bill.pk }}" onclick="onDeleteBillClicked(event)">
           <img src="{% static 'images/delete.svg' %}">
@@ -84,8 +95,29 @@
   </div>
 </dialog>
 
+<dialog id="bill-preview-dialog" name="bill-preview">
+  <div class="content">
+    <header>
+      <h1><span id="preview-bill-name"></span></h1>
+    </header>
+    <div class="body form-row">
+      <div class="col-md">
+        <div id="bill-preview">
+
+        </div>
+      </div>
+    </div>
+    <footer>
+      <button type="button" class="btn btn-primary pl-5 pr-5" onclick="onCloseBillPreviewClicked(event)">
+        Ok
+      </button>
+    </footer>
+  </div>
+</dialog>
+
 <script>
   const DELETE_BILL_URL = "{% url 'delete_bill' 0 %}";
+  const PREVIEW_BILL_URL = "{% url 'preview_bill' 0 %}";
   const CSRF_MIDDLEWARE_TOKEN = "{{ csrf_token }}";
 </script>
 

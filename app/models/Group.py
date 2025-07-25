@@ -44,7 +44,7 @@ class Group(models.Model):
 
     def get_url(self: Group) -> str:
         if self.icon is None:
-            return static(f"images/group/Uncategorized.webp")
+            return static(f"images/groups/Uncategorized.webp")
         
         if self.user is None:
             static_image_name = f"images/groups/{self.name}.webp"

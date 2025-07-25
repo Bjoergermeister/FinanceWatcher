@@ -1,8 +1,10 @@
-from django.db.models import F, Count, Sum
-from django.contrib.postgres.aggregates import ArrayAgg
+from typing import Dict, List
+
+from django.db.models import F, Count
+from django.core.handlers.wsgi import WSGIRequest
 from django.forms import inlineformset_factory, modelformset_factory
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 
 from ..models.Bill import Bill
 from ..models.Group import Group
@@ -11,7 +13,7 @@ from ..models.Position import Position
 from ..forms.bills import CreateBillForm, EditBillForm
 from ..forms.positions import CreatePositionForm, EditPositionForm
 
-def create(request):
+def create(request: WSGIRequest):
     if request.method == "POST":
         PositionFormSet = modelformset_factory(Position, form=CreatePositionForm, can_delete=True)
         position_formset = PositionFormSet(request.POST, prefix="position")
@@ -56,7 +58,7 @@ def create(request):
 
     return render(request, "bills/new.html", context)
 
-def edit(request, id):
+def edit(request: WSGIRequest, id: int):
     if request.method == "POST":
         bill = Bill.objects.get(id=id)
 
@@ -119,7 +121,7 @@ def edit(request, id):
 
     return render(request, "bills/new.html", context)
 
-def delete(request, id):
+def delete(request: WSGIRequest, id: int):
     # Bills can only be deleted by admins or by the user who created them
     # If the user is admin, just delete the bill
     if request.user["isAdmin"]:
@@ -136,7 +138,7 @@ def delete(request, id):
 
     return HttpResponse(status=200)
 
-def delete_position(request, bill_id, position_id):
+def delete_position(request: WSGIRequest, bill_id: int, position_id: int):
 
     position = Position.objects.get(id=position_id)
     price = position.price * position.quantity
@@ -147,12 +149,12 @@ def delete_position(request, bill_id, position_id):
 
     return HttpResponse(status=200)
 
-def bills(request):
+def bills(request: WSGIRequest):
     bills = Bill.objects.filter(user=request.user["id"]).annotate(position_count=Count("positions"))
     
     positions = Position.objects.filter(bill__in=bills).select_related("group").only("bill", "group")
 
-    bill_groups = {}
+    bill_groups: Dict[Bill, List[Group]] = {}
     for position in positions:
         bill = position.bill_id
         group = position.group
@@ -170,3 +172,20 @@ def bills(request):
     }
 
     return render(request, "bills/bills.html", context)
+
+def preview(request: WSGIRequest, id: int) -> HttpResponse:
+    bill = get_object_or_404(Bill, id=id, user=request.user["id"])
+    bill_positions = Position.objects.filter(bill=bill).select_related("group")
+
+    groups_positions: Dict[Group | None, List[Position]] = {}
+    for position in bill_positions:
+        group = position.group
+        if group not in groups_positions:
+            groups_positions[group] = []
+        groups_positions[group].append(position)
+
+    context = {
+        'groups_positions': groups_positions
+    }
+
+    return render(request, "bills/preview.html", context)

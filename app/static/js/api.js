@@ -36,6 +36,11 @@ class BillAPI {
     const options = getOptions("DELETE", { csrfmiddlewaretoken: CSRF_MIDDLEWARE_TOKEN });
     return await makeRequest(url, options);
   }
+
+  static async preview(billId) {
+    const url = PREVIEW_BILL_URL.replace(/0/g, billId);
+    return await makeRequest(url);
+  }
 }
 
 class GroupAPI {
