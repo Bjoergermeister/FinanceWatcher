@@ -53,7 +53,7 @@ class Group(models.Model):
         return self.icon.url
         
 
-    def save(self, file_was_uploaded: bool, *args, **kwargs) -> None:
+    def save(self, file_was_uploaded: bool = False, *args, **kwargs) -> None:
         if self.icon and file_was_uploaded:
             
             # If there already exists a file with the given name, we need to delete it because otherwise

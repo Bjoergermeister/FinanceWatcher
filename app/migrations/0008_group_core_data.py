@@ -13,7 +13,7 @@ def forward_func(app, schema):
     
     # Health and Wellness
     Group.objects.update_or_create(name="Healthcare", user=None, icon=None)
-    Group.objects.update_or_create(name="Fitnesss", user=None, icon=None)
+    Group.objects.update_or_create(name="Fitness", user=None, icon=None)
     Group.objects.update_or_create(name="Personal Care", user=None, icon=None)
     
     # Leisure and Entertainment
@@ -26,7 +26,7 @@ def forward_func(app, schema):
     Group.objects.update_or_create(name="Childcare", user=None, icon=None)
     
     # Financial and Professional
-    Group.objects.update_or_create(name="Investmens", user=None, icon=None)
+    Group.objects.update_or_create(name="Investments", user=None, icon=None)
     Group.objects.update_or_create(name="Professional Expenses", user=None, icon=None)
     Group.objects.update_or_create(name="Savings and Debt", user=None, icon=None)
     
