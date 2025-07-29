@@ -9,7 +9,7 @@ class BillAPI {
       "Content-Type": CONTENT_TYPE_FORM_DATA,
     });
 
-    prepareHeadersForFileUpload[options.headers];
+    prepareHeadersForFileUpload(options.headers);
 
     return await makeRequest(CREATE_BILL_URL, options);
   }
