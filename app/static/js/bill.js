@@ -363,6 +363,16 @@ async function onEditGroupClicked(event) {
   };
 }
 
+function onReceiptImageChanged(event) {
+  event.preventDefault();
+  
+  const fileInput = event.target;
+  if (fileInput.files.length == 0) return;
+
+  const imagePreview = fileInput.nextElementSibling.firstElementChild;
+  imagePreview.src = URL.createObjectURL(event.target.files[0]);
+}
+
 /********************/
 /* Helper Functions */
 /********************/

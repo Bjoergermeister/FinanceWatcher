@@ -13,3 +13,8 @@
 .position-group header img:hover {
   cursor: pointer;
 }
+
+#receipt-image-preview {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}

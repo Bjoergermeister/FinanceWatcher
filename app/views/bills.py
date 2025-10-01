@@ -71,7 +71,8 @@ def edit(request: WSGIRequest, id: int):
             return JsonResponse({ "bill_form": bill_form.errors, "position_formset": position_formset.errors}, status=400)
         
         ids = {}
-        bill: Bill = bill_form.save(was_file_uploaded=len(request.FILES) > 0)
+        bill: Bill = bill_form.save(commit=False)
+        bill.save(file_was_uploaded=len(request.FILES) > 0)
         ids["bill"] = bill.pk
 
         deleted_position_ids = [position_form.initial.get("id") for position_form in position_formset.deleted_forms]

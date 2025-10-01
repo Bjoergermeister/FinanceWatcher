@@ -2,6 +2,7 @@
 
 {% load crispy_forms_tags %} 
 {% load static %} 
+{% load i18n %}
 
 {% block css %}
   <link rel="stylesheet" href="{% static 'css/bill.css' %}"></link>
@@ -20,13 +21,31 @@
       {{ bill_form.id }} {{ bill_form.user }} {{ bill_form.total }}
     </div>
     <div class="form-row">
-      <div class="col-md-6">{{ bill_form.name|as_crispy_field }}</div>
-      <div class="col-md-2">{{ bill_form.date|as_crispy_field }}</div>
-      <div class="col-md-2">{{ bill_form.paid|as_crispy_field }}</div>
-      <div class="col-md-2">{{ bill_form.receipt|as_crispy_field }}</div>
-    </div>
-    <div class="form-row">
-      <div class="col-md">{{ bill_form.description|as_crispy_field }}</div>
+      <div class="col-md-9">
+        <div class="form-row">
+          <div class="col-md-8">{{ bill_form.name|as_crispy_field }}</div>
+          <div class="col-md-4">{{ bill_form.date|as_crispy_field }}</div>          
+        </div>
+        <div class="form-row">
+          <div class="col-md">{{ bill_form.description|as_crispy_field }}</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <label>{% trans 'Kassenzettel' %}</label>
+        <input type="file" id="id_receipt" name="receipt" accept="image/*" onchange="onReceiptImageChanged(event)" style="display: none;">
+        <label id="receipt_image_preview" for="id_receipt" style="width: 100%; aspect-ratio: 1 / 1; height: unset;">
+          {% if bill_form.instance.receipt.name is None %}
+            <img 
+              style="width: 100%; height: 100%; border-radius: 5%"
+              src="{% static 'images/groups/Uncategorized.webp' %}"
+            />
+          {% else %}
+            <img 
+              style="width: 100%; height: 100%; border-radius: 5%"
+              src="{{ bill_form.instance.receipt.url }}"
+            />
+          {% endif %}
+        </label>
     </div>
   </fieldset>
 

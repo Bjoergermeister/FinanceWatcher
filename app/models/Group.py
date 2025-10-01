@@ -57,7 +57,7 @@ class Group(models.Model):
         if self.icon and file_was_uploaded:
             
             # If there already exists a file with the given name, we need to delete it because otherwise
-            # Django generate a new name and uses that one.
+            # Django generates a new name and uses that one.
             full_path = os.path.join(self.icon.storage.location, "groups", self.icon.name)
             if os.path.isfile(full_path):
                 os.remove(full_path)

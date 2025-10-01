@@ -1,7 +1,12 @@
 from __future__ import annotations
 
 import datetime
+from io import BytesIO
+import os
 
+from PIL import Image
+
+from django.core.files import File
 from django.db import models
 
 
@@ -20,6 +25,22 @@ class Bill(models.Model):
     description = models.TextField(db_column="description", blank=True, null=True)
     receipt = models.ImageField(db_column="receipt", upload_to=user_directory_path, blank=True, null=True)
     paid = models.BooleanField(db_column="paid", blank=True, null=False, default=True)
+
+    def save(self, file_was_uploaded: bool = False, *args, **kwargs) -> None:
+        if self.receipt and file_was_uploaded:
+            # If there already exists a file with the given name, we need to delete it because otherwise
+            # Django generates a new name and uses that one.
+            full_path = os.path.join(self.receipt.storage.location, "receipts", str(self.user), self.receipt.name)
+            if os.path.isfile(full_path):
+                os.remove(full_path)
+
+            image = Image.open(self.receipt)
+
+            image_bytes = BytesIO()
+            image.save(image_bytes, 'JPEG', quality=70)
+            self.receipt = File(image_bytes, name=self.receipt.name)
+
+        super(Bill, self).save(*args, **kwargs)
 
     class Meta:
         db_table = "Bill"
