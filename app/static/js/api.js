@@ -47,7 +47,7 @@ class GroupAPI {
   static async create(data) {
     const options = getOptions("POST", data, { "Content-Type": CONTENT_TYPE_FORM_DATA });
 
-    prepareHeadersForFileUpload[options.headers];
+    prepareHeadersForFileUpload(options.headers);
 
     return await makeRequest(CREATE_GROUP_URL, options);
   }

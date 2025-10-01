@@ -34,7 +34,9 @@ class Bill(models.Model):
             if os.path.isfile(full_path):
                 os.remove(full_path)
 
-            image = Image.open(self.receipt)
+            # We save images as JPEGs. If the uploaded image is a PNG with transparency,
+            # we need to convert it to RGB first to get rid of the alpha channel
+            image = Image.open(self.receipt).convert("RGB")
 
             image_bytes = BytesIO()
             image.save(image_bytes, 'JPEG', quality=70)

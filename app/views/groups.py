@@ -74,7 +74,8 @@ def create(request: WSGIRequest) -> HttpResponse:
     if instance.user is None and request.user["isAdmin"] == False:
         return HttpResponseForbidden()
     
-    instance.save()
+    icon_was_uploaded = "icon" in request.FILES
+    instance.save(icon_was_uploaded)
 
     return JsonResponse(instance.to_dict(), status=200)
 
