@@ -111,9 +111,9 @@
     </template>
 
     <script>
-        const CREATE_GROUP_URL = "{% url 'create_group' %}";
+        const CREATE_GROUP_URL = "{% url 'groups' %}";
         const EDIT_GROUP_URL = "{% url 'edit_group' 1 %}";
-        const DELETE_GROUP_URL = "{% url 'delete_group' 1 %}";
+        const DELETE_GROUP_URL = "{% url 'edit_group' 1 %}";
         const CSRF_MIDDLEWARE_TOKEN = "{{ csrf_token }}";
         const USER_ID = "{{ user_id }}";
     </script>

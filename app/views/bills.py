@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Dict, List
 
 from django.db.models import F, Count
@@ -5,6 +7,7 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.forms import inlineformset_factory, modelformset_factory
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.shortcuts import render, get_object_or_404
+from django.views import View
 
 from ..models.Bill import Bill
 from ..models.Group import Group
@@ -13,8 +16,27 @@ from ..models.Position import Position
 from ..forms.bills import CreateBillForm, EditBillForm
 from ..forms.positions import CreatePositionForm, EditPositionForm
 
-def create(request: WSGIRequest):
-    if request.method == "POST":
+class CreateBillView(View):
+    def get(self: CreateBillView, request: WSGIRequest) -> HttpResponse:
+        initial_form_values = { "user": request.user["id"] }
+        bill_form = CreateBillForm(request.user, initial=initial_form_values)
+
+        PositionFormSet = modelformset_factory(Position, form=CreatePositionForm, extra=5, can_delete=True)
+        position_formset = PositionFormSet(queryset=Position.objects.none(), prefix="position")
+
+        group_positions = {
+            None: position_formset
+        }
+
+        context = {
+            'bill_form': bill_form,
+            'position_formset': position_formset,
+            'group_positions': group_positions
+        }
+
+        return render(request, "bills/new.html", context)
+    
+    def post(self: CreateBillView, request: WSGIRequest) -> JsonResponse:
         PositionFormSet = modelformset_factory(Position, form=CreatePositionForm, can_delete=True)
         position_formset = PositionFormSet(request.POST, prefix="position")
         bill_form = CreateBillForm(request.user, request.POST)
@@ -40,27 +62,40 @@ def create(request: WSGIRequest):
         
         return JsonResponse(ids, status=200)
 
-    initial_form_values = { "user": request.user["id"] }
-    bill_form = CreateBillForm(request.user, initial=initial_form_values)
 
-    PositionFormSet = modelformset_factory(Position, form=CreatePositionForm, extra=5, can_delete=True)
-    position_formset = PositionFormSet(queryset=Position.objects.none(), prefix="position")
+class EditBillView(View):
+    def get(self: EditBillView, request: WSGIRequest, bill_id: int) -> HttpResponse:
+        bill = Bill.objects.get(pk=bill_id)
+        bill_form = EditBillForm(instance=bill)
 
-    group_positions = {
-        None: position_formset
-    }
+        positions = Position.objects.filter(bill=bill).select_related("group")
+        group_ids = positions.exclude(group=None).distinct().values_list("group", flat=True)
+        groups = { group.pk: group for group in Group.objects.filter(pk__in=group_ids)}
 
-    context = {
-        'bill_form': bill_form,
-        'position_formset': position_formset,
-        'group_positions': group_positions
-    }
+        PositionFormSet = modelformset_factory(Position, EditPositionForm, exclude=[], can_delete=True, extra=0, labels={"name": "", "price": "", "quantity": ""})
+        position_formset = PositionFormSet(queryset=positions, prefix="position")
 
-    return render(request, "bills/new.html", context)
+        group_positions = {}
+        for position_form in position_formset:
+            group_id = position_form.instance.group.pk if position_form.instance.group is not None else None
+            if group_id not in group_positions:
+                group_positions[group_id] = []
 
-def edit(request: WSGIRequest, id: int):
-    if request.method == "POST":
-        bill = Bill.objects.get(id=id)
+            group_positions[group_id].append(position_form)
+
+        context = {
+            'bill_id': bill_id,
+            'bill_form': bill_form,
+            'position_formset': position_formset,
+            'group_positions': group_positions,
+            'groups': groups,
+            'group_ids': group_ids
+        }
+
+        return render(request, "bills/new.html", context)
+
+    def post(self: EditBillView, request: WSGIRequest, bill_id: int) -> JsonResponse:
+        bill = Bill.objects.get(pk=bill_id)
 
         PositionFormSet = inlineformset_factory(Bill, Position, EditPositionForm, exclude=[], extra=0, can_delete=True)
         position_formset = PositionFormSet(request.POST, instance=bill, prefix="position")
@@ -92,63 +127,24 @@ def edit(request: WSGIRequest, id: int):
         ids["positions"] = positions_ids
 
         return JsonResponse(ids, status=200)
-
-    bill = Bill.objects.get(id=id)
-    bill_form = EditBillForm(instance=bill)
-
-    positions = Position.objects.filter(bill=bill).select_related("group")
-    group_ids = positions.exclude(group=None).distinct().values_list("group", flat=True)
-    groups = { group.pk: group for group in Group.objects.filter(pk__in=group_ids)}
-
-    PositionFormSet = modelformset_factory(Position, EditPositionForm, exclude=[], can_delete=True, extra=0, labels={"name": "", "price": "", "quantity": ""})
-    position_formset = PositionFormSet(queryset=positions, prefix="position")
-
-    group_positions = {}
-    for position_form in position_formset:
-        group_id = position_form.instance.group.pk if position_form.instance.group is not None else None
-        if group_id not in group_positions:
-            group_positions[group_id] = []
-
-        group_positions[group_id].append(position_form)
-
-    context = {
-        'bill_id': id,
-        'bill_form': bill_form,
-        'position_formset': position_formset,
-        'group_positions': group_positions,
-        'groups': groups,
-        'group_ids': group_ids
-    }
-
-    return render(request, "bills/new.html", context)
-
-def delete(request: WSGIRequest, id: int):
-    # Bills can only be deleted by admins or by the user who created them
-    # If the user is admin, just delete the bill
-    if request.user["isAdmin"]:
-        result = Bill.objects.filter(id=id).delete()
+    
+    def delete(self: EditBillView, request: WSGIRequest, bill_id: int) -> HttpResponse:
+        # Bills can only be deleted by admins or by the user who created them
+        # If the user is admin, just delete the bill
+        if request.user["isAdmin"]:
+            result = Bill.objects.filter(pk=bill_id).delete()
+                
+            if result[1]["app.Bill"] != 1:
+                return HttpResponseNotFound()
+            return HttpResponse(status=200)
             
+        # If the user is not admin, check if he created the bill
+        result = Bill.objects.filter(pk=bill_id, user=request.user["id"]).delete()
         if result[1]["app.Bill"] != 1:
             return HttpResponseNotFound()
+
         return HttpResponse(status=200)
-        
-    # If the user is not admin, check if he created the bill
-    result = Bill.objects.filter(id=id, user=request.user["id"]).delete()
-    if result[1]["app.Bill"] != 1:
-        return HttpResponseNotFound()
 
-    return HttpResponse(status=200)
-
-def delete_position(request: WSGIRequest, bill_id: int, position_id: int):
-
-    position = Position.objects.get(id=position_id)
-    price = position.price * position.quantity
-
-    Bill.objects.filter(id=position.bill_id).update(total=F("total") - price)
-
-    position.delete()
-
-    return HttpResponse(status=200)
 
 def bills(request: WSGIRequest):
     bills = Bill.objects.filter(user=request.user["id"]).annotate(position_count=Count("positions"))
@@ -174,8 +170,8 @@ def bills(request: WSGIRequest):
 
     return render(request, "bills/bills.html", context)
 
-def preview(request: WSGIRequest, id: int) -> HttpResponse:
-    bill = get_object_or_404(Bill, id=id, user=request.user["id"])
+def preview(request: WSGIRequest, bill_id: int) -> HttpResponse:
+    bill = get_object_or_404(Bill, pk=bill_id, user=request.user["id"])
     bill_positions = Position.objects.filter(bill=bill).select_related("group")
 
     groups_positions: Dict[Group | None, List[Position]] = {}
@@ -186,6 +182,7 @@ def preview(request: WSGIRequest, id: int) -> HttpResponse:
         groups_positions[group].append(position)
 
     context = {
+        'bill': bill,
         'groups_positions': groups_positions
     }
 

@@ -38,7 +38,7 @@ class Group(models.Model):
 
         groups = Group.objects.filter(groups_query)
         if exclude_id is not None:
-            groups = groups.exclude(id=exclude_id)
+            groups = groups.exclude(pk=exclude_id)
         
         return groups.values_list("name", flat=True)
 
