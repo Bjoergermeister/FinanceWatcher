@@ -128,7 +128,11 @@ async function onBillFormSubmitted(event) {
   }
 
   if (result.success === false) {
-    alert("Ein Fehler ist aufgetreten");
+    sendNotification(
+      "Fehler beim Speichern der Rechnung", 
+      `Die Rechnung konnte nicht gespeichert werden: ${result.errors}.`, 
+      NOTIFICATION_TYPE_DANGER
+    );
     return;
   }
 
@@ -158,6 +162,12 @@ async function onBillFormSubmitted(event) {
   }
 
   setInitialFormCount(billPositions, getTotalFormCount(billPositions));
+
+  sendNotification(
+    "Rechnung gespeichert", 
+    "Die Rechnung wurde erfolgreich gespeichert.", 
+    NOTIFICATION_TYPE_SUCCESS
+  );
 
   return false;
 }
@@ -231,21 +241,6 @@ function onPositionDeletionAbortClicked(event) {
   confirmPositionDeletionDialog.close();
 }
 
-async function onPositionDeletionConfirmClicked(event) {
-  event.preventDefault();
-  event.target.classList.add("loading");
-
-  const positionId = confirmPositionDeletionDialog.dataset.id;
-  const result = await BillAPI.deletePosition(BILL_ID, positionId);
-  if (result.success === false) {
-    return;
-  }
-
-  event.target.classList.remove("loading");
-  confirmPositionDeletionDialog.close();
-  deletePosition();
-}
-
 async function onNewGroupButtonClicked(event) {
   event.preventDefault();
 
@@ -262,7 +257,12 @@ async function onNewGroupButtonClicked(event) {
 
   const result = await GroupAPI.getAll(alreadyChoosenGroups);
   if (result.success === false) {
-    alert("Failure");
+    sendNotification(
+      "Gruppen abfragen fehlgeschlagen",
+      `Konnte keine Gruppen abfragen: ${result.errors}`,
+      NOTIFICATION_TYPE_ERROR
+    );
+    return;
   }
 
   for (const userGroup of result.content.user_groups) {
@@ -336,7 +336,12 @@ async function onEditGroupClicked(event) {
 
   const result = await GroupAPI.getAll(alreadyChoosenGroups);
   if (result.success === false) {
-    alert("Failure");
+    sendNotification(
+      "Gruppen abfragen fehlgeschlagen",
+      `Konnte Gruppen nicht abfragen: ${result.errors}`,
+      NOTIFICATION_TYPE_ERROR
+    );
+    return;
   }
 
   for (const userGroup of result.content.user_groups) {

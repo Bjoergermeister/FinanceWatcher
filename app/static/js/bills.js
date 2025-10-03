@@ -19,7 +19,11 @@ async function onBillDeletionConfirmClicked(event) {
   event.target.classList.add("loading");
   const result = await BillAPI.delete(billId);
   if (result.success === false) {
-    alert(`Failure`);
+    sendNotification(
+      "Löschen fehlgeschlagen",
+      `Die Ausgabe konnte nicht gelöscht werden: ${result.errors}`,
+      NOTIFICATION_TYPE_ERROR
+    )
     return;
   }
 
@@ -37,7 +41,14 @@ async function onBillPreviewClicked(event) {
   const billId = event.currentTarget.dataset.id;
   const billName = event.currentTarget.dataset.name;
   const result = await BillAPI.preview(billId);
-  if (result.success === false) return;
+  if (result.success === false) {
+    sendNotification(
+      "Vorschau fehlgeschlagen",
+      `Die Vorschau der Ausgabe konnte nicht angezeigt werden: ${result.errors}`,
+      NOTIFICATION_TYPE_ERROR
+    );
+    return;
+  }
 
   const billPreviewContainer = document.getElementById("bill-preview");
   billPreviewContainer.innerHTML = result.content;

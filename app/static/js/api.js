@@ -2,6 +2,11 @@ const CONTENT_TYPE_JSON = "application/json";
 const CONTENT_TYPE_FORM_DATA = "multipart/form-data";
 const CONTENT_TYPE_URL_ENCODED = "application/x-www-form-urlencoded; charset=UTF-8";
 
+const HTTP_OK = 200;
+const HTTP_NOT_FOUND = 404;
+const HTTP_FORBIDDEN = 403;
+const HTTP_INTERNAL_SERVER_ERROR = 500;
+
 class BillAPI {
   static async create(data) {
     const options = getOptions("POST", data, {
@@ -128,11 +133,44 @@ function getOptions(method, data, headers) {
 
 async function makeRequest(url, options) {
   const response = await fetch(url, options);
-  const body = isJsonResponse(response) ? await response.json() : await response.text();
+  const success = response.status < 300;
 
-  return { success: response.status === 200, content: body };
+  let content;
+    if (response.status === HTTP_INTERNAL_SERVER_ERROR){
+        content = "Internal Server Error";
+    }else if (response.status === HTTP_FORBIDDEN){
+        content = "Forbidden";
+    }else if (isJsonResponse(response)){
+        content = await response.json();
+    }else if (isHTMLResponse(response) && response.status === HTTP_NOT_FOUND){
+        content = `Die angeforderte Seite wurde nicht gefunden: ${response.url}`;
+    }else if (isHTMLResponse(response)){
+        content = await response.text();
+    }else{
+        content = `Es ist ein unerwarteter Fehler aufgetreten: Content-Type: ${response.headers.get("Content-Type") ?? "Unbekannt"}`;
+    }
+
+    return {
+        success,
+        status: response.status,
+        content: (success) ? content : undefined,
+        errors: (success) ? undefined : content
+    }
 }
 
+/**
+ * 
+ * @param {Response} response - The response to check
+ * @returns Whether the response contains HTML content
+ */
+function isHTMLResponse(response) {
+  return response.headers.get("content-type").indexOf("text/html") !== -1;
+}
+/**
+ * 
+ * @param {Response} response - The response to check
+ * @returns Whether the response contains JSON content
+ */
 function isJsonResponse(response) {
   return response.headers.get("content-type").indexOf("application/json") !== -1;
 }

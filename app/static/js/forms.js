@@ -1,7 +1,7 @@
 /**
  * Traverses the DOM-tree upwards until an element with a class of "form-row" is found or the root HTML element is reached
  * @param {HTMLElement} element
- * @returns An element with the class "form-row" or the root HTML element, whichever is encountered first
+ * @returns {HTMLElement} An element with the class "form-row" or the root HTML element, whichever is encountered first
  */
 function findFormRow(element) {
   let parent = element;

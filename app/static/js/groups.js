@@ -19,8 +19,15 @@ async function onGroupFormSubmitted(event) {
   const result = isCreating ? await GroupAPI.create(data) : await GroupAPI.edit(id, data);
 
   if (result.success == false) {
-    alert("Something went wrong");
-    console.log(result.content);
+    const errorMessageTitle = isCreating 
+      ? "Erstellen der Gruppe fehlgeschlagen" 
+      : "Bearbeiten der Gruppe fehlgeschlagen";
+
+    sendNotification(
+      errorMessageTitle,
+      result.errors,
+      NOTIFICATION_TYPE_ERROR
+    );
     return;
   }
 
@@ -42,6 +49,16 @@ async function onGroupFormSubmitted(event) {
   }
 
   groupDialog.close();
+
+  const notificationTitle = isCreating ? "Gruppe erstellt" : "Gruppe bearbeitet";
+  const notificationMessage = isCreating 
+    ? "Die Gruppe wurde erfolgreich erstellt." 
+    : "Die Gruppe wurde erfolgreich bearbeitet.";
+  sendNotification(
+    notificationTitle,
+    notificationMessage,
+    NOTIFICATION_TYPE_SUCCESS
+  );
 }
 
 async function onDeleteGroupClicked(event) {
@@ -57,7 +74,11 @@ async function onDeleteGroupConfirmed(event) {
   event.target.classList.add("loading");
   const result = await GroupAPI.delete(groupId);
   if (result.success === false) {
-    alert("Failure");
+    sendNotification(
+      "Löschen der Gruppe fehlgeschlagen",
+      result.errors,
+      NOTIFICATION_TYPE_ERROR
+    );
     return;
   }
 
@@ -67,6 +88,12 @@ async function onDeleteGroupConfirmed(event) {
   group.remove();
 
   deleteGroupDialog.close();
+
+  sendNotification(
+    "Gruppe gelöscht",
+    "Die Gruppe wurde erfolgreich gelöscht.",
+    NOTIFICATION_TYPE_SUCCESS
+  );
 }
 
 function onDeleteGroupAborted(event) {
