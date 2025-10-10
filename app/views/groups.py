@@ -8,14 +8,18 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbid
 from django.shortcuts import render
 from django.views import View
 
+from ..enums import Http
 from ..forms.groups import CreateGroupForm, EditGroupForm
 
 from ..models.Group import Group
+from ..shortcuts import get_object_or_404
 
 def list_all(request: WSGIRequest) -> HttpResponse:
 
     body = json.loads(request.body)
-    already_chosen_groups = body["alreadyChosenGroups"]
+
+    key = "alreadyChosenGroups"
+    already_chosen_groups = body[key] if key in body else []
 
     groups = Group.objects.filter(Q(user=request.user["id"]) | Q(user=None))
     if len(already_chosen_groups) > 0:
@@ -64,8 +68,11 @@ class GroupsView(View):
 
         form = CreateGroupForm(request.user, request.POST,request.FILES, user_groups=user_groups)
         if form.is_valid() == False:
-            return JsonResponse(form.errors, status=400)
-        
+            body = {
+                "form": form.errors
+            }
+            return JsonResponse(body, status=Http.BAD_REQUEST)
+
         instance: Group = form.save(commit=False)
         
         # Only admins are allowed to create global groups.
@@ -76,39 +83,47 @@ class GroupsView(View):
         icon_was_uploaded = "icon" in request.FILES
         instance.save(icon_was_uploaded)
 
-        return JsonResponse(instance.to_dict(), status=200)
+        return JsonResponse(instance.to_dict(), status=Http.OK)
 
 
 class EditGroupView(View):
     def post(self: EditGroupView, request: WSGIRequest, group_id: int) -> HttpResponse:
-        group = None
-        try:
-            group = Group.objects.get(pk=group_id)
-        except Group.DoesNotExist:
-            return HttpResponseNotFound(f"Eine Gruppe mit der ID {group_id} existiert nicht")
-
+        group = get_object_or_404(
+            Group, pk=group_id, 
+            error_message="Gruppe wurde nicht gefunden",
+            json=True
+        )
+        
         user_groups = Group.get_all_for_user(request.user, exclude_id=group_id)
 
-        form = EditGroupForm(request.user, request.POST, request.FILES, instance=group, user_groups=user_groups)
+        form = EditGroupForm(
+            request.user,
+            request.POST,
+            request.FILES,
+            instance=group,
+            user_groups=user_groups
+        )
         if form.is_valid() == False:
-            return JsonResponse(form.errors, status=400)
+            body = {
+                "form": form.errors
+            }
+            return JsonResponse(body, status=Http.BAD_REQUEST)
 
         instance: Group = form.save(commit=False)
 
         file_was_uploaded = "icon" in request.FILES
         instance.save(file_was_uploaded)
 
-        return JsonResponse(instance.to_dict(), status=200)
+        return JsonResponse(instance.to_dict(), status=Http.OK)
     
     def delete(self: EditGroupView, request: WSGIRequest, group_id: int) -> HttpResponse:
-        group = None
-        try:
-            group = Group.objects.get(pk=group_id)
-        except Group.DoesNotExist:
-            return HttpResponseNotFound()
+        group = get_object_or_404(
+            Group, pk=group_id,
+            error_message="Gruppe wurde nicht gefunden"
+        )
 
         if group.user != request.user["id"] and request.user["isAdmin"] == False:
             return HttpResponseForbidden()
 
         group.delete()
-        return HttpResponse(200)
+        return HttpResponse(Http.OK)

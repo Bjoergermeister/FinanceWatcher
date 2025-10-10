@@ -6,7 +6,7 @@ from django.db.models import F, Count
 from django.core.handlers.wsgi import WSGIRequest
 from django.forms import inlineformset_factory, modelformset_factory
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from django.views import View
 
 from ..models.Bill import Bill
@@ -15,6 +15,9 @@ from ..models.Position import Position
 
 from ..forms.bills import CreateBillForm, EditBillForm
 from ..forms.positions import CreatePositionForm, EditPositionForm
+from ..enums import Http
+from ..shortcuts import get_object_or_404
+
 
 class CreateBillView(View):
     def get(self: CreateBillView, request: WSGIRequest) -> HttpResponse:
@@ -44,7 +47,7 @@ class CreateBillView(View):
         form_is_valid = bill_form.is_valid() and position_formset.is_valid()
         if form_is_valid == False:
             data = { "bill_form": bill_form.errors, "position_formset": position_formset.errors }
-            return JsonResponse(data, status=400)
+            return JsonResponse(data, status=Http.BAD_REQUEST)
         
         ids = {}
         bill = bill_form.save()
@@ -60,11 +63,16 @@ class CreateBillView(View):
 
         ids["positions"] = position_ids
         
-        return JsonResponse(ids, status=200)
+        return JsonResponse(ids, status=Http.OK)
 
 
 class EditBillView(View):
     def get(self: EditBillView, request: WSGIRequest, bill_id: int) -> HttpResponse:
+        bill = get_object_or_404(
+            Bill, pk=bill_id, user=request.user["id"],
+            error_message="Die Rechnung wurde nicht gefunden"
+        )
+        
         bill = Bill.objects.get(pk=bill_id)
         bill_form = EditBillForm(instance=bill)
 
@@ -103,7 +111,11 @@ class EditBillView(View):
         
         form_is_valid = bill_form.is_valid() and position_formset.is_valid()
         if form_is_valid == False:
-            return JsonResponse({ "bill_form": bill_form.errors, "position_formset": position_formset.errors}, status=400)
+            data = { 
+                "bill_form": bill_form.errors,
+                "position_formset": position_formset.errors
+            }
+            return JsonResponse(data, status=Http.BAD_REQUEST)
         
         ids = {}
         bill: Bill = bill_form.save(commit=False)
@@ -126,7 +138,7 @@ class EditBillView(View):
 
         ids["positions"] = positions_ids
 
-        return JsonResponse(ids, status=200)
+        return JsonResponse(ids, status=Http.OK)
     
     def delete(self: EditBillView, request: WSGIRequest, bill_id: int) -> HttpResponse:
         # Bills can only be deleted by admins or by the user who created them
@@ -136,14 +148,14 @@ class EditBillView(View):
                 
             if result[1]["app.Bill"] != 1:
                 return HttpResponseNotFound()
-            return HttpResponse(status=200)
+            return HttpResponse(status=Http.OK)
             
         # If the user is not admin, check if he created the bill
         result = Bill.objects.filter(pk=bill_id, user=request.user["id"]).delete()
         if result[1]["app.Bill"] != 1:
             return HttpResponseNotFound()
 
-        return HttpResponse(status=200)
+        return HttpResponse(status=Http.OK)
 
 
 def bills(request: WSGIRequest):
@@ -171,7 +183,11 @@ def bills(request: WSGIRequest):
     return render(request, "bills/bills.html", context)
 
 def preview(request: WSGIRequest, bill_id: int) -> HttpResponse:
-    bill = get_object_or_404(Bill, pk=bill_id, user=request.user["id"])
+    bill = get_object_or_404(
+        Bill, pk=bill_id, user=request.user["id"],
+        error_message="Die Rechnung wurde nicht gefunden.",
+        json=True
+    )
     bill_positions = Position.objects.filter(bill=bill).select_related("group")
 
     groups_positions: Dict[Group | None, List[Position]] = {}
