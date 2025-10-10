@@ -4,6 +4,7 @@
 
 {% block js %}
     <script src="{% static 'js/groups.js' %}" defer></script>
+    <script src="{% static 'js/forms.js' %}" defer></script>
 {% endblock %} 
 
 {% block content %} 
@@ -94,7 +95,7 @@
     </dialog>
 
     <dialog id="group-dialog">
-        <div class="content" style="height: 600px">{% include "groups/create.html" %}</div>
+        <div class="content" style="min-height: 600px">{% include "groups/create.html" %}</div>
     </dialog>
 
     <template id="group-template">

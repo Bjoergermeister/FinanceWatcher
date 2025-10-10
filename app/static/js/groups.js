@@ -11,23 +11,28 @@ let groupId = undefined;
 async function onGroupFormSubmitted(event) {
   event.preventDefault();
 
-  const data = new FormData(event.target);
+  const form = event.target;
+  const data = new FormData(form);
   const id = data.get("id");
 
   const isCreating = id === null || id === "";
 
-  const result = isCreating ? await GroupAPI.create(data) : await GroupAPI.edit(id, data);
+  removeFormErrors(form);
+
+  const result = isCreating 
+    ? await GroupAPI.create(data) 
+    : await GroupAPI.edit(id, data);
 
   if (result.success == false) {
+    if (result.errors instanceof Object){
+      displayFormErrors(form, result.errors["form"]);
+    }
     const errorMessageTitle = isCreating 
       ? "Erstellen der Gruppe fehlgeschlagen" 
       : "Bearbeiten der Gruppe fehlgeschlagen";
+    const errorMessage = (typeof result.errors === "string") ? result.errors : "Die Gruppe konnte nicht gespeichert werden";
 
-    sendNotification(
-      errorMessageTitle,
-      result.errors,
-      NOTIFICATION_TYPE_ERROR
-    );
+    sendNotification(errorMessageTitle, errorMessage, NOTIFICATION_TYPE_ERROR);
     return;
   }
 
