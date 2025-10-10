@@ -105,7 +105,6 @@ function onDeleteGroupAborted(event) {
 
 function onAddGroupClicked(event) {
   event.preventDefault();
-  groupDialog.querySelector("input[name='icon']").required = true;
   groupDialog.showModal();
 }
 

@@ -60,9 +60,6 @@ class GroupsView(View):
         return render(request, "groups/groups.html", context)
     
     def post(self: GroupsView, request: WSGIRequest) -> HttpResponse:
-        if len(request.FILES) == 0:
-            return HttpResponseBadRequest()
-
         user_groups = Group.get_all_for_user(request.user)
 
         form = CreateGroupForm(request.user, request.POST,request.FILES, user_groups=user_groups)
@@ -98,7 +95,8 @@ class EditGroupView(View):
 
         instance: Group = form.save(commit=False)
 
-        instance.save(file_was_uploaded=len(request.FILES) > 0)
+        file_was_uploaded = "icon" in request.FILES
+        instance.save(file_was_uploaded)
 
         return JsonResponse(instance.to_dict(), status=200)
     

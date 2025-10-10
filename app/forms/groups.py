@@ -8,7 +8,7 @@ from django.db.models.fields.files import ImageFieldFile
 from ..models.Group import Group
 
 class CreateGroupForm(forms.ModelForm):
-    icon = forms.ImageField(label="Bild")
+    icon = forms.ImageField(label="Bild", required=False)
     is_global = forms.BooleanField(required=False, widget=forms.HiddenInput(), initial=False)
 
     def __init__(self, user, *args, **kwargs):
@@ -38,10 +38,10 @@ class CreateGroupForm(forms.ModelForm):
     def clean(self):
         data = self.cleaned_data
 
-        icon: InMemoryUploadedFile = data.get("icon", None)
-        
-        file_extension = icon.name[icon.name.rfind(".") + 1:]
-        icon.name = f"{self.internal_file_name}.{file_extension}"
+        icon: InMemoryUploadedFile | None = data.get("icon", None)
+        if icon is not None:
+            file_extension = icon.name[icon.name.rfind(".") + 1:]
+            icon.name = f"{self.internal_file_name}.{file_extension}"
 
         return data
     
@@ -77,8 +77,9 @@ class EditGroupForm(forms.ModelForm):
     def clean_icon(self):
         data = self.cleaned_data
 
-        icon: ImageFieldFile = data.get("icon")
-        icon.name = self.instance.icon.name
+        icon: ImageFieldFile | None = data.get("icon", None)
+        if icon is not None:
+            icon.name = self.instance.icon.name
 
         return icon
 

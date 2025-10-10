@@ -43,16 +43,18 @@ class Group(models.Model):
         return groups.values_list("name", flat=True)
 
     def get_url(self: Group) -> str:
-        if self.icon is None:
-            return static(f"images/groups/Uncategorized.webp")
+        if self.icon and hasattr(self.icon, 'url'):
+            return self.icon.url
         
-        if self.user is None:
-            static_image_name = f"images/groups/{self.name}.webp"
-            return static(static_image_name)
+        # If the group has no icon but it belongs to an individual user,
+        # we return a standard user group icon
+        if self.user:
+            return static("images/groups/default_user_group_icon.png")
         
-        return self.icon.url
-        
+        # Otherwise, we return the standard global group icon
+        return static(f"images/groups/{self.name}.webp")
 
+  
     def save(self, file_was_uploaded: bool = False, *args, **kwargs) -> None:
         if self.icon and file_was_uploaded:
             

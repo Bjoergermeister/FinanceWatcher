@@ -34,7 +34,7 @@
         <label>{% trans 'Kassenzettel' %}</label>
         <input type="file" id="id_receipt" name="receipt" accept="image/*" onchange="onReceiptImageChanged(event)" style="display: none;">
         <label id="receipt_image_preview" for="id_receipt" style="width: 100%; aspect-ratio: 1 / 1; height: unset;">
-          {% if bill_form.instance.receipt.name is None %}
+          {% if not bill_form.instance.receipt %}
             <img 
               style="width: 100%; height: 100%; border-radius: 5%"
               src="{% static 'images/groups/Uncategorized.webp' %}"

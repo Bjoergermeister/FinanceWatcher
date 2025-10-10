@@ -7,7 +7,7 @@
 <main>
   <form
     id="create-group-form"
-    class="p-5"
+    class="p-4"
     onsubmit="onGroupFormSubmitted(event)"
     enctype="multipart/form-data"
   >
@@ -21,7 +21,7 @@
     <div class="form-row">
       <div class="col-md-6">
         <div class="form-group">
-          <label class="requiredField">Bild<span class="asterisk">*</span></label>
+          <label class="requiredField">Bild</label>
           <div>
             <input
               id="id_icon"
@@ -30,8 +30,7 @@
               type="file"
               name="icon"
               accept="image/*"
-              onchange="onGroupImageChanged(event)"
-              required
+              onchange="onGroupImageChanged(event)"              
             />
             <label for="id_icon">
               <h3>Bild auswählen</h3>
@@ -43,7 +42,7 @@
       <div class="col-md-6">
         <div class="form-group">
           <label>Vorschau</label>
-          <img class="image-preview" src="" style="width: 250px; height: 250px" />
+          <img class="image-preview" src="{% static 'images/groups/default_user_group_icon.png' %}" style="width: 250px; height: 250px" />
         </div>
       </div>
     </div>
