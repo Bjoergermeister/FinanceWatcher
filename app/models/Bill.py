@@ -9,7 +9,7 @@ from PIL import Image
 from django.core.files import File
 from django.db import models
 
-from app.models.Shop import Shop
+from app.models.Brand import Brand
 from app.models.Address import Address
 
 def user_directory_path(instance: Bill, filename: str) -> str:
@@ -27,7 +27,7 @@ class Bill(models.Model):
     description = models.TextField(db_column="description", blank=True, null=True)
     receipt = models.ImageField(db_column="receipt", upload_to=user_directory_path, blank=True, null=True)
     paid = models.BooleanField(db_column="paid", blank=True, null=False, default=True)
-    shop = models.ForeignKey(Shop, on_delete=models.SET_NULL, db_column='fk_shop', blank=True, null=True)
+    brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, db_column='fk_brand', blank=True, null=True)
     address = models.ForeignKey(Address, on_delete=models.SET_NULL, db_column='fk_address', blank=True, null=True)
     channel = models.CharField(db_column="channel", max_length=100, default="in_store")
 
