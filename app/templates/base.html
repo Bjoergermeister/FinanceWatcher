@@ -19,6 +19,7 @@
     <script src="{% static 'js/api.js' %}"></script>
     <script src="{% static 'js/utils.js' %}"></script>
     <script defer src="{% static 'js/notifications.js' %}"></script>
+    <script defer src="{% static 'js/forms.js' %}"></script>
     {% block js %} {% endblock %}
   </head>
 
@@ -45,7 +46,6 @@
     }
 
     document.onkeydown = function(event){
-      console.log(event);
       if (event.key !== "Enter") return;
 
       sendNotification("Test", "test", NOTIFICATION_TYPE_SUCCESS);

@@ -19,10 +19,11 @@ function getLastElement(elements, predicate) {
 }
 
 /**
- * Traverses the DOM tree upwards until if either finds an element with the specified tag name or the root HTML element
+ * Traverses the DOM tree upwards until if either finds an element 
+ * with the specified tag name or the root HTML element
  * @param {HTMLElement} element - The element whose parent element needs to be found
  * @param {string} tagName - The name of the HTML tag the function should look for
- * @param {HTMLElement} - The
+ * @return {HTMLElement} - The first parent tag with the specified tag name or the document root
  */
 function findParentElement(element, tagName) {
   let parent = element.parentElement;

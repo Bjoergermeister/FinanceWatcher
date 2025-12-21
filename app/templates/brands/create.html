@@ -1,0 +1,62 @@
+{% load crispy_forms_tags %} {% load static %}
+
+<header>
+  <h1>Neuen Brand erstellen</h1>
+</header>
+
+<main>
+  <form
+    id="create-brand-form"
+    class="p-4"
+    onsubmit="onBrandFormSubmitted(event)"
+    enctype="multipart/form-data"
+  >
+    <div class="form-row">
+      {% csrf_token %} 
+      <input type="hidden" name="id">
+    </div>
+    <div class="form-row">
+      <div class="col-md">{{ create_form.name|as_crispy_field }}</div>
+    </div>
+    <div class="form-row">
+      <div class="col-md">{{ create_form.has_physical_stores|as_crispy_field }}</div>
+      <div class="col-md">{{ create_form.default_channel|as_crispy_field }}</div>
+    </div>
+    <div class="form-row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="requiredField">Bild</label>
+          <div>
+            <input
+              id="id_icon"
+              class="clearablefileinput form-control-file"
+              style="display: none"
+              type="file"
+              name="icon"
+              accept="image/*"
+              onchange="onBrandImageChanged(event)"              
+            />
+            <label for="id_icon">
+              <h3>Bild auswählen</h3>
+              <img src="{% static 'images/upload.png' %}" alt="Bild auswählen" />
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>Vorschau</label>
+          <img class="image-preview" src="{% static 'images/default_brand_icon.png' %}" style="width: 250px; height: 250px" />
+        </div>
+      </div>
+    </div>
+  </form>
+</main>
+<footer>
+  <button class="btn btn-primary" form="create-brand-form" type="submit">
+    Speichern
+  </button>
+  <button class="btn btn-danger" type="cancel" onclick="onBrandAbortClicked(event)">
+    Abbrechen
+  </button>
+</footer>

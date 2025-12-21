@@ -19,7 +19,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 
-from app.views import bills, groups
+from app.views import bills, groups, brands
 
 urlpatterns = [
     path("", bills.bills, name="bills"),
@@ -31,8 +31,13 @@ urlpatterns = [
     path("groups", groups.GroupsView.as_view(), name="groups"),
     path("group/<int:group_id>", groups.EditGroupView.as_view(), name="edit_group"),
 
+    path("brands", brands.BrandListView.as_view(), name="brands"),
+    path("brands/<int:brand_id>", brands.BrandDetailView.as_view(), name="brand_details"),
+
+
     # API Endpoints
-    path("api/groups", groups.list_all, name="all_groups")
+    path("api/groups", groups.list_all, name="all_groups"),
+    path("api/brands", brands.get_all, name="all_brands"),
 ]
 
 if settings.DEBUG:

@@ -96,6 +96,82 @@ class GroupAPI {
   }
 }
 
+class BrandAPI {
+  /**
+   * Create a new brand
+   * @param {FormData} data - The form data for the ned brand
+   * @returns {*} An API result object
+   */
+  static async create(data){
+    const options = getOptions("POST", data, { "Content-Type": CONTENT_TYPE_FORM_DATA });
+    prepareHeadersForFileUpload(options.headers);
+    return await makeRequest(CREATE_BRAND_URL, options);
+  }
+
+  /**
+   * Gets a brand by its ID
+   * @param {int} brandId - The ID of the brand
+   * @returns An API result object
+   */
+  static async get(brandId){
+    const url = GET_BRAND_URL.replace(/\d+/g, brandId);
+    return await makeRequest(url);
+  }
+
+  /**
+   * Updates the values of a brand
+   * @param {int} brandId - The ID of the brand to update
+   * @param {*} data - The updated data of the form 
+   * @returns An API result object
+   */
+  static async edit(brandId, data){
+    const url = EDIT_BRAND_URL.replace(/\d+/g, brandId);
+    const options = getOptions("POST", data, { "Content-Type": CONTENT_TYPE_FORM_DATA});
+    prepareHeadersForFileUpload(options.headers);
+    return await makeRequest(url, options);
+  }
+
+  /**
+   * Deletes a brand by its ID
+   * @param {int} brandId - The ID of the bill
+   * @returns An API result object
+   */
+  static async delete(brandId){
+    const url = DELETE_BRAND_URL.replace(/\d+/g, brandId);
+    const options = getOptions("DELETE", null, { "X-CSRFTOKEN": CSRF_MIDDLEWARE_TOKEN });
+    return await makeRequest(url, options);
+  }
+}
+
+class AddressesAPI {
+  static async getSingle(addressId) {
+    const url = GET_ADDRESS_URL.replace(/0/g, addressId);
+    return await makeRequest(url);
+  }
+
+  static async create(data) {
+    const options = getOptions("POST", data);
+    return await makeRequest(CREATE_ADDRESS_URL, options);
+  }
+
+  static async edit(addressId, data) {
+    const url = EDIT_ADDRESS_URL.replace(/0/g, addressId);
+    const options = getOptions("POST", data);
+    return await makeRequest(url, options);
+  }
+
+  /**
+   * Deletes an address by its ID
+   * @param {int} addressId - The ID of the address to delete
+   * @returns 
+   */
+  static async delete(addressId) {
+    const url = DELETE_ADDRESS_URL.replace(/0/g, addressId);
+    const options = getOptions("DELETE", undefined, { "X-CSRFToken": CSRF_MIDDLEWARE_TOKEN });
+    return await makeRequest(url, options);
+  }
+}
+
 // ####################################################################################
 // #                                 Helper Functions                                 #
 // ####################################################################################
