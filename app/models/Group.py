@@ -4,13 +4,12 @@ import os
 
 from typing import Any, Dict
 
-from io import BytesIO
-from django.core.files import File
 from django.db import models
 from django.db.models import Q, QuerySet
 from django.templatetags.static import static
 
-from PIL import Image
+from app.utils.images import save_as_thumbnail
+
 
 class Group(models.Model):
     name = models.CharField(db_column="name")
@@ -43,6 +42,14 @@ class Group(models.Model):
         return groups.values_list("name", flat=True)
 
     def get_url(self: Group) -> str:
+        """
+        Returns the url for the icon for this group
+        
+        :param self: Description
+        :type self: Group
+        :return: Description
+        :rtype: str
+        """
         if self.icon and hasattr(self.icon, 'url'):
             return self.icon.url
         
@@ -63,26 +70,11 @@ class Group(models.Model):
             full_path = os.path.join(self.icon.storage.location, "groups", self.icon.name)
             if os.path.isfile(full_path):
                 os.remove(full_path)
-
-            # We save images as JPEGs. If the uploaded image is a PNG with transparency,
-            # we need to convert it to RGB first to get rid of the alpha channel
-            image = Image.open(self.icon).convert("RGB")
             
             if self.icon.name.startswith("groups"):
                 self.icon.name = self.icon.name.lstrip("groups/")
 
-            smaller_side = min(image.width, image.height)
-            ratio = 1 / (smaller_side / 250)
-            size = (int(image.width * ratio), int(image.height * ratio))
-            image.thumbnail(size)
-
-            x = (image.width - 250) / 2
-            y = (image.height - 250) / 2
-
-            image = image.crop((x, y, image.width - x, image.height - y))
-            image_bytes = BytesIO()
-            image.save(image_bytes, 'JPEG', quality=70)
-            self.icon = File(image_bytes, name=self.icon.name)
+            self.icon = save_as_thumbnail(self.icon, thumbnail_size=250)            
 
         super().save(*args, **kwargs)
 

@@ -66,7 +66,7 @@ class GroupsView(View):
     def post(self: GroupsView, request: WSGIRequest) -> HttpResponse:
         user_groups = Group.get_all_for_user(request.user)
 
-        form = CreateGroupForm(request.user, request.POST,request.FILES, user_groups=user_groups)
+        form = CreateGroupForm(request.user, request.POST, request.FILES, user_groups=user_groups)
         if form.is_valid() == False:
             body = {
                 "form": form.errors

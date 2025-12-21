@@ -155,7 +155,10 @@ function onGroupAbortClicked(event) {
  * @returns {HTMLElement} - The new group element
  */
 function createNewGroup(newGroupInstance) {
-  const groupClone = document.getElementById("group-template").content.cloneNode(true)
+  const groupClone = document
+    .getElementById("group-template")
+    .content
+    .cloneNode(true)
     .children[0];
 
   groupClone.querySelector("h2").innerText = newGroupInstance.name;
