@@ -19,7 +19,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 
-from app.views import bills, groups, brands
+from app.views import addresses, bills, groups, brands
 
 urlpatterns = [
     path("", bills.bills, name="bills"),
@@ -34,6 +34,9 @@ urlpatterns = [
     path("brands", brands.BrandListView.as_view(), name="brands"),
     path("brands/<int:brand_id>", brands.BrandDetailView.as_view(), name="brand_details"),
 
+    path("addresses", addresses.get_all, name="addresses"),
+    path("address", addresses.create, name="create_address"),
+    path("address/<int:address_id>", addresses.EditAddress.as_view(), name="edit_address"),
 
     # API Endpoints
     path("api/groups", groups.list_all, name="all_groups"),
