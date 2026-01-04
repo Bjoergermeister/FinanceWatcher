@@ -1,14 +1,26 @@
 from __future__ import annotations
 
+from datetime import date, timedelta
+
 from django.core.handlers.wsgi import WSGIRequest
 from django.forms.models import model_to_dict
-from django.http import JsonResponse, HttpResponse, HttpResponseNotFound, QueryDict
+from django.http import (
+    JsonResponse,
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseNotFound
+)
 from django.shortcuts import render
 from django.views import View
 
 from app.enums import Http
 from app.forms.brands import CreateBrandForm, EditBrandForm
+
 from app.models.Brand import Brand
+from app.models.BrandAddress import BrandAddress
+from app.models.Country import Country
+
+from app.shortcuts import get_object_or_404
 
 
 def get_all(self: WSGIRequest) -> JsonResponse:
@@ -137,3 +149,58 @@ def assign_addresses(request: WSGIRequest, brand_id: int) -> HttpResponse:
     BrandAddress.objects.bulk_create(addresses)
 
     return HttpResponse(status=Http.CREATED)
+
+def unassign_address(request: WSGIRequest, brand_id: int) -> HttpResponse:
+    """
+    Unassigns an address from a brand. Only works if the address is currently assigned to the brand
+    (no end date is specified)
+    
+    :param request: Description
+    :type request: WSGIRequest
+    :param brand_id: Description
+    :type brand_id: int
+    :return: Description
+    :rtype: HttpResponse
+    """
+    brand: Brand = get_object_or_404(Brand, pk=brand_id, json=True)
+
+    brand_address_id = request.GET.get("address", None)
+
+    if brand_address_id is None:
+        return HttpResponseBadRequest("ID der Addresse benötigt")
+    
+    brand_address: BrandAddress = get_object_or_404(BrandAddress, pk=brand_address_id, json=True)
+    if brand_address.brand_id != brand.pk:
+        return HttpResponseBadRequest(f"Addresse gehört nicht zu {brand.name}")
+
+    brand_address.end_date = date.today() - timedelta(days=1)
+    brand_address.save()
+
+    return JsonResponse(brand_address.to_json())
+
+def delete_address(request: WSGIRequest, brand_id: int) -> HttpResponse:
+    """
+    Deletes the association between the brand and the address
+    This can be used if an address was mistakenly assigned to a brand.
+    
+    :param request: Description
+    :type request: WSGIRequest
+    :param brand_id: Description
+    :type brand_id: int
+    :return: Description
+    :rtype: HttpResponse
+    """
+    brand: Brand = get_object_or_404(Brand, pk=brand_id, json=True)
+
+    brand_address_id = request.GET.get("address", None)
+
+    if brand_address_id is None:
+        return HttpResponseBadRequest("ID der Addresse benötigt")
+    
+    brand_address: BrandAddress = get_object_or_404(BrandAddress, pk=brand_address_id, json=True)
+    if brand_address.brand_id != brand.pk:
+        return HttpResponseBadRequest(f"Addresse gehört nicht zu {brand.name}")
+
+    brand_address.delete()
+
+    return HttpResponse()

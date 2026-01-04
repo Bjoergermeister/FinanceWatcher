@@ -35,6 +35,8 @@ urlpatterns = [
     path("brands/<int:brand_id>", brands.BrandDetailView.as_view(), name="brand_details"),
     path("brands/<int:brand_id>/addresses", brands.BrandAddressesListView.as_view(), name="brand_addresses"),
     path("brands/<int:brand_id>/assign-addresses", brands.assign_addresses, name="assign_addresses"),
+    path("brands/<int:brand_id>/unassign-address", brands.unassign_address, name="unassign_address"),
+    path("brands/<int:brand_id>/delete-address", brands.delete_address, name="delete_address"),
 
     path("addresses", addresses.get_all, name="addresses"),
     path("address", addresses.create, name="create_address"),

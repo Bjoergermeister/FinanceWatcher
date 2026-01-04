@@ -153,6 +153,32 @@ class BrandAPI {
     const options = getOptions("POST", data);
     return await makeRequest(url, options);
   }
+
+  /**
+   * Unassigns an address from a brand
+   * @param {int} brandId The ID of the brand
+   * @param {int} brandAddressId The ID of the association of the address with the brand
+   * @returns An API result
+   */
+  static async unassignAddress(brandId, brandAddressId){
+    const url = UNASSIGN_ADDRESS_URL.replace(/\d+/g, brandId);
+    return await makeRequest(`${url}?address=${brandAddressId}`);
+  }
+
+  static async deleteAddress(brandId, brandAddressId){
+    const url = DELETE_ADDRESS_URL.replace(/\d+/g, brandId);
+    return await makeRequest(`${url}?address=${brandAddressId}`);
+  }
+
+  /**
+   * Searches brands by name
+   * @param {String} query - A query string that is used to search brands by their name 
+   */
+  static async search(query){
+    const parameters = { query };
+    const url = getQueryStringUrl(SEARCH_BRANDS_URL, parameters);
+    return await makeRequest(url);
+  }
 }
 
 class AddressesAPI {

@@ -150,6 +150,54 @@ function onUpdateAddressesClicked(event){
     updateAddressChoices(form);
 }
 
+async function onUnassignAddressClicked(event){
+    event.preventDefault();
+
+    const addressId = event.target.dataset.id;
+    const result = await BrandAPI.unassignAddress(BRAND_ID, addressId);
+    if (result.success === false){
+        sendNotification(
+            "Abmelden fehlgeschlagen",
+            `Die Adresse konnte nicht abgemeldet werden: ${result.errors}`,
+            NOTIFICATION_TYPE_ERROR
+        );
+        return;
+    }
+
+    const formRow = findParentElement(event.target, "TR");
+    const tableRowCells = formRow.querySelectorAll("td");
+    tableRowCells[6].innerText = result.content.end_date;
+
+    sendNotification(
+        "Abmeldung erfolgreich",
+        "Die Addresse wurde erfolgreich abgemeldet",
+        NOTIFICATION_TYPE_SUCCESS
+    );
+
+    // TODO: Move the table row to the previous addresses table
+}
+
+async function onDeleteAddressClicked(event){
+    event.preventDefault();
+
+    const brandAddressId = event.target.dataset.id;
+    const result = await BrandAPI.deleteAddress(BRAND_ID, brandAddressId);
+    if (result.success === false){
+        sendNotification(
+            "Löschen fehlgeschlagen",
+            "Die Adresse konnte nicht gelöscht werden",
+            NOTIFICATION_TYPE_SUCCESS
+        );
+        return;
+    }
+
+    const tableRow = findParentElement(event.target, "TR");
+    tableRow.remove();
+
+    // TODO: If no addresses remain after deleting this one,
+    // show the "no addresses" table row
+}
+
 // ####################
 // # HELPER FUNCTIONS #
 // ####################
