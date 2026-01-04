@@ -1,23 +1,27 @@
 {% load static %}
+{% load i18n %}
 
 <nav>
     <div class="nav-container">
-  <a>
-    <img src="{% static 'images/dashboard.png' %}">
+        <a>
+          <img src="{% static 'images/dashboard.png' %}">
           {% trans 'Dashboard' %}
-  </a>
-  <a href="{% url 'bills' %}">
-    <img src="{% static 'images/bills.png' %}">
+        </a>
+        <a href="{% url 'bills' %}">
+          <img src="{% static 'images/bills.png' %}">
           {% trans 'Ausgaben' %}
-  </a>
-  <a href="{% url 'groups' %}">
-    <img src="{% static 'images/tag.png' %}">
+        </a>
+        <a href="{% url 'groups' %}">
+          <img src="{% static 'images/tag.png' %}">
           {% trans 'Gruppen' %}
         </a>
         <a href="{% url 'brands' %}">
           <i class="fa fa-xl fa-shop mr-2"></i>
           {% trans 'Brands' %}
         </a>
-  </a>
+        <a href="{% url 'addresses' %}">
+          <i class="fa fa-xl fa-location-dot mr-2"></i>
+          {% trans 'Standorte' %}
+        </a>
     </div>
 </nav>

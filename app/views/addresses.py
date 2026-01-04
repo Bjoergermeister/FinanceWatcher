@@ -1,5 +1,4 @@
 from django.core.handlers.wsgi import WSGIRequest
-from django.forms.models import model_to_dict
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views import View
@@ -7,6 +6,7 @@ from django.views import View
 from app.enums import Http
 from app.forms.addresses import CreateAddressForm
 from app.models.Address import Address
+from app.models.BrandAddress import BrandAddress
 
 
 def get_all(request: WSGIRequest) -> HttpResponse:
@@ -76,3 +76,30 @@ class EditAddress(View):
         address = Address.objects.get(id=address_id)
         address.delete()
         return HttpResponse(status=204)
+    
+
+def search(request: WSGIRequest) -> JsonResponse:
+    exclude = request.GET.get("exclude", None)
+    country = request.GET.get("country", None)
+    city = request.GET.get("city", None)
+    region = request.GET.get("region", None)
+    postal_code = request.GET.get("postal_code", None)
+
+    addresses = Address.objects.all()
+
+    if exclude is not None:
+        brand_addresses_ids = BrandAddress.objects.filter(brand=exclude).only("pk").values_list("address_id", flat=True)
+        addresses = addresses.exclude(pk__in=brand_addresses_ids)
+
+    if country is not None:
+        addresses = addresses.filter(country=country)
+
+    if city is not None:
+        addresses = addresses.filter(city=city)
+
+    if region is not None:
+        addresses = addresses.filter(region=region)
+    if postal_code is not None:
+        addresses = addresses.filter(postal_code=postal_code)
+
+    return JsonResponse(list(addresses.values()), safe=False)

@@ -1,3 +1,5 @@
+let timeout = null;
+
 // ###################
 // # EVENT LISTENERS #
 // ###################
@@ -113,9 +115,73 @@ async function onDeleteBrandClicked(event){
     );
 }
 
+function onAssignAddressesClicked(event){
+    const assignAddressesDialog = document.getElementById("assign-brand-address-dialog");
+    assignAddressesDialog.showModal();
+}
+
+function onAssignAddressInputChanged(event){
+    event.preventDefault();
+
+    if (timeout !== null){
+        clearTimeout(timeout);
+    }
+
+    timeout = setTimeout(() => updateAddressChoices(event.target.form), 3000);
+}
+
+async function onAssignAddressesFormSubmitted(event){
+    event.preventDefault();
+
+    const form = event.target;
+    const data = new FormData(form);
+
+    const result = await BrandAPI.assignAddresses(BRAND_ID, data);
+    if (result.success === false){
+        sendNotification("Fehlgeschlagen", "Fehlgeschlagen", NOTIFICATION_TYPE_ERROR);
+        return;
+    }
+
+    alert("Success!");
+}
+
+function onUpdateAddressesClicked(event){
+    event.preventDefault();
+    updateAddressChoices(form);
+}
+
 // ####################
 // # HELPER FUNCTIONS #
 // ####################
+
+/**
+ * Updates the possible address choices based on the filter in the filter form
+ * @param {HTMLFormElement} form - The form used to filter addresses
+ * @returns 
+ */
+async function updateAddressChoices(form){
+    const data = new FormData(form);
+    data.set("exclude", BRAND_ID);
+    data.delete("id");
+    data.delete("csrfmiddlewaretoken");
+    
+    const result = await AddressesAPI.search(data);
+    if (result.success === false){
+        alert("Error");
+        return;
+    }
+
+    const options = result.content.map(address => {
+        const option = document.createElement("OPTION");
+        option.value = address.id;
+        option.textContent = `${address.street} ${address.number}, ${address.postal_code}, ${address.city}`;
+        return option;
+    });
+
+    const assignAddressesForm = document.getElementById("assign-addresses-form");
+    assignAddressesForm.addresses.replaceChildren(...options);
+    console.log(result);
+}
 
 /**
  * Create a new table row for a brand

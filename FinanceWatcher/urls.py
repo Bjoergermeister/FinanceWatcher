@@ -33,9 +33,12 @@ urlpatterns = [
 
     path("brands", brands.BrandListView.as_view(), name="brands"),
     path("brands/<int:brand_id>", brands.BrandDetailView.as_view(), name="brand_details"),
+    path("brands/<int:brand_id>/addresses", brands.BrandAddressesListView.as_view(), name="brand_addresses"),
+    path("brands/<int:brand_id>/assign-addresses", brands.assign_addresses, name="assign_addresses"),
 
     path("addresses", addresses.get_all, name="addresses"),
     path("address", addresses.create, name="create_address"),
+    path("addresses/search", addresses.search, name="search_addresses"),
     path("address/<int:address_id>", addresses.EditAddress.as_view(), name="edit_address"),
 
     # API Endpoints

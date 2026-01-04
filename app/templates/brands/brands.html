@@ -20,6 +20,7 @@
                 <th scope="col">Name</th>
                 <th scope="col">{% trans 'Hat Filialen' %}</th>
                 <th>{% trans 'Standard-Verkaufskanal' %}</th>
+                <th>{% trans 'Anzahl Addressen' %}</th>
                 <th></th>
             </tr>
         </thead>
@@ -30,7 +31,11 @@
                     <td>{{ brand.name }}</td>
                     <td>{{ brand.has_physical_stores }}</td>
                     <td>{{ brand.default_channel }}</td>
+                    <td>{{ brand.addresses.count }}</td>
                     <td>
+                        <a href="{% url 'brand_addresses' brand.pk %}">
+                            <i class="fa-solid fa-lg fa-location-dot"></i>
+                        </a>
                         <button
                             class="btn btn-close"
                             onclick="onEditBrandClicked(event)"
@@ -55,11 +60,17 @@
 
     <template id="brand-template">
         <tr>
-            <td><img style="width: 25px; height: 25px" src="{{ brand.get_icon_url }}"></td>
-            <td>{{ brand.name }}</td>
-            <td>{{ brand.has_physical_stores }}</td>
-            <td>{{ brand.default_channel }}</td>
+            <td><img style="width: 25px; height: 25px" src=""></td>
+            <td></td>
+            <td></td>
+            <td></td>
             <td>
+                <a
+                    class="btn btn-close"
+                    href=""
+                >
+                    <i class="fa-solid fa-location-dot"></i>
+                </a>
                 <button
                     class="btn btn-close"
                     onclick="onDeleteBrandClicked(event)"

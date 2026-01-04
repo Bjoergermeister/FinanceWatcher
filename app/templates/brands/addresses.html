@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load i18n %}
+
+{% block js %}
+    <script src="{% static 'js/brands.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    <h1>{% trans 'Addresses' %}</h1>
+
+    <button class="btn btn-primary mb-3" onclick="onAssignAddressesClicked(event)">
+        <i class="fa fa-plus mr-2"></i>
+        {% trans 'Add address' %}
+    </button>
+    <table id="brand-addresses-table" class="table table-bordered">
+        <thead>
+            <tr>
+                <th>{% trans 'Straße' %}</th>
+                <th>{% trans 'Ort' %}</th>
+                <th>{% trans 'Postleitzahl' %}</th>
+                <th>{% trans 'Region' %}</th>
+                <th>{% trans 'Land' %}</th>
+                <th>{% trans 'Von' %}</th>
+                <th>{% trans 'Bis' %}</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for association in brand_address_associations %}
+                <tr>
+                    <td>{{ association.address.street }} {{ association.address.number }}</td>
+                    <td>{{ association.address.city }}</td>
+                    <td>{{ association.address.postal_code }}</td>
+                    <td>{{ association.address.region }}</td>
+                    <td>{{ association.address.country }}</td>
+                    <td>{{ association.start_date|date:"d.m.Y" }}</td>
+                    <td>{{ association.end_date|default_if_none:"-"|date:"d.m.Y" }}</td>
+                    <td>
+                        <button 
+                            class="btn btn-close"
+                            title="{% trans 'Delete address' %}"
+                            onclick="onDeleteAddressClicked(event)"
+                            data-id="{{ association.pk }}"
+                        >
+                            <i class="fa fa-lg fa-trash no-events" style="color: red"></i>
+                        </button>
+                        {% if association.is_currently_assigned is False %}
+                            <button 
+                                class="btn btn-close"
+                                title="{% trans 'Unassign address' %}"
+                                onclick="onUnassignAddressClicked(event)"
+                                data-id="{{ association.pk }}"
+                            >
+                                <i class="fa fa-lg fa-xmark no-events" style="color: red"></i>
+                            </button>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td>{% trans 'This brand does not have addresses assigned to it' %}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <dialog id="assign-brand-address-dialog">
+        <div class="content">
+            <header>
+                <h1>{% trans 'Add Addresses' %}</h1>
+            </header>
+            <div class="body">
+                <form id="address-filter-form" onsubmit="onAddressFormSubmitted(event)">
+                    <input name="id" type="hidden">
+                    {% csrf_token %}
+                    <div class="form-row mb-2">
+                        <div class="col-md-6">
+                            <select 
+                                name="country"
+                                class="custom-select"
+                                onChange="onAssignAddressInputChanged(event)"
+                            >
+                                {% for country in countries %}
+                                    <option value="{{ country.pk }}">{{ country.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <input 
+                                class="form-control"
+                                type="text"
+                                name="city"
+                                placeholder="City"
+                                onkeyup="onAssignAddressInputChanged(event)"
+                            >
+                        </div>
+                    </div>
+                    <div class="form-row mb-2">
+                        <div class="col-md-6">
+                            <input
+                                class="form-control"
+                                type="text"
+                                name="region"
+                                placeholder="Region"
+                                onkeyup="onAssignAddressInputChanged(event)"
+                            >
+                        </div>
+                        <div class="col-md-6">
+                            <input
+                                class="form-control"
+                                type="text"
+                                name="postal_code"
+                                placeholder="Postleitzahl"
+                                onkeyup="onAssignAddressInputChanged(event)"
+                            >
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-md">
+                            <button 
+                                class="btn btn-primary"
+                                onclick="onUpdateAddressesClicked(event)"
+                            >
+                                <i class="fa fa-undo mr-2"></i>
+                                {% trans 'Update' %}
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <form 
+                    id="assign-addresses-form"
+                    class="mt-3"
+                    onsubmit="onAssignAddressesFormSubmitted(event)"
+                >
+                    <div class="form-row">
+                        <div class="col-md">
+                            {% csrf_token %}
+                            <select name="addresses" class="custom-select" multiple>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <footer>
+                <button class="btn btn-primary" type="submit" form="assign-addresses-form">
+                    <i class="fa fa-save mr-2"></i>
+                    {% trans 'Assign addresses' %}
+                </button>
+                <button class="btn btn-danger" type="cancel">
+                    <i class="fa fa-xmark mr-2"></i>
+                    {% trans 'Cancel' %}
+                </button>
+            </footer>
+        </div>
+    </dialog>
+
+    <script>
+        const BRAND_ID = "{{ brand.pk }}";
+        const SEARCH_ADDRESSES_URL = "{% url 'search_addresses' %}";
+        const ASSIGN_ADDRESSES_URL = "{% url 'assign_addresses' 0 %}";
+        const UNASSIGN_ADDRESS_URL = "{% url 'unassign_address' 0 %}";
+        const DELETE_ADDRESS_URL = "{% url 'delete_address' 0 %}";
+    </script>
+{% endblock %}

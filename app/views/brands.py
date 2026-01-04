@@ -98,3 +98,42 @@ class BrandDetailView(View):
         brand.delete()
 
         return HttpResponse()
+    
+class BrandAddressesListView(View):
+    def get(self: BrandAddressesListView, request: WSGIRequest, brand_id: int) -> HttpResponse:
+        try:
+            brand = Brand.objects.get(pk=brand_id)
+        except Brand.DoesNotExist:
+            return HttpResponseNotFound(f"Es gibt keine Marke mit der ID f{brand_id}")
+        
+        countries = Country.objects.all()
+        brand_address_associations = BrandAddress.objects.filter(brand=brand).select_related("address")
+
+        context = {
+            "brand": brand,
+            "brand_address_associations": brand_address_associations,
+            "countries": countries
+        }
+
+        return render(request, "brands/addresses.html", context)
+    
+
+def assign_addresses(request: WSGIRequest, brand_id: int) -> HttpResponse:
+    brand = get_object_or_404(Brand, pk=brand_id, json=True)
+
+    address_ids = request.POST.getlist("addresses")
+
+    # Since the addresses can be in use, make sure that the end date is properly set
+    yesterday = date.today() - timedelta(days=1)
+    BrandAddress.objects.filter(address__in=address_ids).update(end_date=yesterday)
+
+    # Create new mappings between addresses and the brand starting from today
+    addresses = (
+        BrandAddress(
+            brand=brand,
+            address_id=address_id,
+            start_date=date.today()
+        ) for address_id in address_ids)
+    BrandAddress.objects.bulk_create(addresses)
+
+    return HttpResponse(status=Http.CREATED)

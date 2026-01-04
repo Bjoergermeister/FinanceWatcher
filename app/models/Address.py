@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Dict
+
 from django.db import models
 from django.forms import model_to_dict
 
@@ -17,7 +19,7 @@ class Address(models.Model):
     def __str__(self: Address) -> str:
         return f"{self.street} {self.number}, {self.city}, {self.country.name}" 
 
-    def to_dict(self: Address) -> dict:
+    def to_dict(self: Address) -> Dict[str, str]:
         return {
             "id": self.pk,
             "country": model_to_dict(self.country),

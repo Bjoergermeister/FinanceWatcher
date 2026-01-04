@@ -141,19 +141,47 @@ class BrandAPI {
     const options = getOptions("DELETE", null, { "X-CSRFTOKEN": CSRF_MIDDLEWARE_TOKEN });
     return await makeRequest(url, options);
   }
+
+  /**
+   * Assigns addresses to a Brand
+   * @param {int} brandId - The ID of the brand
+   * @param {Object} data - The IDs of the addresses which should be assigned to the brand
+   * @returns An API result
+   */
+  static async assignAddresses(brandId, data){
+    const url = ASSIGN_ADDRESSES_URL.replace(/\d+/g, brandId);
+    const options = getOptions("POST", data);
+    return await makeRequest(url, options);
+  }
 }
 
 class AddressesAPI {
+  /**
+   * Gets a single address by its ID
+   * @param {int} addressId - The ID of the address
+   * @returns An API result
+   */
   static async getSingle(addressId) {
     const url = GET_ADDRESS_URL.replace(/0/g, addressId);
     return await makeRequest(url);
   }
 
+  /**
+   * Creates a new address
+   * @param {FormData} data - The form data of the address form
+   * @returns An API result
+   */
   static async create(data) {
     const options = getOptions("POST", data);
     return await makeRequest(CREATE_ADDRESS_URL, options);
   }
 
+  /**
+   * Updates an address
+   * @param {int} addressId - The ID of the address
+   * @param {*} data - The updated form data for the address
+   * @returns An API result
+   */
   static async edit(addressId, data) {
     const url = EDIT_ADDRESS_URL.replace(/0/g, addressId);
     const options = getOptions("POST", data);
@@ -170,11 +198,42 @@ class AddressesAPI {
     const options = getOptions("DELETE", undefined, { "X-CSRFToken": CSRF_MIDDLEWARE_TOKEN });
     return await makeRequest(url, options);
   }
+
+  /**
+   * Searches addresses
+   * @param {FormData} data
+   * @returns 
+   */
+  static async search(data){
+    const url = getQueryStringUrl(SEARCH_ADDRESSES_URL, data);
+    return await makeRequest(url);
+  }
 }
 
 // ####################################################################################
 // #                                 Helper Functions                                 #
 // ####################################################################################
+
+/**
+ * 
+ * @param {string} baseUrl - The base part of the URL
+ * @param {Object | FormData} parameters - An object containing the key and values of query parameters 
+ * @returns {string}
+ */
+function getQueryStringUrl(baseUrl, parameters){
+  const entries = (parameters instanceof FormData) 
+    ? Array.from(parameters.entries()) 
+    : Object.entries(parameters);
+  
+  const encodedParameters = entries
+      .filter(entry => entry[1].length > 0)
+      .map(entry => `${encodeURIComponent(entry[0])}=${encodeURIComponent(entry[1])}`);
+  const queryString = encodedParameters.join('&');
+
+  return (queryString.length > 0)
+    ? `${baseUrl}?${queryString}`
+    : baseUrl;
+}
 
 /**
  *
@@ -207,6 +266,12 @@ function getOptions(method, data, headers) {
   };
 }
 
+/**
+ * Makes a request to an external API
+ * @param {string} url - Die URL of the request
+ * @param {*} options - The Options of the request
+ * @returns - An API response
+ */
 async function makeRequest(url, options) {
   const response = await fetch(url, options);
   const success = response.status < 300;
@@ -235,17 +300,17 @@ async function makeRequest(url, options) {
 }
 
 /**
- * 
+ * Checks if the content type of a response is HTML
  * @param {Response} response - The response to check
- * @returns Whether the response contains HTML content
+ * @returns {boolean} Whether the response contains HTML content
  */
 function isHTMLResponse(response) {
   return response.headers.get("content-type").indexOf("text/html") !== -1;
 }
 /**
- * 
+ * Checks if the content type of the response is JSON
  * @param {Response} response - The response to check
- * @returns Whether the response contains JSON content
+ * @returns {boolean} Whether the response contains JSON content
  */
 function isJsonResponse(response) {
   return response.headers.get("content-type").indexOf("application/json") !== -1;
