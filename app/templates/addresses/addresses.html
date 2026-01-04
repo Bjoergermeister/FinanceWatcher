@@ -30,7 +30,14 @@
                 <td>{{ address.street }} {{ address.number }}</td>
                 <td>{{ address.city }}</td>
                 <td>{{ address.postal_code }}</td>
-                <td>{{ address.country }}</td>
+                <td>
+                    <img 
+                        src="{{ address.country.get_flag_url }}"
+                        alt="{{ address.country.name }}"
+                        style="width: 25px;"
+                    >
+                    {{ address.country }}
+                </td>
                 <td>
                     <button 
                         class="btn btn-sm btn-close" 
