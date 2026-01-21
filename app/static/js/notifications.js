@@ -1,5 +1,16 @@
+const NOTIFICATION_REMOVE_TIMEOUT = 5000;
+
 setupCallbacks.push(() => {
-  sendNotification("Test", "test", NOTIFICATION_TYPE_SUCCESS);
+  // Load stored notifications from local storage
+  const storedNotificationsRaw = localStorage.getItem("notifications");
+  if (storedNotificationsRaw === null) return;
+
+  const storedNotifications = JSON.parse(storedNotificationsRaw);
+  for (const notification of storedNotifications) {
+    sendNotification(notification.title, notification.text, notification.type);
+  }
+
+  localStorage.removeItem("notifications");
 });
 
 const notifications = new Map();
@@ -53,7 +64,7 @@ function sendNotification(title, text, type) {
 
     const currentNotificationCount = parseInt(notificationBell.dataset.count);
     notificationBell.dataset.count = currentNotificationCount + 1;
-  }, 5000);
+  }, NOTIFICATION_REMOVE_TIMEOUT);
 
   notifications[id] = removeTimeout;
 }
@@ -80,6 +91,13 @@ function createNotification(title, text, type) {
   return [notification, id];
 }
 
+function storeNotification(title, text, type){
+  const storedNotificationsRaw = localStorage.getItem("notifications");
+  const storedNotifications = storedNotificationsRaw ? JSON.parse(storedNotificationsRaw) : [];
+  storedNotifications.push({title, text, type});
+  localStorage.setItem("notifications", JSON.stringify(storedNotifications));
+}
+
 // **********************
 // *   EVENT HANDLERS   *
 // **********************
@@ -102,7 +120,7 @@ function onMouseLeaveNotification(event) {
   const id = event.target.dataset.id;
   const removeTimeout = setTimeout(() => {
     event.target.remove();
-  }, 5000);
+  }, NOTIFICATION_REMOVE_TIMEOUT);
   notifications[id] = removeTimeout;
 }
 

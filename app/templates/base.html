@@ -16,6 +16,12 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/notifications.css' %}"/>
     {% block css %} {% endblock %}
 
+    <script>
+      // This script needs to be placed first to make sure setupCallbacks is created before
+      // any other script has the chance to reference it.
+      const setupCallbacks = [];
+    </script>
+
     <script src="{% static 'js/api.js' %}"></script>
     <script src="{% static 'js/utils.js' %}"></script>
     <script defer src="{% static 'js/notifications.js' %}"></script>
@@ -37,18 +43,10 @@
   </body>
 
   <script>
-    const setupCallbacks = [];
-
     window.onload = function(){
       for (const setupCallback of setupCallbacks){
         setupCallback();
       }
-    }
-
-    document.onkeydown = function(event){
-      if (event.key !== "Enter") return;
-
-      sendNotification("Test", "test", NOTIFICATION_TYPE_SUCCESS);
     }
   </script>
 </html>

@@ -41,13 +41,18 @@ function registerEventListeners(positionFormRows) {
   }
 }
 
-// I could have used an IIFE here, but it seems like those don't work with JSDoc, so I'm doing it this way.
+// I could have used an IIFE here, but it seems like those don't work with JSDoc,
+// so I'm doing it this way.
 registerEventListeners();
 
 /******************/
 /* Event handlers */
 /******************/
 
+/**
+ * Updates the total price of the bill when the price of a position changes
+ * @param {Event} event 
+ */
 function onPositionPriceChanged(event) {
   const formRow = findFormRow(event.target);
   const uuid = formRow.dataset.uuid;
@@ -57,6 +62,10 @@ function onPositionPriceChanged(event) {
   calculateBillTotal();
 }
 
+/**
+ * Updates the total price of the bill when the quantity of a position changes
+ * @param {Event} event 
+ */
 function onPositionQuantityChanged(event) {
   const formRow = findFormRow(event.target);
   const uuid = formRow.dataset.uuid;
@@ -131,7 +140,7 @@ async function onBillFormSubmitted(event) {
     sendNotification(
       "Fehler beim Speichern der Rechnung", 
       `Die Rechnung konnte nicht gespeichert werden: ${result.errors}.`, 
-      NOTIFICATION_TYPE_DANGER
+      NOTIFICATION_TYPE_ERROR
     );
     return;
   }
@@ -163,13 +172,13 @@ async function onBillFormSubmitted(event) {
 
   setInitialFormCount(billPositions, getTotalFormCount(billPositions));
 
-  sendNotification(
+  storeNotification(
     "Rechnung gespeichert", 
-    "Die Rechnung wurde erfolgreich gespeichert.", 
+    `Die Rechnung \"${form.name.value}\" wurde erfolgreich gespeichert.`,
     NOTIFICATION_TYPE_SUCCESS
   );
 
-  return false;
+  window.location.href = "/";
 }
 
 async function onDeletePositionClicked(event) {
