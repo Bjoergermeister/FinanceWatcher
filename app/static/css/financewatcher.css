@@ -9,6 +9,7 @@
 }
 
 body {
+  position: relative;
   display: grid;
   grid-template-rows: 100px 1fr;
   grid-template-columns: 15% 1fr 15%;
@@ -23,6 +24,14 @@ header {
 
 .no-events {
   pointer-events: none;
+}
+
+.display-on-hover {
+  opacity: 0;
+}
+
+.display-on-hover:hover {
+  opacity: 1;
 }
 
 #content {
@@ -91,6 +100,12 @@ dialog[name="choose-group"] .content {
   height: 750px;
 }
 
+dialog[name="bill-receipt-preview"] .content {
+  max-width: 90%;
+  width: auto;
+  height: 90%;
+}
+
 dialog header {
   padding: 10px 20px;
   text-align: center;
@@ -99,6 +114,10 @@ dialog header {
 
 dialog .body {
   padding: 15px;
+}
+
+dialog[name="bill-receipt-preview"] .body {
+  height: 100%;
 }
 
 dialog footer {

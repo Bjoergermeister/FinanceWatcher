@@ -387,6 +387,18 @@ function onReceiptImageChanged(event) {
   imagePreview.src = URL.createObjectURL(event.target.files[0]);
 }
 
+function onShowReceiptClicked(event){
+  event.preventDefault();
+
+  const currentBillUrl = event.target.parentElement.previousElementSibling;
+
+  const billReceiptDialog = document.getElementById("bill-receipt-dialog")
+  const billReceipt = billReceiptDialog.querySelector("img");
+  billReceipt.src = currentBillUrl.src;
+
+  billReceiptDialog.showModal();
+}
+
 /********************/
 /* Helper Functions */
 /********************/
