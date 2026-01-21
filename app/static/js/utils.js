@@ -49,3 +49,18 @@ function removeAllChildren(container) {
     container.children[i].remove();
   }
 }
+
+/**
+ * Looks for a template element with the id {templateName}-template and returns its root HTML element
+ * @param {string} templateName - The name of the template
+ * @param {boolean} clone - Whether the element should be cloned
+ * @returns {HTMLElement | null} - The root HTML element of the template
+ */
+function getTemplate(templateName, clone){
+  const templateId = `${templateName}-template`;
+  const template = document.getElementById(templateId);
+  if (template === null) return null;
+
+  clone ??= true;
+  return template.content.cloneNode(clone).children[0];
+}

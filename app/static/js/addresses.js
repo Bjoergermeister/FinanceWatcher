@@ -1,11 +1,20 @@
 /**
+ * @typedef {Object} Country
+ * @property {number} id
+ * @property {string} name
+ * @property {string} internal_name
+ * @property {string} code
+ * @property {string} url
+ */
+
+/**
  * @typedef {Object} Address
  * @property {number} pk 
  * @property {string} street
  * @property {string} number
  * @property {string} city
  * @property {string} postal_code
- * @property {string} country 
+ * @property {Country} country 
  */
 
 // ##################
@@ -115,20 +124,22 @@ async function onAddressFormSubmitted(event) {
  * @returns {HTMLTableRowElement} - The table row for the address
  */
 function createAddressTableRow(address){
-    const addressClone = document
-        .getElementById("address-template")
-        .content
-        .cloneNode(true)
-        .children[0];
+    const addressClone = getTemplate("address", true)
 
     addressClone.dataset.id = address.id;
     const cells = addressClone.querySelectorAll("td");
     cells[0].innerText = `${address.street} ${address.number}`;
     cells[1].innerText = address.city;
     cells[2].innerText = address.postal_code;
-    cells[3].innerText = address.country;
+    cells[3].innerText = `${address.country.name}`;
     cells[4].children[0].dataset.id = address.id;
     cells[4].children[1].dataset.id = address.id;
+
+    const flagImage = document.createElement("IMG");
+    flagImage.src = address.country.url;
+    flagImage.alt = address.country.name;
+    flagImage.style.width = "25px";
+    cells[3].insertAdjacentElement("afterbegin", flagImage);
 
     return addressClone;
 }

@@ -22,7 +22,7 @@ class Address(models.Model):
     def to_dict(self: Address) -> Dict[str, str]:
         return {
             "id": self.pk,
-            "country": model_to_dict(self.country),
+            "country": self.country.to_dict(),
             "region": self.region,
             "city": self.city,
             "street": self.street,
