@@ -95,7 +95,8 @@ dialog[name="bill-deletion"] .content {
   height: 225px;
 }
 
-dialog[name="choose-group"] .content {
+dialog[name="choose-group"] .content,
+dialog[name="select-brand"] .content {
   width: 1000px;
   height: 750px;
 }

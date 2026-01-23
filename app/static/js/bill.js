@@ -128,6 +128,8 @@ async function onBillFormSubmitted(event) {
     data.append("description", form.description.value);
     data.append("user", form.user.value);
     data.append("total", form.total.value);
+    data.append("brand", form.brand.value);
+    data.append("address", form.address.value);
     data.append("position-TOTAL_FORMS", form.elements["position-TOTAL_FORMS"].value);
     data.append("position-INITIAL_FORMS", form.elements["position-INITIAL_FORMS"].value);
     data.append("position-MIN_NUM_FORMS", form.elements["position-MIN_NUM_FORMS"].value);
@@ -377,6 +379,25 @@ async function onEditGroupClicked(event) {
   };
 }
 
+async function onSelectBrandButtonPressed(event) {
+  event.preventDefault();
+
+  const brandSelectDialog = document.getElementById("select-brand-dialog");
+  brandSelectDialog.showModal();
+
+  const result = await BrandAPI.getAll();
+  if (result.success === false) {
+    sendNotification(
+      "Brands abfragen fehlgeschlagen",
+      `Konnte keine Brands abfragen: ${result.errors}`,
+      NOTIFICATION_TYPE_ERROR
+    );
+    return;
+  }
+
+  console.log(result.content);
+}
+
 function onReceiptImageChanged(event) {
   event.preventDefault();
   
@@ -397,6 +418,89 @@ function onShowReceiptClicked(event){
   billReceipt.src = currentBillUrl.src;
 
   billReceiptDialog.showModal();
+}
+
+let searchBrandInputTimeout = null;
+async function onBrandSearchInputChanged(event){
+  event.preventDefault();
+
+  if (searchBrandInputTimeout !== null){
+    clearTimeout(searchBrandInputTimeout);
+  }
+
+  searchBrandInputTimeout = setTimeout(async () => {
+    const result = await BrandAPI.search(event.target.value);
+    if (result.success === false){
+      sendNotification(
+        "Laden fehlgeschlagen",
+        "Marken konnte nicht geladen werden",
+        NOTIFICATION_TYPE_ERROR
+      );
+      return;
+    }
+
+    const images = result.content.map(brand => {
+      const template = getTemplate("select-brand");
+      if (template === null) return;
+      template.querySelector("img").src = brand.icon;
+      template.querySelector("h4").innerText = brand.name;
+      template.dataset.id = brand.pk;
+      template.addEventListener("click", onBrandSelected);
+      return template;
+    });
+
+    const imageContainer = document.getElementById("brand-list");
+    imageContainer.replaceChildren(...images);
+  }, 3000);
+}
+
+function onBrandSelected(event){
+  event.preventDefault();
+
+  const dialog = findParentElement(event.target, "DIALOG");
+  dialog.close();
+
+  const select = document.querySelector("#bill-form select[name='brand']");
+  select.value = parseInt(event.currentTarget.dataset.id);
+
+  const chooseAddressButton = document.getElementById("choose-address-button");
+  chooseAddressButton.disabled = false;
+  chooseAddressButton.title = "";
+}
+
+function onSelectAddressClicked(event){
+  event.preventDefault();
+
+  const chooseAddressDialog = document.getElementById("select-address-dialog");
+  chooseAddressDialog.showModal();
+}
+
+let searchAddressInputTimeout = null;
+function onAssignAddressInputChanged(event){
+    event.preventDefault();
+
+    if (searchAddressInputTimeout !== null){
+        clearTimeout(searchAddressInputTimeout);
+    }
+
+    searchAddressInputTimeout = setTimeout(() => updateAddressChoices(event.target.form), 3000);
+}
+
+function onSelectAddressFormSubmitted(event){
+  event.preventDefault();
+  const form = event.target;
+  const selectedAddressOption = form.address.querySelector(`option[value='${form.address.value}']`);
+  if (selectedAddressOption === null) return;
+
+
+  const targetSelect = document.querySelector("#bill-form select[name='address']");
+  const targetOption = targetSelect.querySelector("option");
+  targetOption.innerText = selectedAddressOption.innerText;
+  targetOption.value = form.address.value;
+  targetSelect.value = form.address.value;
+
+  const dialog = findParentElement(form, "DIALOG");
+  dialog.close();
 }
 
 /********************/
@@ -479,6 +583,45 @@ function preprocessPositionFormRows(formRows) {
   }
 
   return data;
+}
+
+/**
+ * Updates the possible address choices based on the filter in the filter form
+ * @param {HTMLFormElement} form - The form used to filter addresses
+ * @returns 
+ */
+async function updateAddressChoices(form){
+    const brandId = document.querySelector("select[name='brand']").value;
+    const data = new FormData(form);
+    data.set("brand", brandId);
+    data.delete("id");
+    data.delete("csrfmiddlewaretoken");
+    
+    const result = await AddressesAPI.search(data);
+    if (result.success === false){
+        alert("Error");
+        return;
+    }
+
+    const addressesTable = document.getElementById("addresses-table");
+    const noAddressesHint = document.getElementById("no-addresses-hint");
+
+    // If no address was returned, hide the table and show the "no addresses matches the parameters" hint
+    if (result.content.length === 0){
+      addressesTable.style.display = "none";
+      noAddressesHint.style.display = "none";
+      return;
+    }
+
+    const options = result.content.map(address => {
+        const option = document.createElement("OPTION");
+        option.value = address.id;
+        option.textContent = `${address.street} ${address.number}, ${address.postal_code}, ${address.city}`;
+        return option;
+    });
+
+    const assignAddressesForm = document.getElementById("choose-address-form");
+    assignAddressesForm.address.replaceChildren(...options);
 }
 
 /**

@@ -2,16 +2,18 @@ from __future__ import annotations
 
 from typing import Dict, List
 
-from django.db.models import F, Count
+from django.db.models import Count
 from django.core.handlers.wsgi import WSGIRequest
 from django.forms import inlineformset_factory, modelformset_factory
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.shortcuts import render
 from django.views import View
 
-from ..models.Bill import Bill
-from ..models.Group import Group
-from ..models.Position import Position
+from app.models.Brand import Brand
+from app.models.Bill import Bill
+from app.models.Country import Country
+from app.models.Group import Group
+from app.models.Position import Position
 
 from ..forms.bills import CreateBillForm, EditBillForm
 from ..forms.positions import CreatePositionForm, EditPositionForm
@@ -31,7 +33,10 @@ class CreateBillView(View):
             None: position_formset
         }
 
+        countries = Country.objects.all()
+
         context = {
+            'countries': countries,
             'bill_form': bill_form,
             'position_formset': position_formset,
             'group_positions': group_positions
@@ -91,7 +96,10 @@ class EditBillView(View):
 
             group_positions[group_id].append(position_form)
 
+        countries = Country.objects.all()
+
         context = {
+            'countries': countries,
             'bill_id': bill_id,
             'bill_form': bill_form,
             'position_formset': position_formset,

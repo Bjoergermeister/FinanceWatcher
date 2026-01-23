@@ -204,3 +204,12 @@ def delete_address(request: WSGIRequest, brand_id: int) -> HttpResponse:
     brand_address.delete()
 
     return HttpResponse()
+
+def search(request: WSGIRequest) -> JsonResponse:
+    query = request.GET.get("query", None)
+
+    if query is None:
+        return HttpResponseBadRequest("Query parameter missing")
+    
+    brands = Brand.objects.filter(name__icontains=query).order_by("name").only("name", "icon")
+    return JsonResponse([brand.to_json() for brand in brands], safe=False)

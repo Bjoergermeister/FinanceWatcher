@@ -46,7 +46,7 @@ class CreateBillForm(forms.ModelForm):
 
     class Meta:
         model = Bill
-        exclude = ["created"]
+        exclude = ["created", "channel"]
 
 
 class EditBillForm(forms.ModelForm):
@@ -79,7 +79,7 @@ class EditBillForm(forms.ModelForm):
     
     class Meta:
         model = Bill
-        exclude = ["created"]
+        exclude = ["created", "channel"]
 
 def get_file_name_without_extension(filename: str | None) -> str | None:
     if filename is None or len(filename) == 0:

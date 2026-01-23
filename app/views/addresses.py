@@ -80,6 +80,7 @@ class EditAddress(View):
 
 def search(request: WSGIRequest) -> JsonResponse:
     exclude = request.GET.get("exclude", None)
+    brand = request.GET.get("brand", None)
     country = request.GET.get("country", None)
     city = request.GET.get("city", None)
     region = request.GET.get("region", None)
@@ -90,6 +91,9 @@ def search(request: WSGIRequest) -> JsonResponse:
     if exclude is not None:
         brand_addresses_ids = BrandAddress.objects.filter(brand=exclude).only("pk").values_list("address_id", flat=True)
         addresses = addresses.exclude(pk__in=brand_addresses_ids)
+
+    if brand is not None:
+        addresses = addresses.filter(brand=brand)
 
     if country is not None:
         addresses = addresses.filter(country=country)

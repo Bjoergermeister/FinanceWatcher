@@ -26,6 +26,59 @@
           <div class="col-md-8">{{ bill_form.name|as_crispy_field }}</div>
           <div class="col-md-4">{{ bill_form.date|as_crispy_field }}</div>          
         </div>
+
+        {% comment %} Select for brand {% endcomment %}
+        <div class="form-row">
+          <div class="col-md-12">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <button 
+                  class="btn btn-outline-secondary" 
+                  type="button"
+                  onclick="onSelectBrandButtonPressed(event)"
+                >
+                  <i class="fa-solid fa-shop mr-2"></i>
+                  {% trans 'Choose brand' %}
+                </button>
+              </div>
+              <select name="brand" class="custom-select" disabled>
+                {% if bill_form.instance.brand %}
+                  <option value="{{ bill_form.instance.brand.pk }}">{{ bill_form.instance.brand.name }}</option>
+                {% else %}
+                  <option></optioN>
+                {% endif %}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {% comment %} Select for address {% endcomment %}
+        <div class="form-row">
+          <div class="col-md">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <button 
+                  id="choose-address-button"
+                  class="btn btn-outline-secondary" 
+                  type="button"
+                  onclick="onSelectAddressClicked(event)"
+                  title="{% trans 'Please choose a brand first' %}"
+                  disabled
+                >
+                  <i class="fa-solid fa-location-dot mr-2"></i>
+                  {% trans 'Choose address' %}
+                </button>
+              </div>
+              <select class="custom-select" name="address" disabled>
+                {% if bill_form.instance.address %}
+                  <option value="{{ bill_form.instance.address.pk }}">{{ bill_form.instance.address }}</option>
+                {% else %}
+                  <option></option>
+                {% endif %}
+              </select>
+            </div>
+          </div>
+        </div>
         <div class="form-row">
           <div class="col-md">{{ bill_form.description|as_crispy_field }}</div>
         </div>
@@ -39,7 +92,7 @@
               style="width: 100%; height: 100%; border-radius: 5%"
               src="{% static 'images/groups/Uncategorized.webp' %}"
             />
-          {% else %}
+            {% else %}
             <img 
               style="width: 100%; height: 100%; border-radius: 5%"
               src="{{ bill_form.instance.receipt.url }}"
@@ -190,6 +243,135 @@
   </div>
 </dialog>
 
+<dialog id="select-brand-dialog" name="select-brand">
+  <div class="content">
+    <header>
+      <h1>{% trans 'Choose brand' %}</h1>
+    </header>
+    <div
+      class="body form-row"
+      style="overflow-y: auto; display: block; height: calc(750px - 160px)"
+    >
+      <div class="form-row">
+        <div class="col-md">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                <i class="fa fa-search"></i>
+              </span>
+            </div>
+            <input 
+              type="text" 
+              id="brand-search-input" 
+              class="form-control" 
+              placeholder="{% trans 'Search brands...' %}" 
+              onkeyup="onBrandSearchInputChanged(event)"
+            />
+          </div>
+        </div>
+      </div>
+      <div id="brand-list" class="form-row p-3 d-flex justify-content-start">
+      </div>
+    </div>
+    <footer class="d-flex flex-row-reverse">
+      <button class="btn btn-primary">Auswählen</button>
+      <button class="btn btn-danger" onclick="onAbortChoosingGroupClicked(event)">Abbrechen</button>
+    </footer>
+  </div>
+</dialog>
+
+<dialog id="select-address-dialog" name="select-address">
+  <div class="content">
+    <header>
+      <h1>{% trans 'Choose address' %}</h1>
+    </header>
+    <div
+      class="body form-row"
+      style="overflow-y: auto; display: block; height: calc(750px - 160px)"
+    >
+      <form id="address-filter-form" onsubmit="onAddressFormSubmitted(event)">
+          <input name="id" type="hidden">
+            {% csrf_token %}
+            <div class="form-row mb-2">
+                <div class="col-md-6">
+                    <select 
+                        name="country"
+                        class="custom-select"
+                        onChange="onAssignAddressInputChanged(event)"
+                    >
+                        {% for country in countries %}
+                            <option value="{{ country.pk }}">{{ country.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <input 
+                        class="form-control"
+                        type="text"
+                        name="city"
+                        placeholder="City"
+                        onkeyup="onAssignAddressInputChanged(event)"
+                    >
+                </div>
+            </div>
+            <div class="form-row mb-2">
+                <div class="col-md-6">
+                    <input
+                        class="form-control"
+                        type="text"
+                        name="region"
+                        placeholder="Region"
+                        onkeyup="onAssignAddressInputChanged(event)"
+                    >
+                </div>
+                <div class="col-md-6">
+                    <input
+                        class="form-control"
+                        type="text"
+                        name="postal_code"
+                        placeholder="Postleitzahl"
+                        onkeyup="onAssignAddressInputChanged(event)"
+                    >
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-md">
+                    <button 
+                        class="btn btn-primary"
+                        onclick="onUpdateAddressesClicked(event)"
+                    >
+                        <i class="fa fa-undo mr-2"></i>
+                        {% trans 'Update' %}
+                    </button>
+                </div>
+            </div>
+        </form>
+      <div id="address-list" class="form-row p-3 d-flex justify-content-start">
+        <div id="no-addresses-hint" class="badge bg-warning" style="display: none">
+          {% trans 'No address matches the search parameters' %}
+        </div>
+        <form id="choose-address-form" style="width: 90%; height; 90%; margin: auto; display: block" onsubmit="onSelectAddressFormSubmitted(event)">
+          <div class="form-row">
+            <div class="col-md"-12>
+              <select name="address" class="custom-select" required>
+                {% if bill_form.instance.address %}
+                  <option value="{{ bill_form.instance.address.pk }}">{{ bill_form.instance.address }}</option>
+                {% else %}
+                  <option></option>
+                {% endif %}
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <footer class="d-flex flex-row-reverse">
+      <button class="btn btn-primary" form="choose-address-form">{% trans 'Select address' %}</button>
+      <button class="btn btn-danger" onclick="onAbortChoosingAddressClicked(event)">{% trans 'Cancel' %}</button>
+    </footer>
+  </div>
+</dialog>
+
 <template id="group-template">
   <div class="group small" onclick="onGroupSelected(event)">
     <img class="no-events" />
@@ -221,11 +403,32 @@
   </fieldset>
 </template>
 
+<template id="select-brand-template">
+  <div class="select-brand-option card shadow">
+    <img>
+    <div class="select-brand-name">
+      <h4></h4>
+    </div>
+  </div>
+</template>
+
+
 <script>
   const CREATE_BILL_URL = "{% url 'create_bill' %}";
   const EDIT_BILL_URL = "{% url 'edit_bill' 0 %}";
   const ALL_GROUPS_URL = "{% url 'all_groups' %}";
+  const GET_ALL_SHOPS_URL = "{% url 'all_brands' %}";
+  const SEARCH_BRANDS_URL = "{% url 'search_brands' %}";
+  const SEARCH_ADDRESSES_URL = "{% url 'search_addresses' %}";
   const CSRF_MIDDLEWARE_TOKEN = "{{ csrf_token }}";
+
+  setupCallbacks.push(() => {
+    const brandSelected = document.querySelector("select[name='brand'] option").innerText !== "";
+    if (brandSelected){
+      const addressSelect = document.querySelector("select[name='address']");
+      addressSelect.previousElementSibling.querySelector("button").disabled = false;
+    }
+  });
 </script>
 
 {% endblock %}

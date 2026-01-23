@@ -32,6 +32,7 @@ urlpatterns = [
     path("group/<int:group_id>", groups.EditGroupView.as_view(), name="edit_group"),
 
     path("brands", brands.BrandListView.as_view(), name="brands"),
+    path("brands/search", brands.search, name="search_brands"),
     path("brands/<int:brand_id>", brands.BrandDetailView.as_view(), name="brand_details"),
     path("brands/<int:brand_id>/addresses", brands.BrandAddressesListView.as_view(), name="brand_addresses"),
     path("brands/<int:brand_id>/assign-addresses", brands.assign_addresses, name="assign_addresses"),
