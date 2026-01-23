@@ -8,18 +8,13 @@
     <div class="col-md-2">{{ position.price|as_crispy_field }}</div>
     <div class="col-md-2">{{ position.quantity|as_crispy_field }}</div>
     <div class="col-md-1">
-      <i
-      class="fa-solid fa-xl fa-comment"
-      style="transform: translate(10px, 10px)"
-      data-index="{{ forloop.counter }}"
-      onclick="onPositionNoteClicked(event)"
-      ></i>
-      <i
-      class="fa-solid fa-xl fa-trash"
-      style="transform: translate(10px, 10px)"
-      data-index="{{ forloop.counter }}"
-      onclick="onDeletePositionClicked(event)"
-      ></i>
+      <button 
+        type="button" 
+        onclick="onDeletePositionClicked(event)"
+        data-index="{{ forloop.counter }}"
+        class="btn btn-warning">
+        <i class="fa fa-minus" style="color: white; pointer-events: none;"></i>
+      </button>
     </div>
     {{ position.note }} {{ position.group }}
   </div>
