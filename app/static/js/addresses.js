@@ -109,6 +109,12 @@ async function onAddressFormSubmitted(event) {
     }
 
     sendNotification("Adresse gespeichert", "Die Adresse wurde erfolgreich gespeichert.", NOTIFICATION_TYPE_SUCCESS);    
+    
+    // Reset all form inputs
+    for (const element of form.elements){
+        if (element.tagName === "button") continue;
+        element.value = "";
+    }
 
     const dialog = document.getElementById('add-address-dialog');
     dialog.close();
@@ -119,8 +125,8 @@ async function onAddressFormSubmitted(event) {
 // ####################
 
 /**
- * Create a table row for an andress
- * @param {Address} address 
+ * Create a table row for an address
+ * @param {Address} address - An address
  * @returns {HTMLTableRowElement} - The table row for the address
  */
 function createAddressTableRow(address){
