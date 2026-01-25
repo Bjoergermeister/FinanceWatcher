@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models.fields.files import ImageFieldFile
 
-from ..models.Group import Group
+from app.models.Group import Group
 
 class CreateGroupForm(forms.ModelForm):
     icon = forms.ImageField(label="Bild", required=False)
@@ -40,8 +40,7 @@ class CreateGroupForm(forms.ModelForm):
 
         icon: InMemoryUploadedFile | None = data.get("icon", None)
         if icon is not None:
-            file_extension = icon.name[icon.name.rfind(".") + 1:]
-            icon.name = f"{self.internal_file_name}.{file_extension}"
+            icon.name = f"{self.internal_file_name}.jpg"
 
         return data
     
