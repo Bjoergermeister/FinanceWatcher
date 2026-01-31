@@ -151,7 +151,7 @@ async function onAssignAddressesFormSubmitted(event){
         cells[1].innerText = brandAddress.address.city;
         cells[2].innerText = brandAddress.address.postal_code;
         cells[3].innerText = brandAddress.address.region;
-        cells[4].innerText = brandAddress.address.country;
+        cells[4].innerText = brandAddress.address.country.name;
         cells[5].innerText = brandAddress.start_date;
         cells[6].innerText = brandAddress.end_date;
         cells[7].children[0].dataset.id = brandAddress.id;
