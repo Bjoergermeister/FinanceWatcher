@@ -220,10 +220,12 @@ async function onDeleteAddressClicked(event){
     }
 
     const tableRow = findParentElement(event.target, "TR");
+    const addressesTable = findParentElement(tableRow, "TABLE");
     tableRow.remove();
 
-    // TODO: If no addresses remain after deleting this one,
-    // show the "no addresses" table row
+    if (tableHasDataRows(addressesTable) === false){
+        showNoDataTableRow(addressesTable);
+    }
 }
 
 // ####################

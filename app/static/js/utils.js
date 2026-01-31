@@ -65,8 +65,9 @@ function getTemplate(templateName, clone){
   return template.content.cloneNode(clone).children[0];
 }
 
+
 /**
- * Check if the table has a table row with the class no-data (which gets displayed if a table has no actual data rows).
+ * Checks if the table has a table row with the class no-data (which gets displayed if a table has no actual data rows).
  * If the table row is found, it is hidden by setting the display value to "none"
  * @param {HTMLTableElement} table 
  */
@@ -75,4 +76,25 @@ function hideNoDataTableRow(table){
   if (noDataTableRow){
     noDataTableRow.style.display = "none";
   }
+}
+
+/**
+ * Displays the table row containing the information that the table has no actual data rows
+ * @param {HTMLTableElement} table - The table who's no data table row should be displayed
+ */
+function showNoDataTableRow(table){
+  const noDataTableRow = table.querySelector("tr.no-data");
+  if (noDataTableRow){
+    noDataTableRow.style.display = "table-row";
+  }
+}
+
+/**
+ * Check if a table has at least one table row with actual data (meaning a row with neither the "no-data" nor the "dummy" class)
+ * @param {HTMLTableElement} table 
+ * @returns True if the table has at least one row with actual data, otherwise false
+ */
+function tableHasDataRows(table){
+  const tableRows = table.querySelectorAll("tr:not(.dummy):not(.no-data)");
+  return tableRows.length > 0;
 }
