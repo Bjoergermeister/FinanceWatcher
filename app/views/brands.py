@@ -157,7 +157,11 @@ def assign_addresses(request: WSGIRequest, brand_id: int) -> HttpResponse:
     
     response = {
         "brand": brand.to_json(),
-        "addresses": [address.to_json() for address in addresses]
+        "addresses": [
+            address.to_json(include_brand=False)
+            for address
+            in addresses
+        ]
     }
 
     return JsonResponse(response, safe=False, status=Http.CREATED)

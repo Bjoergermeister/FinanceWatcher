@@ -154,8 +154,8 @@ async function onAssignAddressesFormSubmitted(event){
         cells[4].innerText = brandAddress.address.country;
         cells[5].innerText = brandAddress.start_date;
         cells[6].innerText = brandAddress.end_date;
-        cells[7].children[0].dataset.id = brandAddress.pk;
-        cells[7].children[1].dataset.id = brandAddress.pk;
+        cells[7].children[0].dataset.id = brandAddress.id;
+        cells[7].children[1].dataset.id = brandAddress.id;
 
         newTableRow.classList.remove("dummy");
         dummyTableRow.parentElement.insertAdjacentElement("afterbegin", newTableRow);
