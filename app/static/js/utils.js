@@ -64,3 +64,15 @@ function getTemplate(templateName, clone){
   clone ??= true;
   return template.content.cloneNode(clone).children[0];
 }
+
+/**
+ * Check if the table has a table row with the class no-data (which gets displayed if a table has no actual data rows).
+ * If the table row is found, it is hidden by setting the display value to "none"
+ * @param {HTMLTableElement} table 
+ */
+function hideNoDataTableRow(table){
+  const noDataTableRow = table.querySelector("tr.no-data");
+  if (noDataTableRow){
+    noDataTableRow.style.display = "none";
+  }
+}

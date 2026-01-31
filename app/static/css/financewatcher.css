@@ -90,6 +90,11 @@ dialog[name="confirm-deletion"] .content {
   height: 250px;
 }
 
+dialog[name="bill-preview"] .content {
+  width: 400px;
+  height: 75%;
+}
+
 dialog[name="bill-deletion"] .content {
   width: 600px;
   height: 225px;
@@ -320,4 +325,8 @@ input[type="file"]:not(:empty) ~ label {
 
 #no-bills-hint p {
   font-size: 2rem;
+}
+
+table tr.dummy {
+  display: none;
 }

@@ -131,7 +131,7 @@ class BrandAddressesListView(View):
     
 
 def assign_addresses(request: WSGIRequest, brand_id: int) -> HttpResponse:
-    brand = get_object_or_404(Brand, pk=brand_id, json=True)
+    brand: Brand = get_object_or_404(Brand, pk=brand_id, json=True)
 
     address_ids = request.POST.getlist("addresses")
 
@@ -140,15 +140,28 @@ def assign_addresses(request: WSGIRequest, brand_id: int) -> HttpResponse:
     BrandAddress.objects.filter(address__in=address_ids).update(end_date=yesterday)
 
     # Create new mappings between addresses and the brand starting from today
-    addresses = (
+    new_address_associations = (
         BrandAddress(
             brand=brand,
             address_id=address_id,
             start_date=date.today()
-        ) for address_id in address_ids)
-    BrandAddress.objects.bulk_create(addresses)
+        )
+        for address_id
+        in address_ids
+    )
+    created_db_objects = BrandAddress.objects.bulk_create(new_address_associations)
 
-    return HttpResponse(status=Http.CREATED)
+    addresses = BrandAddress.objects.filter(
+        pk__in=[address.pk for address in created_db_objects]
+    ).select_related("address")
+    
+    response = {
+        "brand": brand.to_json(),
+        "addresses": [address.to_json() for address in addresses]
+    }
+
+    return JsonResponse(response, safe=False, status=Http.CREATED)
+
 
 def unassign_address(request: WSGIRequest, brand_id: int) -> HttpResponse:
     """

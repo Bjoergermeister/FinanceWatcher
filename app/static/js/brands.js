@@ -142,7 +142,35 @@ async function onAssignAddressesFormSubmitted(event){
         return;
     }
 
-    alert("Success!");
+    // Create new table rows for the new addresses    
+    const dummyTableRow = document.querySelector("#brand-addresses-table tbody tr.dummy");
+    for (const brandAddress of result.content.addresses){
+        const newTableRow = dummyTableRow.cloneNode(true);
+        const cells = newTableRow.querySelectorAll("td");
+        cells[0].innerText = `${brandAddress.address.street} ${brandAddress.address.number}`;
+        cells[1].innerText = brandAddress.address.city;
+        cells[2].innerText = brandAddress.address.postal_code;
+        cells[3].innerText = brandAddress.address.region;
+        cells[4].innerText = brandAddress.address.country;
+        cells[5].innerText = brandAddress.start_date;
+        cells[6].innerText = brandAddress.end_date;
+        cells[7].children[0].dataset.id = brandAddress.pk;
+        cells[7].children[1].dataset.id = brandAddress.pk;
+
+        newTableRow.classList.remove("dummy");
+        dummyTableRow.parentElement.insertAdjacentElement("afterbegin", newTableRow);
+    }
+
+    hideNoDataTableRow(findParentElement(dummyTableRow, "TABLE"));
+
+    sendNotification(
+        "Addresses assigned",
+        `You have assigned ${result.content.addresses.length} addresses to ${result.content.brand.name}`,
+        NOTIFICATION_TYPE_SUCCESS
+    );
+
+    const dialog = findParentElement(form, "DIALOG");
+    dialog.close();
 }
 
 function onUpdateAddressesClicked(event){
@@ -215,6 +243,7 @@ async function updateAddressChoices(form){
     
     const result = await AddressesAPI.search(data);
     if (result.success === false){
+        // TODO: Properly handle the error case
         alert("Error");
         return;
     }
@@ -228,7 +257,6 @@ async function updateAddressChoices(form){
 
     const assignAddressesForm = document.getElementById("assign-addresses-form");
     assignAddressesForm.addresses.replaceChildren(...options);
-    console.log(result);
 }
 
 /**

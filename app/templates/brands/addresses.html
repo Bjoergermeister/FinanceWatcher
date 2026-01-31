@@ -28,6 +28,27 @@
             </tr>
         </thead>
         <tbody>
+            {% comment %}
+                The dummy table row makes sure that there is always at least one table row with the proper cells
+                so it can be copied to create new rows.
+            {% endcomment %}
+            <tr class="dummy">
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>
+                    <button class="btn btn-close" title="{% trans 'Delete address' %}" onclick="onDeleteAddressClicked(event)">
+                        <i class="fa fa-lg fa-trash no-events" style="color: red"></i>
+                    </button>
+                    <button class="btn btn-close" title="{% trans 'Unassign address' %}" onclick="onUnassignAddressClicked(event)">
+                        <i class="fa fa-lg fa-xmark no-events" style="color: red"></i>
+                    </button>
+                </td>
+            </td>
             {% for association in brand_address_associations %}
                 <tr>
                     <td>{{ association.address.street }} {{ association.address.number }}</td>
@@ -59,7 +80,7 @@
                     </td>
                 </tr>
             {% empty %}
-                <tr>
+                <tr class="no-data">
                     <td colspan="8">{% trans 'This brand does not have addresses assigned to it' %}</td>
                 </tr>
             {% endfor %}
