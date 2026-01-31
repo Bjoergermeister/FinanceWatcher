@@ -9,7 +9,7 @@
 
 {% block content %} 
     <section class="p-5 mb-5">
-        <h2 class="text-center mb-3">Allgemeine Gruppen</h2>
+        <h2 class="text-center mb-3">{% trans 'Common groups ' %}</h2>
         <div id="global-groups" class="group-container">
             {% for group in global_groups %}
                 <div class="group card shadow">
@@ -23,7 +23,7 @@
     </section>
 
     <section class="p-5">
-        <h2 class="text-center mb-3">Deine Gruppen</h2>
+        <h2 class="text-center mb-3">{% trans 'Your groups' %}</h2>
         <div id="user-groups" class="group-container">
             {% for user_group in user_groups %}
                 <div class="group card shadow" data-id="{{ user_group.id }}">
@@ -65,13 +65,12 @@
     <dialog id="confirm-group-deletion-dialog" name="group-deletion">
         <div class="content">
             <header>
-                <h1>Gruppe wirklich löschen?</h1>
+                <h1>{% trans 'Delete group?' %}</h1>
             </header>
             <div class="body form-row">
                 <div class="col-md">
                     <p>
-                        Bist Du sicher, dass Du diese Gruppe löschen willst? Diese Aktion ist dauerhaft
-                        und kann nicht rückgängig gemacht werden.
+                        {% trans 'Are you sure you want to delete this group? This action is permanent and cannot be reversed' %}
                     </p>
                 </div>
             </div>
@@ -81,14 +80,14 @@
                         class="btn btn-primary pl-5 pr-5"
                         onclick="onDeleteGroupConfirmed(event)"
                 >
-                    Ja, löschen
+                    {% trans 'Yes, delete' %}
                 </button>
                 <button
                     type="cancel"
                     class="btn btn-danger pl-4 pr-4"
                     onclick="onDeleteGroupAborted(event)"
                 >
-                    Nein, abbrechen
+                    {% trans 'No, cancel' %}
                 </button>
             </footer>
         </div>

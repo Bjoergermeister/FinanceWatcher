@@ -1,7 +1,7 @@
 {% load crispy_forms_tags %} {% load static %}
 
 <header>
-  <h1>Neuen Brand erstellen</h1>
+  <h1>{% trans 'Add brand' %}</h1>
 </header>
 
 <main>
@@ -25,7 +25,7 @@
     <div class="form-row">
       <div class="col-md-6">
         <div class="form-group">
-          <label class="requiredField">Bild</label>
+          <label class="requiredField">{% trans 'Image' %}</label>
           <div>
             <input
               id="id_icon"
@@ -37,7 +37,7 @@
               onchange="onBrandImageChanged(event)"              
             />
             <label for="id_icon">
-              <h3>Bild auswählen</h3>
+              <h3>{% trans 'Choose image' %}</h3>
               <img src="{% static 'images/upload.png' %}" alt="Bild auswählen" />
             </label>
           </div>
@@ -45,7 +45,7 @@
       </div>
       <div class="col-md-6">
         <div class="form-group">
-          <label>Vorschau</label>
+          <label>{% trans 'Preview' %}</label>
           <img class="image-preview" src="{% static 'images/default_brand_icon.png' %}" style="width: 250px; height: 250px" />
         </div>
       </div>
@@ -54,9 +54,9 @@
 </main>
 <footer>
   <button class="btn btn-primary" form="create-brand-form" type="submit">
-    Speichern
+    {% trans 'Save' %}
   </button>
   <button class="btn btn-danger" type="cancel" onclick="onBrandAbortClicked(event)">
-    Abbrechen
+    {% trans 'Cancel' %}
   </button>
 </footer>

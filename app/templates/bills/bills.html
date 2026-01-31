@@ -15,11 +15,11 @@
   <thead>
     <tr>
       <th data-width="5%"><input type="checkbox"></th>
-      <th data-width="10%">Name</th>
-      <th>Datum</th>
-      <th>Positionen</th>
-      <th>Total</th>
-      <th>Kategorien</th>
+      <th data-width="10%">{% trans 'Name' %}</th>
+      <th>{% trans 'Datum' %}</th>
+      <th>{% trans 'Positionen' %}</th>
+      <th>{% trans 'Total' %}</th>
+      <th>{% trans 'Kategorien' %}</th>
       <th></th>
     </tr>
   </thead>
@@ -58,7 +58,7 @@
         <td colspan="7">
           <div id="no-bills-hint" class="mb-5">
             <img src="{% static 'images/eye.svg' %}">
-            <p>Du hast keine Rechnungen</p>
+            <p>{% trans "You don\'t have any bills yet" %}</p>
           </div>
         </td>
       </tr>
@@ -68,28 +68,27 @@
 
 
 <div class="d-flex justify-content-center">
-  <a class="btn btn-primary" href="{% url 'create_bill' %}"><i class="fa fa-plus fa-lg mr-3"></i>Neue Ausgabe</a>
+  <a class="btn btn-primary" href="{% url 'create_bill' %}"><i class="fa fa-plus fa-lg mr-3"></i>{% tran 'New bill' %}</a>
 </div>
 
 <dialog id="confirm-bill-deletion-dialog" name="bill-deletion">
   <div class="content">
     <header>
-      <h1>Ausgabe wirklich löschen?</h1>
+      <h1>{% trans 'Delete bill?' %}</h1>
     </header>
     <div class="body form-row">
       <div class="col-md">
         <p>
-          Bist Du sicher, dass Du diese Ausgabe löschen willst? Diese Aktion ist dauerhaft
-          und kann nicht rückgängig gemacht werden.
+          {% trans 'Are you sure you want to delete this bill? This action is permanent and cannot be reversed' %}
         </p>
       </div>
     </div>
     <footer>
       <button type="submit" class="btn btn-primary pl-5 pr-5" onclick="onBillDeletionConfirmClicked(event)">
-        Ja, löschen
+        {% trans 'Yes, delete' %}
       </button>
       <button type="cancel" class="btn btn-danger pl-4 pr-4" onclick="onBillDeletionAbortClicked(event)">
-        Nein, abbrechen
+        {% trans 'No, cancel' %}
       </button>
     </footer>
   </div>
@@ -109,7 +108,7 @@
     </div>
     <footer>
       <button type="button" class="btn btn-primary pl-5 pr-5" onclick="onCloseBillPreviewClicked(event)">
-        Ok
+        {% trans 'Ok' %}
       </button>
     </footer>
   </div>

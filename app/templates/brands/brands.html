@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block content %}
-    <h1>Brands</h1>
+    <h1>{% trans 'Brands' %}</h1>
     <button class="btn btn-primary mb-3" onclick="onAddBrandClicked(event)">
         <i class="fa fa-plus"></i>
         {% trans 'Add brand'%}
@@ -17,10 +17,10 @@
         <thead>
             <tr>
                 <th></th>
-                <th scope="col">Name</th>
-                <th scope="col">{% trans 'Hat Filialen' %}</th>
-                <th>{% trans 'Standard-Verkaufskanal' %}</th>
-                <th>{% trans 'Anzahl Addressen' %}</th>
+                <th scope="col">{% trans 'Name' %}</th>
+                <th scope="col">{% trans 'Has physical stores' %}</th>
+                <th>{% trans 'Default distribution channel' %}</th>
+                <th>{% trans 'Address count' %}</th>
                 <th></th>
             </tr>
         </thead>

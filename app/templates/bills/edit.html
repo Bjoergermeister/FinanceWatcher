@@ -24,13 +24,13 @@
     {% comment %} Header for positions {% endcomment %}
     <div class="form-row">
       <div class="col-md-8">
-        <p>Name</p>
+        <p>{% trans 'Name' %}</p>
       </div>
       <div class="col-md-2">
-        <p>Preis</p>
+        <p>{% trans 'Price' %}</p>
       </div>
       <div class="col-md-1">
-        <p>Menge</p>
+        <p>{% trans 'Amount' %}</p>
       </div>
       <div class="col-md-1"></div>
     </div>
@@ -54,7 +54,7 @@
 
     <div class="d-flex justify-content-center">
       <button class="btn btn-success" onclick="onNewPositionClicked(event)">
-        <i class="fa-solid fa-plus fa-lg no-event mr-2"></i>Position hinzufügen</button>
+        <i class="fa-solid fa-plus fa-lg no-event mr-2"></i>{% trans 'Add position' %}</button>
     </div>
   </fieldset>
 
@@ -66,13 +66,13 @@
     </header>
     <div class="form-row">
       <div class="col-md-8">
-        <p>Name</p>
+        <p>{% trans 'Name' %}</p>
       </div>
       <div class="col-md-2">
-        <p>Preis</p>
+        <p>{% trans 'Price' %}</p>
       </div>
       <div class="col-md-1">
-        <p>Menge</p>
+        <p>{% trans 'Amount' %}</p>
       </div>
       <div class="col-md-1"></div>
     </div>
@@ -95,42 +95,42 @@
 
     <div class="d-flex justify-content-center">
       <button class="btn btn-success" onclick="onNewPositionClicked(event)">
-        <i class=" fa-solid fa-plus fa-lg no-event mr-2"></i>Position hinzufügen</button>
+        <i class=" fa-solid fa-plus fa-lg no-event mr-2"></i>{% trans 'Add position' %}</button>
     </div>
   </fieldset>
   {% endfor %}
 
   <div class="d-flex justify-content-center mt-5 mb-5">
     <button id="add-group-button" class="btn btn-primary" onclick="onNewGroupButtonClicked(event)">
-      <i class="fa-solid fa-plus fa-lg no-event mr-2"></i>Gruppe hinzufügen
+      <i class="fa-solid fa-plus fa-lg no-event mr-2"></i>{% trans 'Add group' %}
     </button>
   </div>
 
   <fieldset class="card shadow p-3 mb-5">
-    <p>Summe: <span id="bill-sum">{{ bill_form.total.value }} &euro;</span></p>
+    <p>{% trans 'Sum: ' %}<span id="bill-sum">{{ bill_form.total.value }} &euro;</span></p>
   </fieldset>
 
   <div class="form-controls">
-    <button class="btn btn-primary" type="submit">Speichern</button>
-    <button class="btn btn-secondary" type="reset">Zurücksetzen</button>
-    <button class="btn btn-danger" type="cancel">Abbrechen</button>
+    <button class="btn btn-primary" type="submit">{% trans 'Save' %}</button>
+    <button class="btn btn-secondary" type="reset">{% trans 'Reset' %}</button>
+    <button class="btn btn-danger" type="cancel">{% trans 'Cancel' %}</button>
   </div>
 </form>
 
 <dialog id="position-note-dialog" name="position-note">
   <div class="content">
     <header>
-      <h1>Titel</h1>
+      <h1>{% trans 'Title' %}</h1>
     </header>
     <div class="body form-row">
       <textarea id="bill-position-note" rows="5" resizable="false"></textarea>
     </div>
     <footer>
       <button class="btn btn-primary" onclick="onPositionNoteSaveClicked(event)">
-        Speichern
+        {% trans 'Save' %}
       </button>
       <button class="btn btn-danger" onclick="onPositionNoteAbortClicked(event)">
-        Abbrechen
+        {% trans 'Cancel' %}
       </button>
     </footer>
   </div>
@@ -139,23 +139,25 @@
 <dialog id="confirm-position-deletion-dialog" name="confirm-deletion">
   <div class="content">
     <header>
-      <h1>Position wirklich löschen?</h1>
+      <h1>{% trans 'Delete position?' %}</h1>
     </header>
     <div class="body form-row">
       <div class="col-md">
         <p>
-          Die ausgewählte Position ist in der Datenbank gespeichert. Wenn Du sie löschst,
-          wird sie auch in der Datenbank gelöscht. Möchtest Du die Position wirklich
-          löschen?
+          {% trans '
+            This position is already saved in the database.
+            If you delete it, it will be deleted in the database as well.
+            Are you sure you want to delete it?'
+          %}
         </p>
       </div>
     </div>
     <footer>
       <button class="btn btn-primary pl-5 pr-5" onclick="onPositionDeletionConfirmClicked(event)">
-        Ja, löschen
+        {% trans 'Yes, delete' %}
       </button>
       <button class="btn btn-danger pl-4 pr-4" onclick="onPositionDeletionAbortClicked(event)">
-        Nein, abbrechen
+        {% trans 'No, cancel' %}
       </button>
     </footer>
   </div>

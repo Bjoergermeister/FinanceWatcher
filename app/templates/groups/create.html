@@ -1,7 +1,7 @@
 {% load crispy_forms_tags %} {% load static %}
 
 <header>
-  <h1>Neue Gruppe erstellen</h1>
+  <h1>{% trans 'Add group' %}</h1>
 </header>
 
 <main>
@@ -33,7 +33,7 @@
               onchange="onGroupImageChanged(event)"              
             />
             <label for="id_icon">
-              <h3>Bild auswählen</h3>
+              <h3>{% trans 'Choose image' %}</h3>
               <img src="{% static 'images/upload.png' %}" alt="Bild auswählen" />
             </label>
           </div>
@@ -41,7 +41,7 @@
       </div>
       <div class="col-md-6">
         <div class="form-group">
-          <label>Vorschau</label>
+          <label>{% trans 'Preview' %}</label>
           <img class="image-preview" src="{% static 'images/groups/default_user_group_icon.png' %}" style="width: 250px; height: 250px" />
         </div>
       </div>
@@ -50,9 +50,9 @@
 </main>
 <footer>
   <button class="btn btn-primary" form="create-group-form" type="submit">
-    Speichern
+    {% trans 'Save' %}
   </button>
   <button class="btn btn-danger" type="cancel" onclick="onGroupAbortClicked(event)">
-    Abbrechen
+    {% trans 'Cancel' %}
   </button>
 </footer>

@@ -17,13 +17,13 @@
     <table id="brand-addresses-table" class="table table-bordered">
         <thead>
             <tr>
-                <th>{% trans 'Straße' %}</th>
-                <th>{% trans 'Ort' %}</th>
-                <th>{% trans 'Postleitzahl' %}</th>
+                <th>{% trans 'Street' %}</th>
+                <th>{% trans 'City' %}</th>
+                <th>{% trans 'Postal Code' %}</th>
                 <th>{% trans 'Region' %}</th>
-                <th>{% trans 'Land' %}</th>
-                <th>{% trans 'Von' %}</th>
-                <th>{% trans 'Bis' %}</th>
+                <th>{% trans 'Country' %}</th>
+                <th>{% trans 'From' %}</th>
+                <th>{% trans 'To' %}</th>
                 <th></th>
             </tr>
         </thead>
@@ -60,7 +60,7 @@
                 </tr>
             {% empty %}
                 <tr>
-                    <td>{% trans 'This brand does not have addresses assigned to it' %}</td>
+                    <td colspan="8">{% trans 'This brand does not have addresses assigned to it' %}</td>
                 </tr>
             {% endfor %}
         </tbody>
