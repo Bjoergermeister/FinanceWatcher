@@ -1,6 +1,7 @@
-{% extends "base.html" %} 
+{% extends "base.html" %}
 
-{% load static %} 
+{% load static %}
+{% load i18n %}
 
 {% block css %}
   <link rel="stylesheet" type="text/css" href="{% static 'css/bills.css' %}">
@@ -68,7 +69,7 @@
 
 
 <div class="d-flex justify-content-center">
-  <a class="btn btn-primary" href="{% url 'create_bill' %}"><i class="fa fa-plus fa-lg mr-3"></i>{% tran 'New bill' %}</a>
+  <a class="btn btn-primary" href="{% url 'create_bill' %}"><i class="fa fa-plus fa-lg mr-3"></i>{% trans 'New bill' %}</a>
 </div>
 
 <dialog id="confirm-bill-deletion-dialog" name="bill-deletion">
