@@ -19,11 +19,13 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 
-from app.views import addresses, bills, groups, brands
+from app.views import dashboard, addresses, bills, groups, brands
 
 urlpatterns = [
-    path("", bills.bills, name="bills"),
+    path('', dashboard.dashboard, name="dashboard"),
+
     path("admin/", admin.site.urls),
+    path("bills", bills.bills, name="bills"),
     path("bill/new", bills.CreateBillView.as_view(), name="create_bill"),
     path("bill/<int:bill_id>", bills.EditBillView.as_view(), name="edit_bill"),
     path("bill/<int:bill_id>/preview", bills.preview, name="preview_bill"),

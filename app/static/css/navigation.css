@@ -3,20 +3,32 @@ nav {
   width: 100%;
 }
 
+.nav-container {
+  position: sticky;
+  top: 50px;
+  max-height: calc(100vh - 50px);
+}
+
 nav a {
   display: block;
-  width: 80%;
-  height: 50px;
-  line-height: 50px;
-  padding: 0px 20px;
+  width: 90%;
+  height: 40px;
+  line-height: 30px;
+  padding: 5px 15px;
   color: #333 !important;
   cursor: pointer;
   margin: auto;
+  text-decoration: none !important;
 }
 
 nav a:hover {
-  background: white;
-  color: black !important;
+  background: rgba(5, 5, 6, 0.06);
+  border-radius: 10px;
+}
+
+nav a.active {
+  background: color(srgb 0.121569 0.458824 0.796079 / 0.16);
+  border-radius: 10px;
 }
 
 nav a img {

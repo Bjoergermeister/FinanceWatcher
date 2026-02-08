@@ -3,24 +3,24 @@
 
 <nav>
     <div class="nav-container">
-        <a>
-          <img src="{% static 'images/dashboard.png' %}">
+        <a href="{% url 'dashboard' %}" {% if request.path == "/" %} class="active" {% endif %}>
+          <i class="fa-solid fa-fw fa-chart-line mr-2"></i>
           {% trans 'Dashboard' %}
         </a>
-        <a href="{% url 'bills' %}">
-          <img src="{% static 'images/bills.png' %}">
+        <a href="{% url 'bills' %}" {% if request.path|slice:"-5:" == "bills" %} class="active" {% endif %}>
+          <i class="fa-solid fa-fw fa-money-bill mr-2"></i>
           {% trans 'Bills' %}
         </a>
-        <a href="{% url 'groups' %}">
-          <img src="{% static 'images/tag.png' %}">
+        <a href="{% url 'groups' %}" {% if request.path|slice:"-6:" == "groups" %} class="active" {% endif %}>
+          <i class="fa-solid fa-fw fa-tag mr-2"></i>
           {% trans 'Groups' %}
         </a>
-        <a href="{% url 'brands' %}">
-          <i class="fa fa-xl fa-shop mr-2"></i>
+        <a href="{% url 'brands' %}" {% if request.path|slice:"-6:" == "brands" %} class="active" {% endif %}>
+          <i class="fa fa-fw fa-shop mr-2"></i>
           {% trans 'Brands' %}
         </a>
-        <a href="{% url 'addresses' %}">
-          <i class="fa fa-xl fa-location-dot mr-2"></i>
+        <a href="{% url 'addresses' %}" {% if request.path|slice:"-9:" == "addresses" %} class="active" {% endif %}>
+          <i class="fa fa-fw fa-location-dot mr-2"></i>
           {% trans 'Addresses' %}
         </a>
     </div>
