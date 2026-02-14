@@ -10,9 +10,16 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+from __future__ import annotations
+
 from pathlib import Path
 
+import logging
 import os
+
+from pythonjsonlogger.jsonlogger import JsonFormatter
+
+from FinanceWatcher.logging import get_request_context
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -57,7 +64,8 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 
     # Custom Middleware
-    "app.middleware.ExternalServiceAuthenticationMiddleware"
+    "app.middleware.ExternalServiceAuthenticationMiddleware",
+    "app.middleware.RequestContextMiddleware"
 ]
 
 ROOT_URLCONF = "FinanceWatcher.urls"
@@ -113,18 +121,39 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+class RequestContextFilter(logging.Filter):
+    """
+    Attach request-scoped context to log records.
+    """
+    def filter(self: RequestContextFilter, record: logging.LogRecord) -> bool:
+        """
+        Modify the LogRecord in place, then return True so the record is logged.
+        """
+
+        context = get_request_context()
+        record.request_id = context.get("request_id")
+        record.user_id = context.get("user_id")
+        return True
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "filters": {
         "require_debug_false": {
             "{}": "django.utils.log.RequireDebugFalse"
+        },
+        "request_context": {
+            "()": "FinanceWatcher.settings.RequestContextFilter"
         }
     },
     "formatters": {
         "simple": {
             "format": "{asctime} {name} {levelname} {message}",
             "style": "{"
+        },
+        "json": {
+            "()": JsonFormatter,
+            "format": "%(asctime)s %(levelname)s %(name)s %(message)s %(request_id)s %(user_id)s %(path)s %(method)s"
         }
     },
     "handlers": {
@@ -135,17 +164,23 @@ LOGGING = {
         "file": {
             "class": "logging.FileHandler",
             "filename": "financewatcher.log",
+            "filters": ["request_context"],
             "level": "INFO",
-            "formatter": "simple"
+            "formatter": "json"
         }
     },
     "root": {
-        "handlers": ["console"],
-        "level": "WARNING"
+        "handlers": ["console", "file"],
+        "level": "INFO"
     },
     "loggers": {
         "django": {
             "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": False
+        },
+        "django.server": {
+            "handlers": ["console"],
             "level": "INFO",
             "propagate": False
         }
