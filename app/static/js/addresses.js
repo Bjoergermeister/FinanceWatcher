@@ -137,7 +137,7 @@ function createAddressTableRow(address){
     cells[0].innerText = `${address.street} ${address.number}`;
     cells[1].innerText = address.city;
     cells[2].innerText = address.postal_code;
-    cells[3].innerText = `${address.country.name}`;
+    cells[3].innerText = `\xa0${address.country.name}`;
     cells[4].children[0].dataset.id = address.id;
     cells[4].children[1].dataset.id = address.id;
 
