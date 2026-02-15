@@ -110,9 +110,9 @@ async function onAddressFormSubmitted(event) {
 
     sendNotification("Adresse gespeichert", "Die Adresse wurde erfolgreich gespeichert.", NOTIFICATION_TYPE_SUCCESS);    
     
-    // Reset all form inputs
+    // Reset all form inputs (except for the CSRF token)
     for (const element of form.elements){
-        if (element.tagName === "button") continue;
+        if (element.tagName === "button" || element.name === "csrfmiddlewaretoken") continue;
         element.value = "";
     }
 
