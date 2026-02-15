@@ -14,14 +14,24 @@ from django.shortcuts import render
 from django.views import View
 
 from app.enums import Http
-from app.forms.brands import CreateBrandForm, EditBrandForm, EditAddressAssociationForm
+from app.forms.brands import (
+    AssignAddressesForm,
+    CreateBrandForm,
+    EditAddressAssociationForm,
+    EditBrandForm
+)
 
+from app.models.Address import Address
 from app.models.Brand import Brand
 from app.models.BrandAddress import BrandAddress
 from app.models.Country import Country
 
 from app.shortcuts import get_object_or_404
 
+from app.utils.request import (
+    get_date_from_request,
+    get_date_from_request_or_bad_request
+)
 
 def get_all(self: WSGIRequest) -> JsonResponse:
     brands = Brand.objects.order_by("name")
@@ -124,6 +134,7 @@ class BrandAddressesListView(View):
         context = {
             "brand": brand,
             "brand_address_associations": brand_address_associations,
+            "assign_addresses_form": AssignAddressesForm(addresses=Address.objects.none()),
             "edit_address_association_form": EditAddressAssociationForm(),
             "countries": countries
         }
@@ -135,17 +146,22 @@ def assign_addresses(request: WSGIRequest, brand_id: int) -> HttpResponse:
     brand: Brand = get_object_or_404(Brand, pk=brand_id, json=True)
 
     address_ids = request.POST.getlist("addresses")
+    start_date = get_date_from_request_or_bad_request(request, "start_date")
+    end_date = get_date_from_request(request, "end_date")
+
+    if start_date > end_date:
+        return HttpResponseBadRequest("The start date cannot be after the end date")
 
     # Since the addresses can be in use, make sure that the end date is properly set
-    yesterday = date.today() - timedelta(days=1)
-    BrandAddress.objects.filter(address__in=address_ids).update(end_date=yesterday)
+    BrandAddress.objects.filter(address__in=address_ids).update(end_date=start_date - timedelta(days = 1))
 
     # Create new mappings between addresses and the brand starting from today
     new_address_associations = (
         BrandAddress(
             brand=brand,
             address_id=address_id,
-            start_date=date.today()
+            start_date=start_date,
+            end_date=end_date
         )
         for address_id
         in address_ids

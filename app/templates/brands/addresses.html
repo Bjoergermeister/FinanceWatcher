@@ -202,11 +202,18 @@
                     class="mt-3"
                     onsubmit="onAssignAddressesFormSubmitted(event)"
                 >
-                    <div class="form-row">
+                    {% csrf_token %}
+                    <div class="row mb-2">
                         <div class="col-md">
-                            {% csrf_token %}
-                            <select name="addresses" class="custom-select" multiple>
-                            </select>
+                            {{ assign_addresses_form.addresses|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ assign_addresses_form.start_date|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ assign_addresses_form.end_date|as_crispy_field }}
                         </div>
                     </div>
                 </form>

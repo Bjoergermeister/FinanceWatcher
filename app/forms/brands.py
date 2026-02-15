@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+import datetime
 import uuid
 
 from django import forms
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.db.models import QuerySet
 from django.utils.translation import gettext as _
 
+from app.models.Address import Address
 from app.models.Brand import Brand
 
 CHANNEL_CHOICES = [
@@ -89,3 +92,16 @@ class EditAddressAssociationForm(forms.Form):
             raise ValidationError("Start date cannot be after end date")
         
         return self.cleaned_data
+
+class AssignAddressesForm(forms.Form):
+    addresses = forms.MultipleChoiceField(label=_("Addresses"))
+    start_date = forms.DateField(label=_("Start date"), widget=forms.DateInput(attrs={"type": "date"}))
+    end_date = forms.DateField(label=_("End date"), required=False, widget=forms.DateInput(attrs={"type": "date"}))
+
+    def __init__(self: AssignAddressesForm, addresses: QuerySet[Address]):
+        super(AssignAddressesForm, self).__init__()
+        self.fields["addresses"].choices = [(address.id, str(address)) for address in addresses]
+        
+        today = datetime.date.today()
+        self.fields["start_date"].initial = today
+        self.fields["end_date"].initial = today
