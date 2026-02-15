@@ -14,7 +14,7 @@ from django.shortcuts import render
 from django.views import View
 
 from app.enums import Http
-from app.forms.brands import CreateBrandForm, EditBrandForm
+from app.forms.brands import CreateBrandForm, EditBrandForm, EditAddressAssociationForm
 
 from app.models.Brand import Brand
 from app.models.BrandAddress import BrandAddress
@@ -124,6 +124,7 @@ class BrandAddressesListView(View):
         context = {
             "brand": brand,
             "brand_address_associations": brand_address_associations,
+            "edit_address_association_form": EditAddressAssociationForm(),
             "countries": countries
         }
 
@@ -221,6 +222,29 @@ def delete_address(request: WSGIRequest, brand_id: int) -> HttpResponse:
     brand_address.delete()
 
     return HttpResponse()
+
+def update_address(request: WSGIRequest, brand_address_id) -> HttpResponse:
+    brand_address: BrandAddress = get_object_or_404(
+        BrandAddress,
+        pk=brand_address_id,
+        error_message="Address association does not exist",
+        json=True
+    )
+
+    edit_address_association_form = EditAddressAssociationForm(request.POST)
+
+    if edit_address_association_form.is_valid() == False:
+        return JsonResponse(edit_address_association_form.errors, status=Http.BAD_REQUEST)
+    
+    start_date = edit_address_association_form.cleaned_data.get("start_date")
+    end_date = edit_address_association_form.cleaned_data.get("end_date")
+    brand_address.start_date = start_date
+    brand_address.end_date = end_date
+    brand_address.save()
+
+    json_response = brand_address.to_json(include_brand=False, include_id=False)    
+
+    return JsonResponse(json_response)
 
 def search(request: WSGIRequest) -> JsonResponse:
     query = request.GET.get("query", None)

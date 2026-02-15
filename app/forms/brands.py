@@ -70,3 +70,22 @@ class EditBrandForm(CreateBrandForm):
             icon.name = self.instance.icon.name
 
         return icon
+    
+class EditAddressAssociationForm(forms.Form):
+    start_date = forms.DateField(label=_("Start date"), widget=forms.DateInput(attrs={"type": "date"}))
+    end_date = forms.DateField(label=_("End date"), widget=forms.DateInput(attrs={"type": "date"}), required=False)
+
+    def clean(self: EditAddressAssociationForm):
+        start_date = self.cleaned_data.get("start_date")
+        end_date = self.cleaned_data.get("end_date")
+        
+        # If the end date is None, we can stop because the start date cannot be later than the end date
+        # If the start date is None, the form is invalid, but that is a single field error and has already
+        # been handled by that clean method
+        if start_date is None or end_date is None:
+            return self.cleaned_data
+        
+        if start_date > end_date:
+            raise ValidationError("Start date cannot be after end date")
+        
+        return self.cleaned_data

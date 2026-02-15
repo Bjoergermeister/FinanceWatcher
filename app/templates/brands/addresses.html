@@ -3,6 +3,8 @@
 {% load static %}
 {% load i18n %}
 
+{% load crispy_forms_tags %}
+
 {% block js %}
     <script src="{% static 'js/brands.js' %}"></script>
 {% endblock %}
@@ -41,16 +43,19 @@
                 <td></td>
                 <td></td>
                 <td>
-                    <button class="btn btn-close" title="{% trans 'Delete address' %}" onclick="onDeleteAddressClicked(event)">
-                        <i class="fa fa-lg fa-trash no-events" style="color: red"></i>
+                    <button class="btn btn-close" title="{% trans 'Edit address' %}" onclick="onEditAssociationClicked(event)">
+                        <i class="fa-solid fa-lg fa-pen no-events" style="color: green"></i>
                     </button>
                     <button class="btn btn-close" title="{% trans 'Unassign address' %}" onclick="onUnassignAddressClicked(event)">
                         <i class="fa fa-lg fa-xmark no-events" style="color: red"></i>
                     </button>
+                    <button class="btn btn-close" title="{% trans 'Delete address' %}" onclick="onDeleteAddressClicked(event)">
+                        <i class="fa fa-lg fa-trash no-events" style="color: red"></i>
+                    </button>
                 </td>
             </td>
             {% for association in brand_address_associations %}
-                <tr>
+                <tr id="association-table-row-{{ association.pk }}">
                     <td>{{ association.address.street }} {{ association.address.number }}</td>
                     <td>{{ association.address.city }}</td>
                     <td>{{ association.address.postal_code }}</td>
@@ -59,6 +64,16 @@
                     <td>{{ association.start_date|date:"d.m.Y" }}</td>
                     <td>{{ association.end_date|default_if_none:"-"|date:"d.m.Y" }}</td>
                     <td>
+                        <button
+                            class="btn btn-close"
+                            title="{% trans 'Edit address' %}"
+                            onclick="onEditAssociationClicked(event)"
+                            data-id="{{ association.pk }}"
+                            data-from="{{ association.start_date|date:"Y-m-d" }}"
+                            data-to="{{ association.end_date |date:"Y-m-d"}}"
+                        >
+                            <i class="fa-solid fa-lg fa-pen no-events" style="color: green"></i>
+                        </button>
                         <button 
                             class="btn btn-close"
                             title="{% trans 'Delete address' %}"
@@ -86,6 +101,38 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <dialog id="edit-association-dialog">
+        <div class="content">
+            <header>
+                <h1>{% trans 'Edit address association' %}</h1>
+            </header>
+            <div class="body">
+                <form id="edit-address-association-form" onsubmit="onEditAddressAssociationFormSubmitted(event)">
+                    <input type="hidden" name="id">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ edit_address_association_form.start_date|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ edit_address_association_form.end_date|as_crispy_field }}
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <footer>
+                <button class="btn btn-primary" type="submit" form="edit-address-association-form">
+                    <i class="fa fa-save mr-2"></i>
+                    {% trans 'Save' %}
+                </button>
+                <button class="btn btn-danger" type="cancel">
+                    <i class="fa fa-xmark mr-2"></i>
+                    {% trans 'Cancel' %}
+                </button>
+            </footer>
+        </div>
+    </dialog>
 
     <dialog id="assign-brand-address-dialog">
         <div class="content">
@@ -183,5 +230,6 @@
         const ASSIGN_ADDRESSES_URL = "{% url 'assign_addresses' 0 %}";
         const UNASSIGN_ADDRESS_URL = "{% url 'unassign_address' 0 %}";
         const DELETE_ADDRESS_URL = "{% url 'delete_address' 0 %}";
+        const EDIT_ADDRESS_ASSOCIATION_URL = "{% url 'edit-brand-address-association' 0 %}";
     </script>
 {% endblock %}

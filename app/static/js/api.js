@@ -171,6 +171,18 @@ class BrandAPI {
   }
 
   /**
+   * Updates an brand-address association
+   * @param {int} brandAddressId - The association database id 
+   * @param {FormData} data - The new data for the association
+   * @returns An API result
+   */
+  static async updateAddressAssociation(brandAddressId, data){
+    const url = EDIT_ADDRESS_ASSOCIATION_URL.replace(/\d+/g, brandAddressId);
+    const options = getOptions("POST", data);
+    return makeRequest(url, options);
+  }
+
+  /**
    * Searches brands by name
    * @param {String} query - A query string that is used to search brands by their name 
    */

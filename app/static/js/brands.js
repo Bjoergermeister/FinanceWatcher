@@ -154,8 +154,13 @@ async function onAssignAddressesFormSubmitted(event){
         cells[4].innerText = brandAddress.address.country.name;
         cells[5].innerText = brandAddress.start_date;
         cells[6].innerText = brandAddress.end_date;
+        
+        // Update dataset of action buttons
+        cells[7].children[0].dataset.start_date = brandAddress.start_date;
+        cells[7].children[0].dataset.end_date = brandAddress.end_date;
         cells[7].children[0].dataset.id = brandAddress.id;
         cells[7].children[1].dataset.id = brandAddress.id;
+        cells[7].children[2].dataset.id = brandAddress.id;
 
         newTableRow.classList.remove("dummy");
         dummyTableRow.parentElement.insertAdjacentElement("afterbegin", newTableRow);
@@ -226,6 +231,64 @@ async function onDeleteAddressClicked(event){
     if (tableHasDataRows(addressesTable) === false){
         showNoDataTableRow(addressesTable);
     }
+}
+
+function onEditAssociationClicked(event){
+    const dialog = document.getElementById("edit-association-dialog");
+    dialog.showModal();
+
+    const button = event.target;
+
+    startDateInput = dialog.querySelector("input[name='start_date']");
+    startDateInput.value = button.dataset.from;
+    startDateInput.max = button.dataset.to;
+    
+    endDateInput = dialog.querySelector("input[name='end_date']");
+    endDateInput.value = button.dataset.to;
+    endDateInput.min = button.dataset.from;
+
+    dialog.querySelector("input[name='id']").value = button.dataset.id;
+}
+
+async function onEditAddressAssociationFormSubmitted(event){
+    event.preventDefault();
+
+    const form = event.target;
+    const data = new FormData(form);
+    const brandAddressId = data.get("id");
+
+    removeFormErrors(form);
+
+    const result = await BrandAPI.updateAddressAssociation(brandAddressId, data);
+    if (result.success === false){
+        let errorMessage = result.errors;
+        
+        if (result.errors instanceof Object){
+            displayFormErrors(form, result.errors);
+            errorMessage = "Updating address failed";
+        }
+
+        sendNotification(
+            "Error",
+            errorMessage,
+            NOTIFICATION_TYPE_ERROR
+        );
+        return;
+    }
+
+    sendNotification(
+        "Success",
+        "Updated successfully",
+        NOTIFICATION_TYPE_SUCCESS
+    );
+
+    // Update table row
+    const tableRowCells = document.querySelectorAll(`#association-table-row-${brandAddressId} td`);
+    tableRowCells[5].innerText = result.content.start_date;
+    tableRowCells[6].innerText = result.content.end_date || "-";
+
+    const dialog = findParentElement(form, "DIALOG");
+    dialog.close();
 }
 
 // ####################

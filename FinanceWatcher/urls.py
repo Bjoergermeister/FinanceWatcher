@@ -40,6 +40,7 @@ urlpatterns = [
     path("brands/<int:brand_id>/assign-addresses", brands.assign_addresses, name="assign_addresses"),
     path("brands/<int:brand_id>/unassign-address", brands.unassign_address, name="unassign_address"),
     path("brands/<int:brand_id>/delete-address", brands.delete_address, name="delete_address"),
+    path("brands/edit-brand-address/<int:brand_address_id>", brands.update_address, name="edit-brand-address-association"),
 
     path("addresses", addresses.get_all, name="addresses"),
     path("address", addresses.create, name="create_address"),
