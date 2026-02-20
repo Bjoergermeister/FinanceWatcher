@@ -22,7 +22,17 @@ def make_thumbnail_from_image(image: Image, size: int) -> Image:
     new_thumbnail_size = (int(image.width * ratio), int(image.height * ratio))
     image.thumbnail(new_thumbnail_size)
 
-    x = (image.width - size) / 2
-    y = (image.height - size) / 2
+    x = 0
+    y = 0
+
+    if image.width > size:
+        x = (image.width - size) / 2
+    else:
+        x = (size - image.width) / 2
+
+    if image.height > size:
+        y = (image.height - size) / 2
+    else:
+        y = (size - image.height) / 2
 
     return image.crop((x, y, image.width - x, image.height - y))
