@@ -33,7 +33,11 @@
                     <td>{{ brand.default_channel }}</td>
                     <td>{{ brand.addresses.count }}</td>
                     <td>
-                        <a href="{% url 'brand_addresses' brand.pk %}">
+                        <a 
+                            class="btn btn-close"
+                            title="{% trans 'Show addresses' %}"
+                            href="{% url 'brand_addresses' brand.pk %}"
+                        >
                             <i class="fa-solid fa-lg fa-location-dot"></i>
                         </a>
                         <button
@@ -42,15 +46,16 @@
                             title="{% trans 'Edit brand' %}"
                             data-id="{{ brand.pk }}"
                         >
-                            <i class="fa-solid fa-lg fa-pen no-events" style="color: green"></i>
+                            <i class="fa-solid fa-lg fa-edit no-events"></i>
                         </button>
                         <button
                             class="btn btn-close"
                             onclick="onDeleteBrandClicked(event)"
                             title="{% trans 'Delete Brand' %}"
                             data-id="{{ brand.pk }}"
+                            data-name="{{ brand.name }}"
                         >
-                            <i class="fa-solid fa-lg fa-trash no-events" style="color: red"></i>
+                            <i class="fa-solid fa-lg fa-trash no-events"></i>
                         </button>
                     </td>
                 </tr>
@@ -67,10 +72,19 @@
             <td>
                 <a
                     class="btn btn-close"
-                    href=""
+                    title="{% trans 'Show addresses' %}"
+                    href="{% url 'brand_addresses' 0 %}"
                 >
-                    <i class="fa-solid fa-location-dot"></i>
+                    <i class="fa-solid fa-lg fa-location-dot"></i>
                 </a>
+                <button
+                    class="btn btn-close"
+                    onclick="onEditBrandClicked(event)"
+                    title="{% trans 'Edit brand' %}"
+                    data-id=""
+                >
+                    <i class="fa-solid fa-lg fa-edit"></i>
+                </button>
                 <button
                     class="btn btn-close"
                     onclick="onDeleteBrandClicked(event)"
