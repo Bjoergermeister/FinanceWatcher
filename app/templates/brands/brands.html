@@ -101,6 +101,32 @@
         <div class="content" style="min-height: 600px">{% include "brands/create.html" with create_form=create_brand_form %}</div>
     </dialog>
 
+    <dialog id="confirm-delete-brand-dialog">
+        <div class="content">
+            <header>
+                <h1>Delete <span id="title-brand-name"></span></h1>
+            </header>
+            <div class="body">
+                <form id="confirm-delete-brand-form" onsubmit="onConfirmDeleteBrandFormSubmitted(event)">
+                    <p>
+                        Are you sure that you want to delete the brand <span id="body-brand-name"></span>?
+                        This action cannot be undone.
+                    </p>
+                </form>
+            </div>
+            <footer>
+                <button class="btn btn-danger" type="submit" form="confirm-delete-brand-form">
+                    <i class="fa fa-lg fa-trash mr-2"></i>
+                    {% trans 'Delete' %}
+                </button>
+                <button class="btn btn-secondary" type="cancel">
+                    <i class="fa fa-lg fa-xmark mr-2"></i>
+                    {% trans 'Cancel' %}
+                </button>
+            </footer>
+        </div>
+    </dialog>
+
     <script>
         CSRF_MIDDLEWARE_TOKEN = "{{ csrf_token }}";
 

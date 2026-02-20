@@ -1,5 +1,17 @@
 let timeout = null;
 
+// ####################
+// # TYPE DEFINITIONS #
+// ####################
+
+/**
+ * @typedef {Object} Brand
+ * @property {String} name
+ * @property {String} icon
+ * @property {String} default_channel
+ * @property {boolean} has_physical_stores
+ */
+
 // ###################
 // # EVENT LISTENERS #
 // ###################
@@ -67,8 +79,14 @@ async function onBrandFormSubmitted(event){
     dialog.close();
 }
 
+/**
+ * This function is called when the edit icon on a brand table row is clicked.
+ * It loads the brand from the API and displays the information in an edit dialog.
+ * @param {PointerEvent} event The PointerEvent
+ * @returns 
+ */
 async function onEditBrandClicked(event){
-    const brandId = event.target.dataset.id;
+    const brandId = event.currentTarget.dataset.id;
     const result = await BrandAPI.get(brandId);
     if (result.success === false){
         sendNotification(
@@ -93,8 +111,28 @@ async function onEditBrandClicked(event){
     dialog.showModal();
 }
 
+/**
+ * 
+ * @param {PointerEvent} event - The PointerEvent 
+ */
 async function onDeleteBrandClicked(event){
-    const brandId = event.target.dataset.id;
+    const dialog = document.getElementById("confirm-delete-brand-dialog");
+    dialog.showModal();
+
+    dialog.querySelector("form").dataset.id = event.currentTarget.dataset.id;
+    dialog.querySelector("#title-brand-name").innerText = event.currentTarget.dataset.name;
+    dialog.querySelector("#body-brand-name").innerText = event.currentTarget.dataset.name;
+}
+
+/**
+ * 
+ * @param {SubmitEvent} event 
+ * @returns 
+ */
+async function onConfirmDeleteBrandFormSubmitted(event){
+    event.preventDefault();
+
+    const brandId = event.currentTarget.dataset.id;
     const result = await BrandAPI.delete(brandId);
     if (result.success === false){
         sendNotification(
@@ -105,8 +143,11 @@ async function onDeleteBrandClicked(event){
         return;
     }
 
-    const tableRow = findParentElement(event.target, "TR");
+    const tableRow = document.querySelector(`tr[data-id='${event.target.dataset.id}']`);
     tableRow.remove();
+
+    const dialog = findParentElement(event.target, "DIALOG");
+    dialog.close();
 
     sendNotification(
         "Marke gelöscht",
@@ -115,6 +156,10 @@ async function onDeleteBrandClicked(event){
     );
 }
 
+/**
+ * 
+ * @param {PointerEvent} event 
+ */
 function onAssignAddressesClicked(event){
     const assignAddressesDialog = document.getElementById("assign-brand-address-dialog");
     assignAddressesDialog.showModal();
@@ -130,6 +175,11 @@ function onAssignAddressInputChanged(event){
     timeout = setTimeout(() => updateAddressChoices(event.target.form), 3000);
 }
 
+/**
+ * 
+ * @param {SubmitEvent} event 
+ * @returns 
+ */
 async function onAssignAddressesFormSubmitted(event){
     event.preventDefault();
 
@@ -178,11 +228,20 @@ async function onAssignAddressesFormSubmitted(event){
     dialog.close();
 }
 
+/**
+ * 
+ * @param {PointerEvent} event 
+ */
 function onUpdateAddressesClicked(event){
     event.preventDefault();
     updateAddressChoices(form);
 }
 
+/**
+ * 
+ * @param {PointerEvent} event 
+ * @returns 
+ */
 async function onUnassignAddressClicked(event){
     event.preventDefault();
 
@@ -210,6 +269,11 @@ async function onUnassignAddressClicked(event){
     // TODO: Move the table row to the previous addresses table
 }
 
+/**
+ * 
+ * @param {PointerEvent} event 
+ * @returns 
+ */
 async function onDeleteAddressClicked(event){
     event.preventDefault();
 
@@ -233,6 +297,10 @@ async function onDeleteAddressClicked(event){
     }
 }
 
+/**
+ * 
+ * @param {PointerEvent} event 
+ */
 function onEditAssociationClicked(event){
     const dialog = document.getElementById("edit-association-dialog");
     dialog.showModal();
@@ -250,6 +318,11 @@ function onEditAssociationClicked(event){
     dialog.querySelector("input[name='id']").value = button.dataset.id;
 }
 
+/**
+ * 
+ * @param {SubmitEvent} event 
+ * @returns 
+ */
 async function onEditAddressAssociationFormSubmitted(event){
     event.preventDefault();
 
@@ -326,7 +399,7 @@ async function updateAddressChoices(form){
 
 /**
  * Create a new table row for a brand
- * @param {*} brand
+ * @param {Brand} brand - The brand to create a table row for
  * @returns {HTMLTableRowElement} - The new table row element for the brand
  */
 function createNewBrandTableRow(brand){
@@ -336,12 +409,19 @@ function createNewBrandTableRow(brand){
         .cloneNode(true)
         .children[0];
 
-    brandClone.dataset.id = brand.pk;
+    brandClone.dataset.id = brand.id;
     const cells = brandClone.querySelectorAll("td");
     cells[0].children[0].src = brand.icon;
     cells[1].innerText = brand.name;
     cells[2].innerText = brand.has_physical_stores;
     cells[3].innerText = brand.default_channel;
+    cells[4].innerText = 0;
+    cells[5].children[1].dataset.id = brand.id;
+    cells[5].children[2].dataset.id = brand.id;
+    cells[5].children[2].dataset.name = brand.name;
+    
+    const currentUrl = cells[5].children[0].href;
+    cells[5].children[0].href = currentUrl.replace("0", brand.id);
 
     return brandClone;
 }
