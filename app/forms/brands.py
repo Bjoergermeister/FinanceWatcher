@@ -55,7 +55,7 @@ class CreateBrandForm(forms.ModelForm):
         }
 
 class EditBrandForm(CreateBrandForm):
-    
+
     def clean_name(self: EditBrandForm) -> str:
         # We need to make sure that the name check does not throw an exception
         # if the name wasn't edited (and therefore already exists)
@@ -65,7 +65,7 @@ class EditBrandForm(CreateBrandForm):
             return name
 
         # Otherwise, proceed with the normal checks
-        return super(CreateBrandForm, self).clean_name()
+        return super(EditBrandForm, self).clean_name()
 
     def clean_icon(self: EditBrandForm):
         icon: InMemoryUploadedFile | None = self.cleaned_data.get("icon", None)
