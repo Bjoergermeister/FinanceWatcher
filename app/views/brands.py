@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+
 from datetime import date, timedelta
 
 from django.core.handlers.wsgi import WSGIRequest
@@ -116,7 +118,10 @@ class BrandDetailView(View):
             brand = Brand.objects.get(id=brand_id)
         except Brand.DoesNotExist:
             return HttpResponseNotFound(f"Es existiert keine Marke mit der ID {brand_id}")
-        
+
+        if os.path.exists(brand.icon.path):
+            os.remove(brand.icon.path)
+
         brand.delete()
 
         return HttpResponse()
