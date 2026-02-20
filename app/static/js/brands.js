@@ -32,6 +32,11 @@ function onBrandImageChanged(event) {
   imagePreview.src = URL.createObjectURL(event.target.files[0]);
 }
 
+/**
+ * This function is called when either the create or edit forms of brands are submitted
+ * @param {SubmitEvent} event The SubmitEvent
+ * @returns 
+ */
 async function onBrandFormSubmitted(event){
     event.preventDefault();
 
@@ -68,6 +73,11 @@ async function onBrandFormSubmitted(event){
         const newBrandTableCell = createNewBrandTableRow(result.content);
         brandTableRowBody.insertAdjacentElement("afterbegin", newBrandTableCell);
     }
+
+    resetForm(form, ["csrfmiddlewaretoken"]);
+
+    // Reset preview image to the default brand image
+    form.querySelector("#brand-image-preview").src = "/static/images/default_brand_icon.png";
 
     sendNotification(
         "Speichern erfolgreich",

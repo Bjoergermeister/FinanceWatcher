@@ -173,3 +173,30 @@ function createErrorAlert(errors){
     return container;
 }
 
+/**
+ * Resets all input elements in the form.
+ * 
+ * All inputs whose name is in the exceptFields array will not be resetted
+ * @param {HTMLFormElement} form 
+ * @param {String[]} exceptFields 
+ */
+function resetForm(form, exceptFields){
+    exceptFields ??= [];
+
+    for (const element of form.elements){
+        if (exceptFields.includes(element.name)) continue;
+
+        if (element.tagName === "INPUT" && element.type === "checkbox"){
+            element.checked = false;
+        }
+
+        if (element.tagName === "INPUT" || element.tagName === "TEXTAREA"){
+            element.value = "";
+        }
+
+        if (element.tagName === "SELECT"){
+            element.value = element.querySelector("option").value;
+        }
+    }
+}
+
