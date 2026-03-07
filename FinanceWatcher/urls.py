@@ -19,7 +19,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 
-from app.views import dashboard, addresses, bills, groups, brands
+from app.views import dashboard, addresses, bills, groups, brands, test
 
 urlpatterns = [
     path('', dashboard.dashboard, name="dashboard"),
@@ -47,9 +47,12 @@ urlpatterns = [
     path("addresses/search", addresses.search, name="search_addresses"),
     path("address/<int:address_id>", addresses.EditAddress.as_view(), name="edit_address"),
 
+    # Admin
+    path("test/bugsink", test.bugsink, name="admin_bugsink_test"),
+
     # API Endpoints
     path("api/groups", groups.list_all, name="all_groups"),
-    path("api/brands", brands.get_all, name="all_brands"),
+    path("api/brands", brands.get_all, name="all_brands")
 ]
 
 if settings.DEBUG:

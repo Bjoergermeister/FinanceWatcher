@@ -17,6 +17,8 @@ from pathlib import Path
 import logging
 import os
 
+import sentry_sdk
+
 from pythonjsonlogger.jsonlogger import JsonFormatter
 
 from FinanceWatcher.logging import get_request_context
@@ -218,3 +220,20 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 CRISPY_TEMPLATE_PACK = "bootstrap4"
+
+# Setup bugsink/sentry
+sentry_sdk.init(
+    os.getenv("BUGSINK_DNS"),
+
+    send_default_pii=True,
+    max_request_body_size="always",
+
+    # Setting up the release is highly recommended. The SDK will try to
+    # infer it, but explicitly setting it is more reliable:
+    # release=...,
+
+    # Don't event types which are not supported by Bugsink:
+    traces_sample_rate=0,
+    send_client_reports=False,
+    auto_session_tracking=False,
+)
