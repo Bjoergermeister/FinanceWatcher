@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 
 from datetime import date, timedelta
+from logging import getLogger
 
 from django.core.handlers.wsgi import WSGIRequest
 from django.forms.models import model_to_dict
@@ -24,7 +25,7 @@ from app.forms.brands import (
 )
 
 from app.models.Address import Address
-from app.models.Brand import Brand
+from app.models.Brand import Brand, BrandEvents
 from app.models.BrandAddress import BrandAddress
 from app.models.Country import Country
 
@@ -34,6 +35,8 @@ from app.utils.request import (
     get_date_from_request,
     get_date_from_request_or_bad_request
 )
+
+logger = getLogger(__name__)
 
 def get_all(self: WSGIRequest) -> JsonResponse:
     brands = Brand.objects.order_by("name")
@@ -84,6 +87,9 @@ class BrandListView(View):
 
         brand_dict = model_to_dict(new_brand, exclude=["icon"])
         brand_dict["icon"] = new_brand.get_icon_url()
+
+        logger.info(BrandEvents.CREATED, extra={ "id": new_brand.pk })
+
         return JsonResponse(brand_dict)
     
 class BrandDetailView(View):
@@ -111,6 +117,8 @@ class BrandDetailView(View):
         edited_brand: Brand = edit_brand_form.save(commit=False)
         edited_brand.save(file_was_uploaded="icon" in request.FILES)
 
+        logger.info(BrandEvents.EDITED, extra={ "id": edited_brand.pk })
+
         return JsonResponse(edited_brand.to_json())
 
     def delete(self: BrandDetailView, request: WSGIRequest, brand_id: int) -> HttpResponse:
@@ -123,6 +131,8 @@ class BrandDetailView(View):
             os.remove(brand.icon.path)
 
         brand.delete()
+
+        logger.info(BrandEvents.DELETED, extra={ "id": brand.pk })
 
         return HttpResponse()
     
@@ -177,6 +187,8 @@ def assign_addresses(request: WSGIRequest, brand_id: int) -> HttpResponse:
         pk__in=[address.pk for address in created_db_objects]
     ).select_related("address")
     
+    logger.info(BrandEvents.ADDRESS_ASSIGNED, extra={ "ids": address_ids })
+
     response = {
         "brand": brand.to_json(),
         "addresses": [
@@ -215,6 +227,8 @@ def unassign_address(request: WSGIRequest, brand_id: int) -> HttpResponse:
     brand_address.end_date = date.today() - timedelta(days=1)
     brand_address.save()
 
+    logger.info(BrandEvents.ADDRESS_UNASSIGNED, extra={ "id": brand_address.address_pk })
+
     return JsonResponse(brand_address.to_json())
 
 def delete_address(request: WSGIRequest, brand_id: int) -> HttpResponse:
@@ -242,6 +256,8 @@ def delete_address(request: WSGIRequest, brand_id: int) -> HttpResponse:
 
     brand_address.delete()
 
+    logger.info(BrandEvents.ADDRESS_REMOVED, extra={ "id": brand_address.address_pk })
+
     return HttpResponse()
 
 def update_address(request: WSGIRequest, brand_address_id) -> HttpResponse:
@@ -262,6 +278,8 @@ def update_address(request: WSGIRequest, brand_address_id) -> HttpResponse:
     brand_address.start_date = start_date
     brand_address.end_date = end_date
     brand_address.save()
+
+    logger.info(BrandEvents.ADDRESS_EDITED, extra={ "id": brand_address.address_pk })
 
     json_response = brand_address.to_json(include_brand=False, include_id=False)    
 

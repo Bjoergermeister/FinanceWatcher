@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import datetime
-from io import BytesIO
 import os
+
+from enum import StrEnum
+from io import BytesIO
 
 from PIL import Image
 
@@ -18,6 +20,13 @@ def user_directory_path(instance: Bill, filename: str) -> str:
     Returns the path where the image of the receipt gets saved
     """
     return f"receipts/{instance.user}/{filename}"
+
+
+class BillEvents(StrEnum):
+    CREATED = "bill_created"
+    EDITED = "bill_edited"
+    DELETED = "bill_deleted"
+
 
 class Bill(models.Model):
     name = models.CharField(db_column="name", max_length=100)

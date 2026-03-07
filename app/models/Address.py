@@ -1,11 +1,18 @@
 from __future__ import annotations
 
+from enum import StrEnum
 from typing import Dict
 
 from django.db import models
-from django.forms import model_to_dict
 
 from app.models.Country import Country
+
+
+class AddressEvents(StrEnum):
+    CREATED = "address_created"
+    EDITED = "address_edited"
+    DELETED = "address_deleted"
+
 
 class Address(models.Model):
     country = models.ForeignKey(Country, on_delete=models.PROTECT, db_column='fk_country')

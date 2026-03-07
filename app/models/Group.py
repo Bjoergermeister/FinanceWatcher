@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 
+from enum import StrEnum
 from typing import Any, Dict
 
 from django.db import models
@@ -10,6 +11,12 @@ from django.templatetags.static import static
 
 from app.models.User import User
 from app.utils.images import save_as_thumbnail
+
+
+class GroupEvents(StrEnum):
+    CREATED = "group_created"
+    EDITED = "group_edited"
+    DELETED = "group_deleted"
 
 
 class Group(models.Model):

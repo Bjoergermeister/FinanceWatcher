@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 
+from enum import StrEnum
 from typing import Any, Dict
 
 from django.db import models
@@ -11,6 +12,17 @@ from app.models.Address import Address
 from app.models.BrandAddress import BrandAddress
 
 from app.utils.images import save_as_thumbnail
+
+
+class BrandEvents(StrEnum):
+    CREATED = "brand_created"
+    EDITED = "brand_edited"
+    DELETED = "brand_deleted"
+    ADDRESS_ASSIGNED = "brand_address_assigned"
+    ADDRESS_UNASSIGNED = "brand_address_unassigned"
+    ADDRESS_EDITED = "brand_address_edited"
+    ADDRESS_REMOVED = "brand_address_unassigned"
+
 
 class Brand(models.Model):
     name = models.CharField(max_length=200)
