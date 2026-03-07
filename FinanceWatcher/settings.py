@@ -121,6 +121,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = "app.User"
+
 class RequestContextFilter(logging.Filter):
     """
     Attach request-scoped context to log records.

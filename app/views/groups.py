@@ -21,7 +21,7 @@ def list_all(request: WSGIRequest) -> HttpResponse:
     key = "alreadyChosenGroups"
     already_chosen_groups = body[key] if key in body else []
 
-    groups = Group.objects.filter(Q(user=request.user["id"]) | Q(user=None))
+    groups = Group.objects.filter(Q(user=request.user.pk) | Q(user=None))
     if len(already_chosen_groups) > 0:
         groups = groups.exclude(id__in=already_chosen_groups)
 
@@ -45,10 +45,10 @@ def list_all(request: WSGIRequest) -> HttpResponse:
 
 class GroupsView(View):
     def get(self: GroupsView, request: WSGIRequest) -> HttpResponse:
-        user_groups = Group.objects.filter(user=request.user["id"])
+        user_groups = Group.objects.filter(user=request.user.pk)
 
         global_groups = None
-        if request.user["isAdmin"]:
+        if request.user.is_superuser:
             global_groups = Group.objects.filter(user=None)
 
         form = CreateGroupForm(request.user)
@@ -57,8 +57,8 @@ class GroupsView(View):
             "user_groups": user_groups, 
             "global_groups": global_groups, 
             "create_form": form,
-            "is_admin": request.user["isAdmin"],
-            "user_id": request.user["id"]        
+            "is_admin": request.user.is_superuser,
+            "user_id": request.user.pk
         }
 
         return render(request, "groups/groups.html", context)
@@ -77,7 +77,7 @@ class GroupsView(View):
         
         # Only admins are allowed to create global groups.
         # If the user tried to create a global group but is not an administrator, send an 403 response
-        if instance.user is None and request.user["isAdmin"] == False:
+        if instance.user is None and request.user.is_superuser == False:
             return HttpResponseForbidden()
         
         icon_was_uploaded = "icon" in request.FILES
@@ -122,7 +122,7 @@ class EditGroupView(View):
             error_message="Gruppe wurde nicht gefunden"
         )
 
-        if group.user != request.user["id"] and request.user["isAdmin"] == False:
+        if group.user != request.user.pk and request.user.is_superuser == False:
             return HttpResponseForbidden()
 
         group.delete()

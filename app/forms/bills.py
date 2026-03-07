@@ -7,8 +7,8 @@ import datetime
 from django import forms
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
-from ..models.Bill import Bill
-
+from app.models.Bill import Bill
+from app.models.User import User
 
 class CreateBillForm(forms.ModelForm):
     id = forms.IntegerField(required=False, widget=forms.HiddenInput())
@@ -20,13 +20,18 @@ class CreateBillForm(forms.ModelForm):
     receipt = forms.ImageField(label="Kassenzettel (optional)", required=False)
     paid = forms.BooleanField(label="Bezahlt", required=False)
 
-    def __init__(self, user, *args, **kwargs):
+    def __init__(
+        self: CreateBillForm,
+        user: User,
+        *args,
+        **kwargs
+    ):
         super(CreateBillForm, self).__init__(*args, **kwargs)
 
         if self.is_bound is False:
             self.fields["date"].initial = datetime.date.today()
 
-            latest_bill = Bill.objects.filter(user=user["id"]).order_by("pk").last()
+            latest_bill = Bill.objects.filter(user=user.pk).order_by("pk").last()
             new_bill_number = latest_bill.pk + 1 if latest_bill is not None else 1
             self.fields["name"].initial = f"Rechnung #{new_bill_number}"
 

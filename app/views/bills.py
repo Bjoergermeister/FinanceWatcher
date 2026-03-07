@@ -23,7 +23,7 @@ from ..shortcuts import get_object_or_404
 
 class CreateBillView(View):
     def get(self: CreateBillView, request: WSGIRequest) -> HttpResponse:
-        initial_form_values = { "user": request.user["id"] }
+        initial_form_values = { "user": request.user.pk }
         bill_form = CreateBillForm(request.user, initial=initial_form_values)
 
         PositionFormSet = modelformset_factory(Position, form=CreatePositionForm, extra=5, can_delete=True)
@@ -74,7 +74,7 @@ class CreateBillView(View):
 class EditBillView(View):
     def get(self: EditBillView, request: WSGIRequest, bill_id: int) -> HttpResponse:
         bill = get_object_or_404(
-            Bill, pk=bill_id, user=request.user["id"],
+            Bill, pk=bill_id, user=request.user.pk,
             error_message="Die Rechnung wurde nicht gefunden"
         )
         
@@ -151,7 +151,7 @@ class EditBillView(View):
     def delete(self: EditBillView, request: WSGIRequest, bill_id: int) -> HttpResponse:
         # Bills can only be deleted by admins or by the user who created them
         # If the user is admin, just delete the bill
-        if request.user["isAdmin"]:
+        if request.user.is_superuser:
             result = Bill.objects.filter(pk=bill_id).delete()
                 
             if result[1]["app.Bill"] != 1:
@@ -159,7 +159,7 @@ class EditBillView(View):
             return HttpResponse(status=Http.OK)
             
         # If the user is not admin, check if he created the bill
-        result = Bill.objects.filter(pk=bill_id, user=request.user["id"]).delete()
+        result = Bill.objects.filter(pk=bill_id, user=request.user.pk).delete()
         if result[1]["app.Bill"] != 1:
             return HttpResponseNotFound()
 
@@ -167,7 +167,7 @@ class EditBillView(View):
 
 
 def bills(request: WSGIRequest):
-    bills = Bill.objects.filter(user=request.user["id"]).annotate(position_count=Count("positions"))
+    bills = Bill.objects.filter(user=request.user.pk).annotate(position_count=Count("positions"))
     
     positions = Position.objects.filter(bill__in=bills).select_related("group").only("bill", "group")
 
@@ -192,7 +192,7 @@ def bills(request: WSGIRequest):
 
 def preview(request: WSGIRequest, bill_id: int) -> HttpResponse:
     bill = get_object_or_404(
-        Bill, pk=bill_id, user=request.user["id"],
+        Bill, pk=bill_id, user=request.user.pk,
         error_message="Die Rechnung wurde nicht gefunden.",
         json=True
     )

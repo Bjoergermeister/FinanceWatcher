@@ -9,8 +9,9 @@ from PIL import Image
 from django.core.files import File
 from django.db import models
 
-from app.models.Brand import Brand
 from app.models.Address import Address
+from app.models.Brand import Brand
+from app.models.User import User
 
 def user_directory_path(instance: Bill, filename: str) -> str:
     """
@@ -20,7 +21,7 @@ def user_directory_path(instance: Bill, filename: str) -> str:
 
 class Bill(models.Model):
     name = models.CharField(db_column="name", max_length=100)
-    user = models.UUIDField(db_column="user")
+    user = models.ForeignKey(User, db_column="user", on_delete=models.CASCADE, related_name="bills")
     date = models.DateField(db_column="date")
     created = models.DateField(db_column="created", default=datetime.date.today)
     total = models.DecimalField(db_column="total", max_digits=13, decimal_places=2)
