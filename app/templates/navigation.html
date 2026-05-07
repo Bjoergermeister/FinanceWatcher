@@ -19,7 +19,7 @@
           <i class="fa fa-fw fa-shop mr-2"></i>
           {% trans 'Brands' %}
         </a>
-        <a href="{% url 'addresses' %}" {% if request.path|slice:"-9:" == "addresses" %} class="active" {% endif %}>
+        <a href="{% url 'addresses' %}" {% if request.path|slice:"-9:" == "addresses" and "brands" not in request.path %} class="active" {% endif %}>
           <i class="fa fa-fw fa-location-dot mr-2"></i>
           {% trans 'Addresses' %}
         </a>
