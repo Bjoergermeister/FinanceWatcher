@@ -164,7 +164,7 @@ def assign_addresses(request: WSGIRequest, brand_id: int) -> HttpResponse:
     start_date = get_date_from_request_or_bad_request(request, "start_date")
     end_date = get_date_from_request(request, "end_date")
 
-    if start_date > end_date:
+    if end_date is not None and start_date > end_date:
         return HttpResponseBadRequest("The start date cannot be after the end date")
 
     # Since the addresses can be in use, make sure that the end date is properly set
