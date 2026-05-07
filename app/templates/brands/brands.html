@@ -59,6 +59,12 @@
                         </button>
                     </td>
                 </tr>
+            {% empty %}
+                <tr id="no-brands-table-row">
+                    <td colspan="6" class="text-center">
+                        {% trans 'No brands have been created yet' %}
+                    </td>
+                </tr>
             {% endfor %}
         </tbody>
     </table>

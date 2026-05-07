@@ -62,6 +62,8 @@ async function onBrandFormSubmitted(event){
         return;
     }
 
+    // If the brand was edited, we update the data in the table.
+    // If it was newly created, we create a new table row for the new brand.
     if (isEdit){
         const cells = document.querySelectorAll(`#brands-table tbody tr[data-id='${brandId}'] td`);
         cells[0].children[0].src = result.content.icon;
@@ -72,6 +74,11 @@ async function onBrandFormSubmitted(event){
         const brandTableRowBody = document.querySelector("#brands-table tbody");
         const newBrandTableCell = createNewBrandTableRow(result.content);
         brandTableRowBody.insertAdjacentElement("afterbegin", newBrandTableCell);
+
+        const noBrandsTableRow = document.getElementById("no-brands-table-row");
+        if (noBrandsTableRow !== null){
+            noBrandsTableRow.remove();
+        }
     }
 
     resetForm(form, ["csrfmiddlewaretoken"]);
@@ -391,8 +398,11 @@ async function updateAddressChoices(form){
     
     const result = await AddressesAPI.search(data);
     if (result.success === false){
-        // TODO: Properly handle the error case
-        alert("Error");
+        sendNotification(
+            "Searching addresses failed",
+            `Addresses couldn't be searched: ${result.errors}`,
+            NOTIFICATION_TYPE_ERROR
+        );
         return;
     }
 

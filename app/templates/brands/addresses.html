@@ -10,7 +10,13 @@
 {% endblock %}
 
 {% block content %}
-    <h1>{% trans 'Addresses' %}</h1>
+    <div class="row mb-5">
+        <a class="btn btn-primary" href="{% url 'brands' %}">
+            <i class="fa-solid fa-lg fa-arrow-left mr-2"></i>
+            {% trans 'Back to brands' %}
+        </a>
+    </div>
+    <h1>{% trans 'Addresses for brand ' %}{{ brand.name }}</h1>
 
     <button class="btn btn-primary mb-3" onclick="onAssignAddressesClicked(event)">
         <i class="fa fa-plus mr-2"></i>
@@ -96,7 +102,7 @@
                 </tr>
             {% empty %}
                 <tr class="no-data">
-                    <td colspan="8">{% trans 'This brand does not have addresses assigned to it' %}</td>
+                    <td class="text-center p-3" colspan="8">{% trans 'This brand does not have addresses assigned to it' %}</td>
                 </tr>
             {% endfor %}
         </tbody>
