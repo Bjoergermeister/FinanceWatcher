@@ -96,16 +96,14 @@
 </dialog>
 
 <dialog id="bill-preview-dialog" name="bill-preview">
-  <div class="content">
+  <div class="content" style="--width: 400px; --height: 75vh">
     <header>
-      <h1><span id="preview-bill-name"></span></h1>
+      <h1 style="overflow: hidden; text-overflow: ellipsis;">
+        <span id="preview-bill-name" style="white-space: nowrap;"></span>
+      </h1>
     </header>
-    <div class="body form-row">
-      <div class="col-md">
-        <div id="bill-preview">
+    <div id="bill-preview">
 
-        </div>
-      </div>
     </div>
     <footer>
       <button type="button" class="btn btn-primary pl-5 pr-5" onclick="onCloseBillPreviewClicked(event)">

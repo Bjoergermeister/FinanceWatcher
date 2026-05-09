@@ -56,8 +56,8 @@ dialog {
   position: fixed;
   top: 0px;
   left: 0px;
-  min-width: 100% !important;
-  min-height: 100% !important;
+  width: 100% !important;
+  height: 100% !important;
   background: none;
   border: none;
 }
@@ -67,59 +67,31 @@ dialog::backdrop {
 }
 
 dialog .content {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  display: grid;
+  grid-template-columns: var(--width, 600px);
+  grid-template-rows: 100px calc(var(--height, 75vh) - 160px) 60px;
+  grid-template-areas: "header" "content" "footer";
+
+  margin: 12.5vh auto 0 auto;
   background: white;
   border-radius: 5px;
   box-shadow: 1px 1px 10px #333;
-  padding-bottom: 60px;
 
   min-height: 250px;
-  width: 600px;
-}
-
-dialog[name="position-note"] .content {
-  width: 600px;
-  height: 400px;
-}
-
-dialog[name="confirm-deletion"] .content {
-  width: 600px;
-  height: 250px;
-}
-
-dialog[name="bill-preview"] .content {
-  width: 400px;
-  height: 75%;
-}
-
-dialog[name="bill-deletion"] .content {
-  width: 600px;
-  height: 225px;
-}
-
-dialog[name="choose-group"] .content,
-dialog[name="select-brand"] .content {
-  width: 1000px;
-  height: 750px;
-}
-
-dialog[name="bill-receipt-preview"] .content {
-  max-width: 90%;
-  width: auto;
-  height: 90%;
+  max-height: 75vh;
+  width: var(--width, 600px);
 }
 
 dialog header {
   padding: 10px 20px;
   text-align: center;
   border-bottom: 1px solid #333;
+  grid-area: header;
 }
 
 dialog .body {
   padding: 15px;
+  grid-area: content;
 }
 
 dialog[name="bill-receipt-preview"] .body {
@@ -127,11 +99,7 @@ dialog[name="bill-receipt-preview"] .body {
 }
 
 dialog footer {
-  position: absolute;
-  left: 0px;
-  bottom: 0px;
-  height: 60px;
-  width: 100%;
+  grid-area: footer;
   padding: 10px;
 
   display: flex;

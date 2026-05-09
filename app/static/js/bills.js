@@ -55,6 +55,8 @@ async function onBillPreviewClicked(event) {
 
   const billPreviewDialog = document.getElementById("bill-preview-dialog");
   billPreviewDialog.querySelector("#preview-bill-name").innerText = billName;
+  billPreviewDialog.querySelector("#preview-bill-name").title = billName;
+  
   billPreviewDialog.showModal();
 }
 

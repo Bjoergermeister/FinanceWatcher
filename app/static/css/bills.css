@@ -1,17 +1,21 @@
-#position-table img {
-  width: 50px;
-  height: 50px;
+dialog[name="bill-preview"] img {
+  width: 40px;
+  height: 40px;
+}
+
+dialog[name="bill-preview"] h3 {
+  line-height: 40px;
+  height: 40px;
+}
+
+#bill-preview-group-container {
+  overflow-y: scroll;
 }
 
 .bill-preview-category {
   display: block;
   width: 95%;
   margin: auto;
-}
-
-#position-table .group-header {
-  padding: 5px;
-  background: cornflowerblue;
 }
 
 #position-table .group-header h3 {

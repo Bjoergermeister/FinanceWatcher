@@ -1,28 +1,47 @@
 {% load static %}
 {% load i18n %}
 
-<table id="position-table" class="table table-sm table-bordered">
-    <tbody>
-        {% for group in groups_positions %}
-            <tr class="group-header">
-                <td colspan="3">
-                    {% if group is None %}
-                        <img src="{% static 'images/groups/Uncategorized.webp' %}">
-                        <h3>{% trans 'Ungruppiert' %}</h2>
-                    {% else %}
-                        <img src="{{ group.get_url }}">
-                        <h3>{{ group.name }}</h2>
-                    {% endif %}
-                </td>
-            </tr>
+<div class="mt-4 mb-3 mx-2 p-3 card shadow">
+    <div style="padding: 5px;" class="form-row">
+        <div class="col-md-6">
+            {% trans 'Date' %}
+        </div>
+        <div class="col-md-6">
+            <span class="mr-3">:</span> {{ bill.date|date:"d.m.Y" }}
+        </div>
+    </div>
+    <div style="padding: 5px;" class="form-row">
+        <div class="col-md-6">
+            {% trans 'Sum' %}
+        </div>
+        <div class="col-md-6">
+            <span class="mr-3">:</span> {{ bill.total|floatformat:2 }}&nbsp;&euro;
+        </div>
+    </div>
+</div>
 
+<div id="bill-preview-group-container" style="overflow-y: scroll; overflow-x: hidden; height: calc(100% - 160px);">
+    {% for group in groups_positions %}
+        <div style="border-top: 5px dotted #333" class="pt-4">
+            <div class="d-flex flex-row justify-content-center">
+                {% if group is None %}
+                    <img src="{% static 'images/groups/Uncategorized.webp' %}">
+                    <h3 class="ml-3">{% trans 'Not grouped' %}</h2>
+                {% else %}
+                    <img src="{{ group.get_url }}">
+                    <h3 class="ml-3">{{ group.name }}</h2>
+                {% endif %}                
+            </div>
             {% for position in groups_positions|get_item:group %}
-                <tr>
-                    <td style="width: 60%">{{ position.name }}</td>
-                    <td>{{ position.quantity }}</td>
-                    <td>{{ position.price }}&euro;</td>
-                </tr>    
+                <div style="padding: 5px" class="form-row">
+                    <div class="col-md-9" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        {{ position.quantity }}x <strong title="{{ position.name }}">{{ position.name }}</strong>
+                    </div>
+                    <div class="col-md-3">
+                        {{ position.price }}&nbsp;&euro;
+                    </div>
+                </div>
             {% endfor %}
-        {% endfor %}
-    </tbody>
-</table>
+        </div>
+    {% endfor %}
+</div>
