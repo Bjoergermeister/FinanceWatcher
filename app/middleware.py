@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import requests
 import uuid
 
@@ -33,6 +34,9 @@ User = get_user_model()
 class ExternalServiceAuthenticationMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
+        self.authentication_service_host = os.getenv('AUTHENTICATION_SERVICE_HOST')
+        self.authentication_service_url = os.getenv('AUTHENTICATION_SERVICE_URL')
+        self.authentication_service_login_url = os.getenv('AUTHENTICATION_SERVICE_LOGIN_URL')
 
     def __call__(self, request):
         authorization_cookie = request.COOKIES.get("session")
@@ -65,10 +69,10 @@ class ExternalServiceAuthenticationMiddleware:
         request: WSGIRequest,
         token: str
     ) -> UserData | None:
-        authentication_service_url = f"http://{request.META['AUTHENTICATION_SERVICE_HOST']}/token/verify"
+        verify_token_url = f"http://{self.authentication_service_host}/token/verify"
         headers = { "Content-Type": "application/json" }
         data = { "token": token }
-        response = requests.post(authentication_service_url, headers=headers, json=data)
+        response = requests.post(verify_token_url, headers=headers, json=data)
 
         if response.status_code != Http.OK:
             return None
@@ -76,9 +80,7 @@ class ExternalServiceAuthenticationMiddleware:
         return UserData(response.json())
 
     def build_redirect_url(self, request):
-        authentication_service_host = request.META['AUTHENTICATION_SERVICE_URL']
-        login_url = request.META['AUTHENTICATION_SERVICE_LOGIN_URL']
-        redirect_url = f"http://{authentication_service_host}/{login_url}"
+        redirect_url = f"http://{self.authentication_service_url}/{self.authentication_service_login_url}"
         
         host = request.META['HTTP_HOST']
         next_page = f"{request.scheme}://{host}{request.META['PATH_INFO']}"
