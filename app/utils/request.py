@@ -14,7 +14,7 @@ def get_date_from_request(request: HttpRequest, key: str, default: date | None =
 
     value = request_data.get(key, None)
 
-    if value is None:
+    if value is None or value == '':
         return default
     
     try:
