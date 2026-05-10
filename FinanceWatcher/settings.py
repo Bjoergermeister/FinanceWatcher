@@ -37,8 +37,8 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 application_mode = os.getenv("MODE", "debug")
 DEBUG = application_mode == "debug"
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = [os.getenv("ALLOWED_HOSTS")]
+CSRF_TRUSTED_ORIGINS = [os.getenv("TRUSTED_ORIGINS")]
 
 # Application definition
 
