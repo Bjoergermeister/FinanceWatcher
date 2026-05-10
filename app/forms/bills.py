@@ -13,7 +13,7 @@ from app.models.User import User
 class CreateBillForm(forms.ModelForm):
     id = forms.IntegerField(required=False, widget=forms.HiddenInput())
     name = forms.CharField(label="Name")
-    user = forms.UUIDField(widget=forms.HiddenInput())
+    user = forms.ModelChoiceField(User.objects.none(), widget=forms.HiddenInput())
     date = forms.DateField(label="Datum", widget=forms.DateInput(attrs={'type': 'date'}))
     total = forms.DecimalField(widget=forms.HiddenInput(), initial=0.0)
     description = forms.CharField(label="Beschreibung (optional)", required=False, widget=forms.Textarea(attrs={'rows': 3}))
@@ -28,6 +28,8 @@ class CreateBillForm(forms.ModelForm):
     ):
         super(CreateBillForm, self).__init__(*args, **kwargs)
 
+        self.fields["user"].queryset = User.objects.filter(pk=user.pk)
+
         if self.is_bound is False:
             self.fields["date"].initial = datetime.date.today()
 
@@ -40,7 +42,7 @@ class CreateBillForm(forms.ModelForm):
     def clean(self):
         data = self.cleaned_data
 
-        receipt: InMemoryUploadedFile = data.ge("receipt", None)
+        receipt: InMemoryUploadedFile = data.get("receipt", None)
         if receipt is None:
             return data
         
@@ -57,7 +59,6 @@ class CreateBillForm(forms.ModelForm):
 class EditBillForm(forms.ModelForm):
     id = forms.IntegerField(widget=forms.HiddenInput())
     name = forms.CharField(label="Name")
-    user = forms.UUIDField(widget=forms.HiddenInput())
     date = forms.DateField(label="Datum", widget=forms.DateInput(attrs={'type': 'date'}))
     total = forms.DecimalField(widget=forms.HiddenInput())
     description = forms.CharField(label="Beschreibung (optional)", required=False, widget=forms.Textarea(attrs={'rows': 3}))
@@ -84,7 +85,7 @@ class EditBillForm(forms.ModelForm):
     
     class Meta:
         model = Bill
-        exclude = ["created", "channel"]
+        exclude = ["user", "created", "channel"]
 
 def get_file_name_without_extension(filename: str | None) -> str | None:
     if filename is None or len(filename) == 0:

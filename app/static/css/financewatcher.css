@@ -298,3 +298,7 @@ input[type="file"]:not(:empty) ~ label {
 table tr.dummy {
   display: none;
 }
+
+.clickable {
+  cursor: pointer;
+}

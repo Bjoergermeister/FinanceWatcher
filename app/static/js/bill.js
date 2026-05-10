@@ -126,7 +126,6 @@ async function onBillFormSubmitted(event) {
     data.append("date", form.date.value);
     data.append("receipt", form.receipt.files.length > 0 ? form.receipt.files[0] : "");
     data.append("description", form.description.value);
-    data.append("user", form.user.value);
     data.append("total", form.total.value);
     data.append("brand", form.brand.value);
     data.append("address", form.address.value);
@@ -134,6 +133,12 @@ async function onBillFormSubmitted(event) {
     data.append("position-INITIAL_FORMS", form.elements["position-INITIAL_FORMS"].value);
     data.append("position-MIN_NUM_FORMS", form.elements["position-MIN_NUM_FORMS"].value);
     data.append("position-MAX_NUM_FORMS", form.elements["position-MAX_NUM_FORMS"].value);
+    
+    // Since the creator (user) of a bill cannot be changed, there is no user id input when editing a bill.
+    // Therefore we need to check if the form has a user field before adding it.
+    if (form.user !== undefined){
+      data.append("user", form.user.value);
+    }
 
     result = await BillAPI.edit(form.id.value, data);
   }
@@ -384,18 +389,6 @@ async function onSelectBrandButtonPressed(event) {
 
   const brandSelectDialog = document.getElementById("select-brand-dialog");
   brandSelectDialog.showModal();
-
-  const result = await BrandAPI.getAll();
-  if (result.success === false) {
-    sendNotification(
-      "Brands abfragen fehlgeschlagen",
-      `Konnte keine Brands abfragen: ${result.errors}`,
-      NOTIFICATION_TYPE_ERROR
-    );
-    return;
-  }
-
-  console.log(result.content);
 }
 
 function onReceiptImageChanged(event) {
@@ -442,9 +435,11 @@ async function onBrandSearchInputChanged(event){
     const images = result.content.map(brand => {
       const template = getTemplate("select-brand");
       if (template === null) return;
+      template.classList.add("clickable");
       template.querySelector("img").src = brand.icon;
       template.querySelector("h4").innerText = brand.name;
       template.dataset.id = brand.pk;
+      template.dataset.name = brand.name;
       template.addEventListener("click", onBrandSelected);
       return template;
     });
@@ -461,6 +456,10 @@ function onBrandSelected(event){
   dialog.close();
 
   const select = document.querySelector("#bill-form select[name='brand']");
+  const { id, name } = event.currentTarget.dataset;
+
+  select.children[0].value = parseInt(id);
+  select.children[0].innerText = name;
   select.value = parseInt(event.currentTarget.dataset.id);
 
   const chooseAddressButton = document.getElementById("choose-address-button");

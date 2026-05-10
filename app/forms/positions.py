@@ -17,10 +17,8 @@ class CreatePositionForm(forms.ModelForm):
     uuid = forms.UUIDField(widget=forms.HiddenInput())
 
     def __init__(self, *args, **kwargs):
-        data = kwargs.get("data")
-        user = data["user"] if data is not None else None
+        user = kwargs.pop("user")
         super().__init__(*args, **kwargs)
-        #TODO: Optimize so that only one database query is made
         self.fields["group"].queryset = Group.objects.filter(Q(user=None) | Q(user=user))
 
         if self.is_bound == False:
@@ -41,8 +39,7 @@ class EditPositionForm(forms.ModelForm):
     uuid = forms.UUIDField(widget=forms.HiddenInput())
 
     def __init__(self, *args, **kwargs):
-        data = kwargs.get("data")
-        user = data["user"] if data is not None else None
+        user = kwargs.pop("user")
         super().__init__(*args, **kwargs)
         
         self.fields["group"].queryset = Group.objects.filter(Q(user=None) | Q(user=user))

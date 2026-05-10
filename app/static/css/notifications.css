@@ -24,6 +24,12 @@
 
 .notification header {
   position: relative;
+  height: auto;
+  margin-bottom: 0.5rem;
+}
+
+.notification p {
+  margin-bottom: 0;
 }
 
 .notification header h4 {
@@ -38,7 +44,7 @@
 }
 
 #notification-bell {
-  position: absolute;
+  position: fixed;
   left: 1rem;
   bottom: 1rem;
 }

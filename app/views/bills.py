@@ -27,7 +27,11 @@ class CreateBillView(View):
         bill_form = CreateBillForm(request.user, initial=initial_form_values)
 
         PositionFormSet = modelformset_factory(Position, form=CreatePositionForm, extra=5, can_delete=True)
-        position_formset = PositionFormSet(queryset=Position.objects.none(), prefix="position")
+        position_formset = PositionFormSet(
+            queryset=Position.objects.none(),
+            prefix="position",
+            form_kwargs={ "user": request.user }
+        )
 
         group_positions = {
             None: position_formset
@@ -46,7 +50,11 @@ class CreateBillView(View):
     
     def post(self: CreateBillView, request: WSGIRequest) -> JsonResponse:
         PositionFormSet = modelformset_factory(Position, form=CreatePositionForm, can_delete=True)
-        position_formset = PositionFormSet(request.POST, prefix="position")
+        position_formset = PositionFormSet(
+            request.POST,
+            prefix="position",
+            form_kwargs={ "user": request.user }
+        )
         bill_form = CreateBillForm(request.user, request.POST)
         
         form_is_valid = bill_form.is_valid() and position_formset.is_valid()
@@ -85,10 +93,21 @@ class EditBillView(View):
         group_ids = positions.exclude(group=None).distinct().values_list("group", flat=True)
         groups = { group.pk: group for group in Group.objects.filter(pk__in=group_ids)}
 
-        PositionFormSet = modelformset_factory(Position, EditPositionForm, exclude=[], can_delete=True, extra=0, labels={"name": "", "price": "", "quantity": ""})
-        position_formset = PositionFormSet(queryset=positions, prefix="position")
+        PositionFormSet = modelformset_factory(
+            Position,
+            EditPositionForm,
+            exclude=[],
+            can_delete=True,
+            extra=0,
+            labels={ "name": "", "price": "", "quantity": "" }
+        )
+        position_formset = PositionFormSet(
+            queryset=positions,
+            prefix="position",
+            form_kwargs={ "user": request.user }
+        )
 
-        group_positions = {}
+        group_positions: Dict[int | None, List[EditPositionForm]] = {}
         for position_form in position_formset:
             group_id = position_form.instance.group.pk if position_form.instance.group is not None else None
             if group_id not in group_positions:
@@ -113,8 +132,20 @@ class EditBillView(View):
     def post(self: EditBillView, request: WSGIRequest, bill_id: int) -> JsonResponse:
         bill = Bill.objects.get(pk=bill_id)
 
-        PositionFormSet = inlineformset_factory(Bill, Position, EditPositionForm, exclude=[], extra=0, can_delete=True)
-        position_formset = PositionFormSet(request.POST, instance=bill, prefix="position")
+        PositionFormSet = inlineformset_factory(
+            Bill,
+            Position,
+            EditPositionForm,
+            exclude=[],
+            extra=0,
+            can_delete=True
+        )
+        position_formset = PositionFormSet(
+            request.POST,
+            instance=bill,
+            prefix="position",
+            form_kwargs={ "user": request.user }
+        )
         bill_form = EditBillForm(request.POST, request.FILES, instance=bill)
         
         form_is_valid = bill_form.is_valid() and position_formset.is_valid()
