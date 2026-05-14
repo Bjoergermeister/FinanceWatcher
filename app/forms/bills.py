@@ -75,7 +75,7 @@ class EditBillForm(forms.ModelForm):
 
         receipt: InMemoryUploadedFile = data.get("receipt", None)
         if receipt is not None:
-            if self.instance.receipt.name is not None:
+            if self.instance.receipt.name not in [None, '']:
                 receipt.name = self.instance.receipt.name
             else:
                 file_extensions = get_file_extension(receipt.name)                

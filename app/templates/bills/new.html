@@ -92,7 +92,13 @@
               style="width: 100%; height: 100%; border-radius: 5%"
               src="{% static 'images/groups/Uncategorized.webp' %}"
             />
-            {% else %}
+            <div id="bill-receipt-actions" class="display-on-hover">
+              <label class="btn btn-primary mb-2" for="id_receipt">
+                <i class="fa fa-edit me-2"></i>
+                Ändern
+              </label>
+            </div>
+          {% else %}
             <img 
               style="width: 100%; height: 100%; border-radius: 5%"
               src="{{ bill_form.instance.receipt.url }}"
