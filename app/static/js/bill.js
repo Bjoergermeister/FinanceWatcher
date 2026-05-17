@@ -427,6 +427,11 @@ function onShowReceiptClicked(event){
 }
 
 let searchBrandInputTimeout = null;
+
+/**
+ * 
+ * @param {KeyboardEvent} event - The event 
+ */
 async function onBrandSearchInputChanged(event){
   event.preventDefault();
 
@@ -434,8 +439,26 @@ async function onBrandSearchInputChanged(event){
     clearTimeout(searchBrandInputTimeout);
   }
 
-  searchBrandInputTimeout = setTimeout(async () => {
-    const result = await BrandAPI.search(event.target.value);
+  if (event.key === "Enter"){
+    searchBrands(event.target.value);
+  }else{
+    searchBrandInputTimeout = setTimeout(async () => searchBrands(event.target.value), 5000);
+  }
+}
+
+/**
+ * 
+ * @param {PointerEvent} event 
+ */
+function onSearchBrandsClicked(event){
+  event.preventDefault();
+
+  const query = document.getElementById("brand-search-input").value;
+  searchBrands(query);
+}
+
+async function searchBrands(query){
+  const result = await BrandAPI.search(query);
     if (result.success === false){
       sendNotification(
         "Laden fehlgeschlagen",
@@ -459,7 +482,6 @@ async function onBrandSearchInputChanged(event){
 
     const imageContainer = document.getElementById("brand-list");
     imageContainer.replaceChildren(...images);
-  }, 3000);
 }
 
 function onBrandSelected(event){
@@ -471,13 +493,38 @@ function onBrandSelected(event){
   const select = document.querySelector("#bill-form select[name='brand']");
   const { id, name } = event.currentTarget.dataset;
 
+  // Check if a brand was choosen before and if it's different from the one chosen now.
+  // If so, reset the address select to prevent corrupted data. This obviously needs to be done
+  // before the select is updated to the new brand
+  if (select.children[0].innerText !== name){
+    const addressSelect = document.querySelector("#bill-form select[name='address']");
+    addressSelect.value = "";
+    addressSelect.children[0].value = "";
+    addressSelect.children[0].innerText = "";
+  }
+
   select.children[0].value = parseInt(id);
   select.children[0].innerText = name;
   select.value = parseInt(event.currentTarget.dataset.id);
 
+  // Enable address selection
   const chooseAddressButton = document.getElementById("choose-address-button");
   chooseAddressButton.disabled = false;
   chooseAddressButton.title = "";
+}
+
+/**
+ * 
+ * @param {PointerEvent} event 
+ */
+function onAbortSearchBrandClicked(event){
+  event.preventDefault();
+  document.getElementById("brand-search-input").value = "";
+  const brandList = document.getElementById("brand-list");
+  removeAllChildren(brandList);
+
+  const dialog = findParentElement(event.target, "DIALOG");
+  dialog.close();
 }
 
 function onSelectAddressClicked(event){

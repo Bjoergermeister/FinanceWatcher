@@ -264,8 +264,8 @@
         <div class="col-md">
           <div class="input-group">
             <div class="input-group-prepend">
-              <span class="input-group-text">
-                <i class="fa fa-search"></i>
+              <span class="input-group-text clickable" onclick="onSearchBrandsClicked(event)">
+                <i class="fa fa-search no-events"></i>
               </span>
             </div>
             <input 
@@ -282,8 +282,14 @@
       </div>
     </div>
     <footer class="d-flex flex-row-reverse">
-      <button class="btn btn-primary">Auswählen</button>
-      <button class="btn btn-danger" onclick="onAbortChoosingGroupClicked(event)">Abbrechen</button>
+      <button class="btn btn-primary" onclick="onSearchBrandsClicked(event)">
+        <i class="fa fa-search me-2"></i>
+        {% trans 'Search brands' %}
+      </button>
+      <button class="btn btn-danger" onclick="onAbortSearchBrandClicked(event)">
+        <i class="fa fa-xmark me-2"></i>
+        {% trans 'Cancel' %}
+      </button>
     </footer>
   </div>
 </dialog>
