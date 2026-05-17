@@ -40,6 +40,7 @@ class CreateBillView(View):
         countries = Country.objects.all()
 
         context = {
+            'group_ids': [None],
             'countries': countries,
             'bill_form': bill_form,
             'position_formset': position_formset,
@@ -87,11 +88,10 @@ class EditBillView(View):
             error_message="Die Rechnung wurde nicht gefunden"
         )
         
-        bill = Bill.objects.get(pk=bill_id)
         bill_form = EditBillForm(instance=bill)
 
         positions = Position.objects.filter(bill=bill).select_related("group")
-        group_ids = positions.exclude(group=None).distinct().values_list("group", flat=True)
+        group_ids = positions.distinct().values_list("group", flat=True)
         groups = { group.pk: group for group in Group.objects.filter(pk__in=group_ids)}
 
         PositionFormSet = modelformset_factory(

@@ -124,47 +124,52 @@
 
   <div id="group-container" class="d-flex flex-row flex-wrap">
     {{ position_formset.management_form }}
-    <fieldset id="bill-positions" class="card shadow p-3 mb-5 position-group">
-      <header class="mb-3 p-3 d-flex flex-row" onclick="onEditGroupClicked(event)" data-mode="edit">
-        <img src="{% static 'images/groups/Uncategorized.webp' %}"/>
-        <h2 class="ml-3 mb-0">Keine Kategorie</h2>
-      </header>
-      {% comment %} Header for positions {% endcomment %}
-      {% include "bills/group_header.html" %}
-      
-      {% for position_form in group_positions|get_item:None %}
-        {% include "bills/position.html" with position=position_form %}
-      {% endfor %}
-
-      <div class="d-flex justify-content-center">
-        <button class="btn btn-success" onclick="onNewPositionClicked(event)">
-          <i class="fa-solid fa-plus fa-lg no-event mr-2"></i>Position hinzufügen
-        </button>
-      </div>
-    </fieldset>
-
+    
     {% if group_ids|length > 0 %}
       {% for group_id in group_ids %}
-        {% with group=groups|get_item:group_id %}
+        {% if group_id is None %}
           <fieldset id="bill-positions" class="card shadow p-3 mb-5 position-group">
             <header class="mb-3 p-3 d-flex flex-row" onclick="onEditGroupClicked(event)" data-mode="edit">
-              <img src="{{ group.get_url }}"/>
-              <h2 class="ml-3 mb-0">{{ group.name }}</h2>
+              <img src="{% static 'images/groups/Uncategorized.webp' %}"/>
+              <h2 class="ml-3 mb-0">{% trans 'Uncategorized' %}</h2>
             </header>
             {% comment %} Header for positions {% endcomment %}
             {% include "bills/group_header.html" %}
             
-            {% for position_form in group_positions|get_item:group_id %}
+            {% for position_form in group_positions|get_item:None %}
               {% include "bills/position.html" with position=position_form %}
             {% endfor %}
-      
+
             <div class="d-flex justify-content-center">
               <button class="btn btn-success" onclick="onNewPositionClicked(event)">
-                <i class="fa-solid fa-plus fa-lg no-event mr-2"></i>Position hinzufügen
+                <i class="fa-solid fa-plus fa-lg no-event mr-2"></i>
+                {% trans 'Add position' %}
               </button>
             </div>
           </fieldset>
-        {% endwith %}
+        {% else %}
+          {% with group=groups|get_item:group_id %}
+            <fieldset id="bill-positions" class="card shadow p-3 mb-5 position-group">
+              <header class="mb-3 p-3 d-flex flex-row" onclick="onEditGroupClicked(event)" data-mode="edit">
+                <img src="{{ group.get_url }}"/>
+                <h2 class="ml-3 mb-0">{{ group.name }}</h2>
+              </header>
+              {% comment %} Header for positions {% endcomment %}
+              {% include "bills/group_header.html" %}
+              
+              {% for position_form in group_positions|get_item:group_id %}
+                {% include "bills/position.html" with position=position_form %}
+              {% endfor %}
+        
+              <div class="d-flex justify-content-center">
+                <button class="btn btn-success" onclick="onNewPositionClicked(event)">
+                  <i class="fa-solid fa-plus fa-lg no-event mr-2"></i>
+                  {% trans 'Add position' %}
+                </button>
+              </div>
+            </fieldset>
+          {% endwith %}
+        {% endif %}
       {% endfor %}
     {% endif %}
   </div>
@@ -237,17 +242,17 @@
       <h1>{% trans 'Choose category' %}</h1>
     </header>
     <div>
-    <div
+      <div
         class="body"
         style="overflow-y: auto; display: block; height: calc(750px - 160px)"
-    >
+      >
         <div>
           <h2>{% trans 'Global categories' %}</h2>
-      <ul id="global-group-list" class="d-flex flex-row flex-wrap" style="gap: 10px"></ul>
+          <ul id="global-group-list" class="d-flex flex-row flex-wrap" style="gap: 10px"></ul>
         </div>
         <div>
           <h2 class="mt-3">{% trans 'Your categories' %}</h2>
-      <ul id="user-group-list" class="d-flex flex-row flex-wrap" style="gap: 10px"></ul>
+          <ul id="user-group-list" class="d-flex flex-row flex-wrap" style="gap: 10px"></ul>
         </div>
       </div>
     </div>
