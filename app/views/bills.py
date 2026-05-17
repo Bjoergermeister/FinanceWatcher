@@ -55,7 +55,7 @@ class CreateBillView(View):
             prefix="position",
             form_kwargs={ "user": request.user }
         )
-        bill_form = CreateBillForm(request.user, request.POST)
+        bill_form = CreateBillForm(request.user, request.POST, request.FILES)
         
         form_is_valid = bill_form.is_valid() and position_formset.is_valid()
         if form_is_valid == False:
@@ -63,7 +63,8 @@ class CreateBillView(View):
             return JsonResponse(data, status=Http.BAD_REQUEST)
         
         ids = {}
-        bill = bill_form.save()
+        bill: Bill = bill_form.save(commit=False)
+        bill.save(file_was_uploaded=len(request.FILES) > 0)
         ids["bill"] = bill.pk
         
         position_ids = {}
