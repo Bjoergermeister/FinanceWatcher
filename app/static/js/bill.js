@@ -535,6 +535,11 @@ function onSelectAddressClicked(event){
 }
 
 let searchAddressInputTimeout = null;
+
+/**
+ * 
+ * @param {KeyboardEvent} event 
+ */
 function onAssignAddressInputChanged(event){
     event.preventDefault();
 
@@ -545,18 +550,33 @@ function onAssignAddressInputChanged(event){
     searchAddressInputTimeout = setTimeout(() => updateAddressChoices(event.target.form), 3000);
 }
 
+/**
+ * 
+ * @param {PointerEvent} event 
+ */
+function onUpdateAddressesClicked(event){
+  event.preventDefault();
+
+  if (searchAddressInputTimeout !== null){
+    clearTimeout(searchAddressInputTimeout);
+  }
+
+  updateAddressChoices(event.target.form);
+}
+
 function onSelectAddressFormSubmitted(event){
   event.preventDefault();
   const form = event.target;
-  const selectedAddressOption = form.address.querySelector(`option[value='${form.address.value}']`);
+  const availableAddressesSelect = form["available-addresses"];
+  const selectedAddressOption = availableAddressesSelect.querySelector(`option[value='${availableAddressesSelect.value}']`);
   if (selectedAddressOption === null) return;
 
 
   const targetSelect = document.querySelector("#bill-form select[name='address']");
   const targetOption = targetSelect.querySelector("option");
   targetOption.innerText = selectedAddressOption.innerText;
-  targetOption.value = form.address.value;
-  targetSelect.value = form.address.value;
+  targetOption.value = availableAddressesSelect.value;
+  targetSelect.value = availableAddressesSelect.value;
 
   const dialog = findParentElement(form, "DIALOG");
   dialog.close();
@@ -662,16 +682,17 @@ async function updateAddressChoices(form){
         return;
     }
 
-    const addressesTable = document.getElementById("addresses-table");
+    const addressesSelect = document.querySelector("select[name='available-addresses']");
     const noAddressesHint = document.getElementById("no-addresses-hint");
 
     // If no address was returned, hide the table and show the "no addresses matches the parameters" hint
     if (result.content.length === 0){
-      addressesTable.style.display = "none";
-      noAddressesHint.style.display = "none";
+      removeAllChildren(addressesSelect);
+      noAddressesHint.style.display = "block";
       return;
     }
 
+    noAddressesHint.style.display = "none";
     const options = result.content.map(address => {
         const option = document.createElement("OPTION");
         option.value = address.id;
@@ -679,8 +700,7 @@ async function updateAddressChoices(form){
         return option;
     });
 
-    const assignAddressesForm = document.getElementById("choose-address-form");
-    assignAddressesForm.address.replaceChildren(...options);
+    addressesSelect.replaceChildren(...options);
 }
 
 /**

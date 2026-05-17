@@ -305,83 +305,91 @@
     >
       <form id="address-filter-form" onsubmit="onAddressFormSubmitted(event)">
           <input name="id" type="hidden">
-            {% csrf_token %}
-            <div class="form-row mb-2">
-                <div class="col-md-6">
-                    <select 
-                        name="country"
-                        class="custom-select"
-                        onChange="onAssignAddressInputChanged(event)"
-                    >
-                        {% for country in countries %}
-                            <option value="{{ country.pk }}">{{ country.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <input 
-                        class="form-control"
-                        type="text"
-                        name="city"
-                        placeholder="City"
-                        onkeyup="onAssignAddressInputChanged(event)"
-                    >
-                </div>
-            </div>
-            <div class="form-row mb-2">
-                <div class="col-md-6">
-                    <input
-                        class="form-control"
-                        type="text"
-                        name="region"
-                        placeholder="Region"
-                        onkeyup="onAssignAddressInputChanged(event)"
-                    >
-                </div>
-                <div class="col-md-6">
-                    <input
-                        class="form-control"
-                        type="text"
-                        name="postal_code"
-                        placeholder="Postleitzahl"
-                        onkeyup="onAssignAddressInputChanged(event)"
-                    >
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="col-md">
-                    <button 
-                        class="btn btn-primary"
-                        onclick="onUpdateAddressesClicked(event)"
-                    >
-                        <i class="fa fa-undo mr-2"></i>
-                        {% trans 'Update' %}
-                    </button>
-                </div>
-            </div>
-        </form>
-      <div id="address-list" class="form-row p-3 d-flex justify-content-start">
-        <div id="no-addresses-hint" class="badge bg-warning" style="display: none">
-          {% trans 'No address matches the search parameters' %}
-        </div>
-        <form id="choose-address-form" style="width: 90%; height: 90%; margin: auto; display: block" onsubmit="onSelectAddressFormSubmitted(event)">
-          <div class="form-row">
-            <div class="col-md"-12>
-              <select name="address" class="custom-select" required>
-                {% if bill_form.instance.address %}
-                  <option value="{{ bill_form.instance.address.pk }}">{{ bill_form.instance.address }}</option>
-                {% else %}
-                  <option></option>
-                {% endif %}
-              </select>
-            </div>
+          {% csrf_token %}
+          <div class="form-row mb-2">
+              <div class="col-md-6">
+                  <select 
+                      name="country"
+                      class="custom-select"
+                      onChange="onAssignAddressInputChanged(event)"
+                  >
+                      {% for country in countries %}
+                          <option value="{{ country.pk }}">{{ country.name }}</option>
+                      {% endfor %}
+                  </select>
+              </div>
+              <div class="col-md-6">
+                  <input 
+                      class="form-control"
+                      type="text"
+                      name="city"
+                      placeholder="City"
+                      onkeyup="onAssignAddressInputChanged(event)"
+                  >
+              </div>
           </div>
-        </form>
+          <div class="form-row mb-2">
+              <div class="col-md-6">
+                  <input
+                      class="form-control"
+                      type="text"
+                      name="region"
+                      placeholder="Region"
+                      onkeyup="onAssignAddressInputChanged(event)"
+                  >
+              </div>
+              <div class="col-md-6">
+                  <input
+                      class="form-control"
+                      type="text"
+                      name="postal_code"
+                      placeholder="Postleitzahl"
+                      onkeyup="onAssignAddressInputChanged(event)"
+                  >
+              </div>
+          </div>
+          <div class="form-row">
+              <div class="col-md">
+                  <button 
+                      class="btn btn-primary"
+                      onclick="onUpdateAddressesClicked(event)"
+                  >
+                      <i class="fa fa-undo mr-2"></i>
+                      {% trans 'Update' %}
+                  </button>
+              </div>
+          </div>
+      </form>
+      <div class="form-row mb-2 mt-4">
+        <div class="col-md">
+            <div id="no-addresses-hint" class="alert alert-warning text-center p-3" style="display: none">
+              {% trans 'No address matches the search parameters' %}
+            </div>
+        </div>
       </div>
+      <form id="choose-address-form" onsubmit="onSelectAddressFormSubmitted(event)">
+        <div class="row">
+          <div class="col-md">
+            <select name="available-addresses" class="custom-select" required>
+              {% if bill_form.instance.address %}
+                <option value="{{ bill_form.instance.address.pk }}">{{ bill_form.instance.address }}</option>
+              {% else %}
+                <option></option>
+              {% endif %}
+            </select>
+          </div>
+        </div>
+      </form>
     </div>
     <footer class="d-flex flex-row-reverse">
-      <button class="btn btn-primary" form="choose-address-form">{% trans 'Select address' %}</button>
-      <button class="btn btn-danger" onclick="onAbortChoosingAddressClicked(event)">{% trans 'Cancel' %}</button>
+      <button class="btn btn-primary" form="choose-address-form">
+        <i class="fa fa-check me-2"></i>
+        {% trans 'Select address' %}
+      </button>
+      <button class="btn btn-danger" onclick="onAbortChoosingAddressClicked(event)">
+        <i class="fa fa-xmark me-2"></i>
+        {% trans 'Cancel' %}
+      </button>
     </footer>
   </div>
 </dialog>
