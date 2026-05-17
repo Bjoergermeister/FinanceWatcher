@@ -116,10 +116,23 @@ async function onBillFormSubmitted(event) {
     updateFormRowIndices(positionFormRows);
 
     const data = new FormData(form);
+
+    // The brand and address inputs are disabled and therefore not being picked up by the FormData constructor.
+    // So we need to add them manually
+    data.append("brand", form.brand.value);
+    data.append("address", form.address.value);
     result = await BillAPI.create(data);
   } else {
     // The bill already exists in the database. It needs to be updated
+    
+    // In Django Formsets, new entries must always be at the very "end" of the data, meaning that all existing
+    // rows must be before any new ones. Since new positions can be added to different groups,
+    // new positions may be at the start, middle or end of the positions list.
+    // Therefore, we need to reorder them to make sure all new ones are at the end. 
     const data = preprocessPositionFormRows(positionFormRows);
+
+    // Adding the rest of the data. It's easier to add these by hand to an empty FormData object
+    // than just taking all the form input, filter out the position data and then reordering it.
     data.append("csrfmiddlewaretoken", form.csrfmiddlewaretoken.value);
     data.append("id", form.id.value);
     data.append("name", form.name.value);
