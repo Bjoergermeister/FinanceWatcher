@@ -259,9 +259,9 @@ function onNewPositionClicked(event) {
   increaseFormCount(positionContainer);
 
   // Check if the position is part of a group. If so, set the group ID
-  const groupId = event.target.parentElement.dataset.groupid;
-  if (groupId !== undefined) {
-    formRowCopy.querySelector("input[name$='group']").value = groupId;
+  const groupContainer = findParentElement(event.target, "FIELDSET");
+  if ("groupId" in groupContainer.dataset) {
+    formRowCopy.querySelector("input[name$='group']").value = groupContainer.dataset.groupId;
   }
 }
 
@@ -387,6 +387,7 @@ async function onEditGroupClicked(event) {
     groupHeader.querySelector("img").src = groupSelectedEvent.target.dataset.icon;
     groupHeader.querySelector("h2").innerText = groupSelectedEvent.target.dataset.name;
 
+    groupContainer.dataset.groupId = groupSelectedEvent.target.dataset.id;
     const positionFormRows = groupContainer.querySelectorAll(".form-row.position");
     for (const positionFormRow of positionFormRows) {
       const groupInput = positionFormRow.querySelector("input[name$='group']");
