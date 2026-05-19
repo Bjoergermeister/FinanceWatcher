@@ -80,7 +80,7 @@ class ExternalServiceAuthenticationMiddleware:
         return UserData(response.json())
 
     def build_redirect_url(self, request):
-        redirect_url = f"http://{self.authentication_service_url}/{self.authentication_service_login_url}"
+        redirect_url = f"{self.authentication_service_url}/{self.authentication_service_login_url}"
         
         host = request.META['HTTP_HOST']
         next_page = f"{request.scheme}://{host}{request.META['PATH_INFO']}"
