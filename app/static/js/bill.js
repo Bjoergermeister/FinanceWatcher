@@ -246,7 +246,7 @@ function onNewPositionClicked(event) {
   priceInput.addEventListener("change", onPositionPriceChanged);
 
   const quantityInput = formRowCopy.querySelector("input[name$='quantity']");
-  quantityInput.addEventListener("change", onPositionPriceChanged);
+  quantityInput.addEventListener("change", onPositionQuantityChanged);
 
   positions[uuid] = {
     price: 0.0,
