@@ -199,7 +199,9 @@ class EditBillView(View):
 
 
 def bills(request: WSGIRequest):
-    bills = Bill.objects.filter(user=request.user.pk).annotate(position_count=Count("positions")).order_by("-date")
+    sort = request.GET.get("sort", "-date")
+
+    bills = Bill.objects.filter(user=request.user.pk).select_related("brand").annotate(position_count=Count("positions")).order_by(sort)
     
     positions = Position.objects.filter(bill__in=bills).select_related("group").only("bill", "group")
 

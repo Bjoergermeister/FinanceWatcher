@@ -1,3 +1,16 @@
+th {
+  color: white;
+}
+
+th a {
+  color: inherit;
+  text-decoration: none;
+}
+
+th a:hover {
+  text-decoration: none;
+}
+
 dialog[name="bill-preview"] img {
   width: 40px;
   height: 40px;
