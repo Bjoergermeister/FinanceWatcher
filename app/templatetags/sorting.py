@@ -30,3 +30,13 @@ def get_sorting_url(request: WSGIRequest, name: str) -> str:
     query_string = "&".join([f"{key}={value}" for key, value in data.items()])
 
     return f"{request.path}?{query_string}"
+
+@register.simple_tag
+def get_pagination_url(request: WSGIRequest, page_index: int) -> str:
+    data = request.GET.copy() if request.method == "GET" else request.POST.copy()
+    
+    data["page"] = page_index
+
+    query_string = "&".join([f"{key}={value}" for key, value in data.items()])
+
+    return f"{request.path}?{query_string}"

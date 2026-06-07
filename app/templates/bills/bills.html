@@ -12,6 +12,22 @@
 {% endblock %} 
 
 {% block content %}
+
+<div class="row ml-0 mb-3">
+  <div class="mr-3">
+    {% for page in pages %}
+      {% if page == paginator.ELLIPSIS %}
+        <span>&nbsp;...&nbsp;</span>
+      {% elif page == bills.number %}
+        <a href="{% get_pagination_url request page %}" class="btn btn-primary">{{ page }}</a>
+      {% else %}
+        <a href="{% get_pagination_url request page %}" class="btn btn-outline-secondary">{{ page }}</a>
+      {% endif %}
+    {% endfor %}
+  </div>
+  <p>Bill {{ bills.start_index }} to {{ bills.end_index }} of {{ total_bill_count }}</p>
+</div>
+
 <table id="bills-table" class="table table-bordered">
   <thead>
     <tr>

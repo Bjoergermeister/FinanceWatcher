@@ -217,8 +217,20 @@ def bills(request: WSGIRequest):
 
         bill_groups[bill].append(position.group)
 
+    paginator = Paginator(bills, 25)
+
+    page_index = int(request.GET.get("page", 1))
+    page_index = max(1, page_index)
+    page_index = min(page_index, paginator.num_pages)
+
+    page = paginator.get_page(page_index)
+    pages = paginator.get_elided_page_range(page_index, on_each_side=1, on_ends=1)
+
     context = {
-        "bills": bills,
+        "paginator": paginator,
+        "pages": pages,
+        "bills": page,
+        'total_bill_count': Bill.objects.filter(user=request.user.pk).count(),
         "bill_groups": bill_groups
     }
 
