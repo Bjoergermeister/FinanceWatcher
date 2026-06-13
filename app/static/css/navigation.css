@@ -36,3 +36,9 @@ nav a img {
   width: 30px;
   margin-right: 1rem;
 }
+
+@media (max-width: 1300px) {
+  nav a i {
+    display: none !important;
+  }
+}

@@ -12,7 +12,7 @@ body {
   position: relative;
   display: grid;
   grid-template-rows: 50px 1fr;
-  grid-template-columns: 12.5% 1fr 1rem;
+  grid-template-columns: max(150px, 12.5%) 1fr 1rem;
   background: rgb(236, 236, 239);
 }
 

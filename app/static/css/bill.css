@@ -10,6 +10,14 @@
   margin-right: 2%;
 }
 
+@media (max-width: 1300px){
+  #group-container fieldset {
+    flex-basis: 100%;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+}
+
 .position-group header img:hover {
   cursor: pointer;
 }
