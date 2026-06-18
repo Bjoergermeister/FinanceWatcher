@@ -28,91 +28,93 @@
   <p>Bill {{ bills.start_index }} to {{ bills.end_index }} of {{ total_bill_count }}</p>
 </div>
 
-<table id="bills-table" class="table table-bordered">
-  <thead>
-    <tr>
-      <th data-width="5%"><input type="checkbox"></th>
-      <th>
-        <a href="{% get_sorting_url request 'brand' %}">
-          {% trans 'Brand' %}
-          <i class="fa fa-solid {{ request.GET|get_sorting_icon:'brand' }}"></i>
-        </a>
-      </th>
-      <th data-width="10%">
-        <a href="{% get_sorting_url request 'name' %}">
-          {% trans 'Name' %}
-          <i class="fa fa-solid {{ request.GET|get_sorting_icon:'name' }}"></i>
-        </a>
-      </th>
-      <th>
-        <a href="{% get_sorting_url request 'date' %}">
-          {% trans 'Date' %}
-          <i class="fa fa-solid {{ request.GET|get_sorting_icon:'date' }}"></i>
-        </a>
-      </th>
-      <th>
-        <a href="{% get_sorting_url request 'position_count' %}">
-          {% trans 'Positions' %}
-          <i class="fa fa-solid {{ request.GET|get_sorting_icon:'position_count' }}"></i>
-        </a>
-      </th>
-      <th>
-        <a href="{% get_sorting_url request 'total' %}">
-          {% trans 'Total' %}
-          <i class="fa fa-solid {{ request.GET|get_sorting_icon:'total' }}"></i>
-        </a>
-      </th>
-      <th>{% trans 'Categories' %}</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for bill in bills %}
-    <tr data-id="{{ bill.pk }}">
-      <td><input type="checkbox"></td>
-      <td>
-        {% if bill.brand %}
-          <img src="{{ bill.brand.get_icon_url }}" alt="{{ bill.brand.name }} icon">
-        {% endif %}
-      </td>
-      <td>{{ bill.name }}</td>
-      <td>{{ bill.date|date:"d.m.Y" }}</td>
-      <td>{{ bill.position_count }}</td>
-      <td>{{ bill.total }}&euro;</td>
-      <td>
-        {% for icon in bill_groups|get_item:bill.pk %}
-          {% if icon is not None %}
-            <img src="{{ icon.get_url }}" title="{{ icon.get_name }}">
-          {% endif %}
-        {% endfor %}
-      </td>
-      <td>
-        <button 
-          class="btn btn-link view" 
-          data-id="{{ bill.pk }}" 
-          data-name="{{ bill.name }}"
-          onclick="onBillPreviewClicked(event)"
-        >
-          <img src="{% static 'images/view.svg' %}">
-        </button>
-        <a class="btn btn-link edit" href="{% url 'edit_bill' bill.pk %}"><img src="{% static 'images/edit.svg' %}"></a>
-        <button class="btn btn-link delete" data-id="{{ bill.pk }}" onclick="onDeleteBillClicked(event)">
-          <img src="{% static 'images/delete.svg' %}">
-        </button>
-      </td>
-    </tr>
-    {% empty %}
+<div class="table-responsive">
+  <table id="bills-table" class="table table-bordered">
+    <thead>
       <tr>
-        <td colspan="7">
-          <div id="no-bills-hint" class="mb-5">
-            <img src="{% static 'images/eye.svg' %}">
-            <p>{% trans "You don\'t have any bills yet" %}</p>
-          </div>
+        <th data-width="5%"><input type="checkbox"></th>
+        <th>
+          <a href="{% get_sorting_url request 'brand' %}">
+            {% trans 'Brand' %}
+            <i class="fa fa-solid {{ request.GET|get_sorting_icon:'brand' }}"></i>
+          </a>
+        </th>
+        <th data-width="10%">
+          <a href="{% get_sorting_url request 'name' %}">
+            {% trans 'Name' %}
+            <i class="fa fa-solid {{ request.GET|get_sorting_icon:'name' }}"></i>
+          </a>
+        </th>
+        <th>
+          <a href="{% get_sorting_url request 'date' %}">
+            {% trans 'Date' %}
+            <i class="fa fa-solid {{ request.GET|get_sorting_icon:'date' }}"></i>
+          </a>
+        </th>
+        <th>
+          <a href="{% get_sorting_url request 'position_count' %}">
+            {% trans 'Items' %}
+            <i class="fa fa-solid {{ request.GET|get_sorting_icon:'position_count' }}"></i>
+          </a>
+        </th>
+        <th>
+          <a href="{% get_sorting_url request 'total' %}">
+            {% trans 'Total' %}
+            <i class="fa fa-solid {{ request.GET|get_sorting_icon:'total' }}"></i>
+          </a>
+        </th>
+        <th>{% trans 'Categories' %}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for bill in bills %}
+      <tr data-id="{{ bill.pk }}">
+        <td><input type="checkbox"></td>
+        <td>
+          {% if bill.brand %}
+            <img src="{{ bill.brand.get_icon_url }}" alt="{{ bill.brand.name }} icon">
+          {% endif %}
+        </td>
+        <td>{{ bill.name }}</td>
+        <td>{{ bill.date|date:"d.m.Y" }}</td>
+        <td>{{ bill.position_count }}</td>
+        <td>{{ bill.total }}&euro;</td>
+        <td>
+          {% for icon in bill_groups|get_item:bill.pk %}
+            {% if icon is not None %}
+              <img src="{{ icon.get_url }}" title="{{ icon.get_name }}">
+            {% endif %}
+          {% endfor %}
+        </td>
+        <td>
+          <button 
+            class="btn btn-link view" 
+            data-id="{{ bill.pk }}" 
+            data-name="{{ bill.name }}"
+            onclick="onBillPreviewClicked(event)"
+          >
+            <img src="{% static 'images/view.svg' %}">
+          </button>
+          <a class="btn btn-link edit" href="{% url 'edit_bill' bill.pk %}"><img src="{% static 'images/edit.svg' %}"></a>
+          <button class="btn btn-link delete" data-id="{{ bill.pk }}" onclick="onDeleteBillClicked(event)">
+            <img src="{% static 'images/delete.svg' %}">
+          </button>
         </td>
       </tr>
-    {% endfor %}
-  </tbody>
-</table>
+      {% empty %}
+        <tr>
+          <td colspan="7">
+            <div id="no-bills-hint" class="mb-5">
+              <img src="{% static 'images/eye.svg' %}">
+              <p>{% trans "You don\'t have any bills yet" %}</p>
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 
 
 <div class="d-flex justify-content-center">
