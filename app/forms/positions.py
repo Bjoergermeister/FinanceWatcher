@@ -3,14 +3,14 @@ import uuid
 from django import forms
 from django.db.models import Q
 
-from ..models.Position import Position
-from ..models.Group import Group
+from app.models.Position import Position
+from app.models.Group import Group
 
 class CreatePositionForm(forms.ModelForm):
     id = forms.IntegerField(required=False, widget=forms.HiddenInput())
     name = forms.CharField(label="", min_length=1, widget=forms.TextInput(attrs={ 'required': True }))
-    price = forms.DecimalField(label="", decimal_places=2, initial=0.0)
-    quantity = forms.DecimalField(label="", decimal_places=2, initial=1.0)
+    price = forms.DecimalField(label="", decimal_places=3, initial=0.0)
+    quantity = forms.DecimalField(label="", decimal_places=3, initial=1.0)
     note = forms.CharField(label="", required=False, widget=forms.HiddenInput())
     group = forms.ModelChoiceField(label="", required=False, queryset=Group.objects.none(), widget=forms.HiddenInput())
 
