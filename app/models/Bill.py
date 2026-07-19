@@ -13,6 +13,7 @@ from django.db import models
 
 from app.models.Address import Address
 from app.models.Brand import Brand
+from app.models.RecurrentPayment import RecurrentPayment
 from app.models.User import User
 
 def user_directory_path(instance: Bill, filename: str) -> str:
@@ -30,15 +31,17 @@ class BillEvents(StrEnum):
 
 class Bill(models.Model):
     name = models.CharField(db_column="name", max_length=100)
-    user = models.ForeignKey(User, db_column="user", on_delete=models.CASCADE, related_name="bills")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, db_column="user", related_name="bills")
+    brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, db_column='fk_brand', blank=True, null=True)
+    address = models.ForeignKey(Address, on_delete=models.SET_NULL, db_column='fk_address', blank=True, null=True)
+    recurrent_payment = models.ForeignKey(RecurrentPayment, on_delete=models.SET_NULL, db_column="fk_recurrent_payment", null=True)
+
     date = models.DateField(db_column="date")
     created = models.DateField(db_column="created", default=datetime.date.today)
     total = models.DecimalField(db_column="total", max_digits=13, decimal_places=2)
     description = models.TextField(db_column="description", blank=True, null=True)
     receipt = models.ImageField(db_column="receipt", upload_to=user_directory_path, blank=True, null=True)
     paid = models.BooleanField(db_column="paid", blank=True, null=False, default=True)
-    brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, db_column='fk_brand', blank=True, null=True)
-    address = models.ForeignKey(Address, on_delete=models.SET_NULL, db_column='fk_address', blank=True, null=True)
     channel = models.CharField(db_column="channel", max_length=100, default="in_store")
 
     def save(self, file_was_uploaded: bool = False, *args, **kwargs) -> None:
