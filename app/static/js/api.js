@@ -248,6 +248,13 @@ class AddressesAPI {
   }
 }
 
+class RecurrentPaymentAPI {
+  static async create(data){
+    const options = getOptions("POST", data);
+    return await makeRequest(CREATE_RECURRENT_PAYMENT_URL, options);
+  }
+}
+
 // ####################################################################################
 // #                                 Helper Functions                                 #
 // ####################################################################################

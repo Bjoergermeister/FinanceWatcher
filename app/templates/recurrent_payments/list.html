@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load i18n %}
+
+{% load crispy_forms_tags %}
+
+{% block js %}
+  <script src="{% static 'js/recurrentPayments.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+<div class="table-responsive">
+  <table id="recurrent-payments-table" class="table table-bordered">
+    <thead>
+      <tr>
+        <th data-width="5%"><input type="checkbox"></th>
+        <th data-width="10%">
+          <a href="{% get_sorting_url request 'name' %}">
+            {% trans 'Name' %}
+            <i class="fa fa-solid {{ request.GET|get_sorting_icon:'name' }}"></i>
+          </a>
+        </th>
+        <th>
+          <a href="{% get_sorting_url request 'brand' %}">
+            {% trans 'Brand' %}
+            <i class="fa fa-solid {{ request.GET|get_sorting_icon:'brand' }}"></i>
+          </a>
+        </th>
+        <th>
+          <a href="{% get_sorting_url request 'frequency' %}">
+            {% trans 'Frequency' %}
+            <i class="fa fa-solid {{ request.GET|get_sorting_icon:'frequency' }}"></i>
+          </a>
+        </th>
+        <th>
+          <a href="{% get_sorting_url request 'price' %}">
+            {% trans 'Price' %}
+            <i class="fa fa-solid {{ request.GET|get_sorting_icon:'price' }}"></i>
+          </a>
+        </th>
+        <th>
+          <a href="{% get_sorting_url request 'next_payment' %}">
+            {% trans 'First payment' %}
+            <i class="fa fa-solid {{ request.GET|get_sorting_icon:'next_payment' }}"></i>
+          </a>
+        </th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for recurrent_payment in recurrent_payments %}
+      <tr data-id="{{ recurrent_payment.pk }}">
+        <td><input type="checkbox"></td>
+        <td>{{ recurrent_payment.name }}</td>
+        <td>
+          {% if recurrent_payment.brand %}
+            <img src="{{ recurrent_payment.brand.get_icon_url }}" alt="{{ recurrent_payment.brand.name }} icon">
+          {% endif %}
+        </td>
+        <td>{{ recurrent_payment.frequency }}</td>
+        <td>{{ recurrent_payment.prices.first.price }}&nbsp;&euro;</td>
+        <td>{{ recurrent_payment.start_date|date:"d.m.Y" }}</td>
+        <td>
+        </td>
+      </tr>
+      {% empty %}
+        <tr>
+          <td colspan="7">
+            <div id="no-bills-hint" class="mb-5">
+              <img src="{% static 'images/eye.svg' %}">
+              <p>{% trans "You don\'t have any recurrent payments yet" %}</p>
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+
+<div class="d-flex justify-content-center">
+  <button class="btn btn-primary" onclick="onCreateRecurrentPaymentClicked(event)"><i class="fa fa-plus fa-lg mr-3"></i>{% trans 'New recurrent payment' %}</button>
+</div>
+
+<dialog id="create-recurrent-payment-dialog" name="create-recurrent-payment">
+  <div class="content">
+    <header>
+      <h1>{% trans 'Create recurrent payment' %}</h1>
+    </header>
+    <div class="body">
+      <form id="create-recurrent-payment-form" onsubmit="onCreateRecurrentPaymentFormSubmitted(event)">
+        {% csrf_token %}
+        <div class="form-row">
+          <div class="col-md">
+            {{ create_recurrent_payment_form.name|as_crispy_field }}
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="col-md-4">
+            {{ create_recurrent_payment_form.price|as_crispy_field }}
+          </div>
+          <div class="col-md-4">
+            {{ create_recurrent_payment_form.frequency|as_crispy_field }}
+          </div>
+          <div class="col-md-4">
+            {{ create_recurrent_payment_form.interval|as_crispy_field }}
+          </div>          
+        </div>
+        <div class="form-row">
+          <div class="col-md-6">
+            {{ create_recurrent_payment_form.brand|as_crispy_field }}
+          </div>
+          <div class="col-md-6">
+            {{ create_recurrent_payment_form.start_date|as_crispy_field }}
+          </div>
+        </div>
+      </form>
+    </div>
+    <footer>
+      <button type="submit" form="create-recurrent-payment-form" class="btn btn-primary pl-5 pr-5">
+        <i class="fa fa-save mr-2"></i>
+        {% trans 'Save' %}
+      </button>
+      <button type="cancel" class="btn btn-danger pl-4 pr-4" onclick="onBillDeletionAbortClicked(event)">
+        {% trans 'Cancel' %}
+      </button>
+    </footer>
+  </div>
+</dialog>
+
+<script>
+  const CREATE_RECURRENT_PAYMENT_URL = "{% url 'recurrent_payments' %}";
+  const CSRF_MIDDLEWARE_TOKEN = "{{ csrf_token }}";
+
+  function onCreateRecurrentPaymentClicked(event){
+    event.preventDefault();
+
+    const createRecurrentPaymentDialog = document.getElementById("create-recurrent-payment-dialog");
+    createRecurrentPaymentDialog.showModal();
+  }
+</script>
+
+{% endblock %}

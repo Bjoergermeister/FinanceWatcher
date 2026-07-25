@@ -19,7 +19,15 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 
-from app.views import dashboard, addresses, bills, groups, brands, test
+from app.views import (
+    addresses,
+    bills,
+    brands,
+    dashboard,
+    groups,
+    recurrent_payments,
+    test
+)
 
 urlpatterns = [
     path('', dashboard.dashboard, name="dashboard"),
@@ -46,6 +54,8 @@ urlpatterns = [
     path("address", addresses.create, name="create_address"),
     path("addresses/search", addresses.search, name="search_addresses"),
     path("address/<int:address_id>", addresses.EditAddress.as_view(), name="edit_address"),
+
+    path("recurrent_payments", recurrent_payments.RecurrentPaymentListView.as_view(), name="recurrent_payments"),
 
     # Admin
     path("test/bugsink", test.bugsink, name="admin_bugsink_test"),
