@@ -194,9 +194,18 @@
   </fieldset>
 
   <div class="form-controls">
-    <button class="btn btn-primary" type="submit">{% trans  'Save' %}</button>
-    <button class="btn btn-secondary" type="reset">{% trans 'Reset' %}</button>
-    <button class="btn btn-danger" type="cancel">{% trans 'Cancel' %}</button>
+    <button class="btn btn-primary" type="submit">
+      <i class="fa fa-save mr-2"></i>
+      {% trans  'Save' %}
+    </button>
+    <button class="btn btn-secondary" type="reset">
+      <i class="fa fa-rotate-left mr-2"></i>
+      {% trans 'Reset' %}
+    </button>
+    <button class="btn btn-danger" type="cancel">
+      <i class="fa fa-xmark mr-2"></i>
+      {% trans 'Cancel' %}
+    </button>
   </div>
 </form>
 
