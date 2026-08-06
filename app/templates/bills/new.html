@@ -84,7 +84,7 @@
         </div>
       </div>
       <div class="col-md-3">
-        <label>{% trans 'Kassenzettel' %}</label>
+        <label>{% trans 'Receipt' %}</label>
         <input type="file" id="id_receipt" name="receipt" accept="image/*" onchange="onReceiptImageChanged(event)" style="display: none;">
         <div id="receipt-image-preview" style="width: 100%; aspect-ratio: 1 / 1; height: unset;">
           {% if not bill_form.instance.receipt %}
@@ -95,7 +95,7 @@
             <div id="bill-receipt-actions" class="display-on-hover">
               <label class="btn btn-primary mb-2" for="id_receipt">
                 <i class="fa fa-edit me-2"></i>
-                Ändern
+                {% trans 'Edit' %}
               </label>
             </div>
           {% else %}
@@ -106,7 +106,7 @@
             <div id="bill-receipt-actions" class="display-on-hover">
               <label class="btn btn-primary mb-2" for="id_receipt">
                 <i class="fa fa-edit me-2"></i>
-                Ändern
+                {% trans 'Edit' %}
               </label>
               <button 
                 class="btn btn-success"
@@ -114,7 +114,7 @@
                 onclick="onShowReceiptClicked(event)"
               >
                 <i class="fa fa-eye me-2"></i>
-                Ansehen
+                {% trans 'View' %}
               </button>
             </div>
           {% endif %}
@@ -181,12 +181,12 @@
       onclick="onNewGroupButtonClicked(event)"
       data-mode="add"
     >
-      <i class="fa-solid fa-plus fa-lg no-event mr-2"></i>Gruppe hinzufügen
+      <i class="fa-solid fa-plus fa-lg no-event mr-2"></i>{% trans 'Add category' %}
     </button>
   </div>
 
   <fieldset class="card shadow p-3 mb-5">
-    <p>Summe: 
+    <p>{% trans 'Sum' %}: 
       <span id="bill-sum">
         {{ bill_form.total.value }}&nbsp;&euro;
       </span>
@@ -194,26 +194,26 @@
   </fieldset>
 
   <div class="form-controls">
-    <button class="btn btn-primary" type="submit">Speichern</button>
-    <button class="btn btn-secondary" type="reset">Zurücksetzen</button>
-    <button class="btn btn-danger" type="cancel">Abbrechen</button>
+    <button class="btn btn-primary" type="submit">{% trans  'Save' %}</button>
+    <button class="btn btn-secondary" type="reset">{% trans 'Reset' %}</button>
+    <button class="btn btn-danger" type="cancel">{% trans 'Cancel' %}</button>
   </div>
 </form>
 
 <dialog id="position-note-dialog" name="position-note">
   <div class="content">
     <header>
-      <h1>Titel</h1>
+      <h1>{% trans 'Title' %}</h1>
     </header>
     <div class="body form-row">
       <textarea id="bill-position-note" rows="5" resizable="false"></textarea>
     </div>
     <footer>
       <button class="btn btn-primary" onclick="onPositionNoteSaveClicked(event)">
-        Speichern
+        {% trans 'Save' %}
       </button>
       <button class="btn btn-danger" onclick="onPositionNoteAbortClicked(event)">
-        Abbrechen
+        {% trans 'Cancel' %}
       </button>
     </footer>
   </div>
@@ -228,9 +228,9 @@
       <footer>
         <a href="{{ bill_form.instance.receipt.url }}" class="btn btn-success" download="{{ bill_form.instance.name }}" id="download-receipt-button">
           <i class="fa fa-download me-2"></i>
-          Herunterladen
+          {% trans 'Download' %}
         </a>
-        <button class="btn btn-danger" onclick="onCloseReceiptPreviewClicked(event)">Schließen</button>
+        <button class="btn btn-danger" onclick="onCloseReceiptPreviewClicked(event)">{% trans 'Close' %}</button>
       </footer>
     {% endif %}
   </div>
@@ -433,7 +433,8 @@
 
     <div class="d-flex justify-content-center">
       <button class="btn btn-success" onclick="onNewPositionClicked(event)">
-        <i class="fa-solid fa-plus fa-lg no-event mr-2"></i>Position hinzufügen
+        <i class="fa-solid fa-plus fa-lg no-event mr-2"></i>
+        {% trans 'Add position' %}
       </button>
     </div>
   </fieldset>

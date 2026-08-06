@@ -18,8 +18,8 @@ CHANNEL_CHOICES = [
 ]
 
 class CreateBrandForm(forms.ModelForm):
-    icon = forms.ImageField(label=_("Bild"), required=False)
-    default_channel = forms.ChoiceField(label=_('Standard-Verkaufsweg'), choices=CHANNEL_CHOICES)
+    icon = forms.ImageField(label=_("Image"), required=False)
+    default_channel = forms.ChoiceField(label=_('Default distribution channel'), choices=CHANNEL_CHOICES)
     
     def __init__(self: CreateBrandForm, *args, **kwargs):
         super(CreateBrandForm, self).__init__(*args, **kwargs)
@@ -51,7 +51,7 @@ class CreateBrandForm(forms.ModelForm):
         model = Brand
 
         labels = {
-            "has_physical_stores": _("Hat Filialen")
+            "has_physical_stores": _("Has physical stores")
         }
 
 class EditBrandForm(CreateBrandForm):
