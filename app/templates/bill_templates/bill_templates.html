@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load i18n %}
+
+{% block css %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/templates.css' %}">
+{% endblock %}
+
+{% block js %}
+  <script src="{% static 'js/bill_templates.js' %}" defer></script>
+{% endblock %} 
+
+{% block content %}
+
+<div class="row ml-0 mb-3">
+  <div class="mr-3">
+    {% for page in pages %}
+      {% if page == paginator.ELLIPSIS %}
+        <span>&nbsp;...&nbsp;</span>
+      {% elif page == templates.number %}
+        <a href="{% get_pagination_url request page %}" class="btn btn-primary">{{ page }}</a>
+      {% else %}
+        <a href="{% get_pagination_url request page %}" class="btn btn-outline-secondary">{{ page }}</a>
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% if total_template_count > 0 %}
+  <p>Temlate {{ templates.start_index }} to {{ templates.end_index }} of {{ total_template_count }}</p>
+  {% endif %}
+</div>
+
+<div class="table-responsive">
+  <table id="bills-table" class="table table-bordered">
+    <thead>
+      <tr>
+        <th data-width="5%"><input type="checkbox"></th>
+        <th>
+          <a href="{% get_sorting_url request 'name' %}">
+            {% trans 'Name' %}
+            <i class="fa fa-solid {{ request.GET|get_sorting_icon:'name' }}"></i>
+          </a>
+        </th>
+        <th data-width="10%">
+          <a href="{% get_sorting_url request 'brand' %}">
+            {% trans 'Brand' %}
+            <i class="fa fa-solid {{ request.GET|get_sorting_icon:'brand' }}"></i>
+          </a>
+        </th>
+        <th>
+          <a href="{% get_sorting_url request 'address' %}">
+            {% trans 'Address' %}
+            <i class="fa fa-solid {{ request.GET|get_sorting_icon:'address' }}"></i>
+          </a>
+        </th>
+        <th>
+          <a href="{% get_sorting_url request 'group' %}">
+            {% trans 'Group' %}
+            <i class="fa fa-solid {{ request.GET|get_sorting_icon:'group' }}"></i>
+          </a>
+        </th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for template in templates %}
+      <tr data-id="{{ template.pk }}">
+        <td><input type="checkbox"></td>
+        <td>{{ template.name }}</td>
+        <td>{{ template.brand }}</td>
+        <td>{{ template.address }}</td>
+        <td>{{ template.group }}</td>        
+        <td>
+        </td>
+      </tr>
+      {% empty %}
+        <tr>
+          <td colspan="7">
+            <div id="no-templates-hint" class="mb-5">
+              <img src="{% static 'images/eye.svg' %}">
+              <p>{% trans "You don\'t have any templates yet" %}</p>
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+
+<button class="btn btn-primary mb-3" onclick="onAddTemplateClicked(event)">
+    <i class="fa fa-plus"></i>
+    {% trans 'Add template'%}
+</button>
+
+<dialog id="confirm-template-deletion-dialog" name="template-deletion">
+  <div class="content">
+    <header>
+      <h1>{% trans 'Delete template?' %}</h1>
+    </header>
+    <div class="body form-row">
+      <div class="col-md">
+        <p>
+          {% trans 'Are you sure you want to delete this template? This action is permanent and cannot be reversed' %}
+        </p>
+      </div>
+    </div>
+    <footer>
+      <button type="submit" class="btn btn-primary pl-5 pr-5" onclick="onTemplateDeletionConfirmClicked(event)">
+        {% trans 'Yes, delete' %}
+      </button>
+      <button type="cancel" class="btn btn-danger pl-4 pr-4" onclick="onTempalteDeletionAbortClicked(event)">
+        {% trans 'No, cancel' %}
+      </button>
+    </footer>
+  </div>
+</dialog>
+
+<script>
+</script>
+
+{% endblock %}

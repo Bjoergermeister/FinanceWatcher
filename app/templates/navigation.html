@@ -11,6 +11,10 @@
           <i class="fa-solid fa-fw fa-money-bill mr-2"></i>
           {% trans 'Bills' %}
         </a>
+        <a href="{% url 'bill_templates' %}" {% if request.path|slice:"-14:" == "bill-templates" %} class="active" {% endif %}>
+          <i class="far fa-fw fa-copy mr-2"></i>
+          {% trans 'Templates' %}
+        </a>
         <a href="{% url 'groups' %}" {% if request.path|slice:"-6:" == "groups" %} class="active" {% endif %}>
           <i class="fa-solid fa-fw fa-tag mr-2"></i>
           {% trans 'Groups' %}
