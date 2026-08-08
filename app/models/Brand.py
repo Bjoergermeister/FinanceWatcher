@@ -31,6 +31,9 @@ class Brand(models.Model):
     default_channel = models.CharField(max_length=100)
     icon = models.ImageField(db_column="icon", null=True, upload_to="brands")
 
+    def __str__(self: Brand) -> str:
+        return self.name
+
     def save(self: Brand, file_was_uploaded: bool, *args, **kwargs):
         if self.icon and file_was_uploaded:
             # If there already exists a file with the given name, we need to delete it because otherwise

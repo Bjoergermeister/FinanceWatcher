@@ -1,0 +1,217 @@
+{% load crispy_forms_tags %}
+
+{% load static %}
+{% load i18n %}
+
+<header>
+    <h1>{% trans 'Add template' %}</h1>
+</header>
+
+<main>
+    {% comment %} Main form section {% endcomment %}
+    <section id="main-section">
+        <form
+            id="create-template-form"
+            class="p-4"
+            onsubmit="onTemplateFormSubmitted(event)"
+            enctype="multipart/form-data"
+        >
+            <div class="form-row">
+                {% csrf_token %} 
+                <input type="hidden" name="id">
+            </div>
+                
+            <div class="form-row">
+                <div class="col-md">{{ create_form.name|as_crispy_field }}</div>
+            </div>
+
+            {% comment %} Select for brand {% endcomment %}
+            <div class="form-row">
+                <div class="col-md-12">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                    <button 
+                        class="btn btn-outline-secondary" 
+                        type="button"
+                        onclick="onSelectBrandClicked(event)"
+                    >
+                        <i class="fa-solid fa-shop mr-2"></i>
+                        {% trans 'Choose brand' %}
+                    </button>
+                    </div>
+                    <select name="brand" class="custom-select" disabled>
+                    {% if create_form.instance.brand %}
+                        <option value="{{ bill_form.instance.brand.pk }}">{{ create_form.instance.brand.name }}</option>
+                    {% else %}
+                        <option></option>
+                    {% endif %}
+                    </select>
+                </div>
+                </div>
+            </div>
+
+            {% comment %} Select for address {% endcomment %}
+            <div class="form-row">
+                <div class="col-md">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                    <button 
+                        id="choose-address-button"
+                        class="btn btn-outline-secondary" 
+                        type="button"
+                        onclick="onSelectAddressClicked(event)"
+                        title="{% trans 'Please choose a brand first' %}"
+                        disabled
+                    >
+                        <i class="fa-solid fa-location-dot mr-2"></i>
+                        {% trans 'Choose address' %}
+                    </button>
+                    </div>
+                    <select class="custom-select" name="address" disabled>
+                        <option></option>
+                    </select>
+                </div>
+                </div>
+            </div>
+        </form>
+    </section>
+
+    {% comment %} Section for choosing the brand {% endcomment %}
+    <section id="brand-section" style="display: none">
+        <div class="p-4">
+            <div class="form-row">
+                <div class="col-md">
+                <p class="alert alert-success">{% trans 'Choose a brand' %}</p>
+                </div>
+            </div>
+        
+            <div class="form-row">
+                <div class="col-md-10">
+                    <label>{% trans 'Brand name' %}</label>
+                    <input class="textinput form-control" type="text" name="brand-search-query" placeholder="Name" onkeyup="onSearchBrandQueryInputChanged(event)"/>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary" onclick="onSearchBrandsClicked(event)">
+                        <i class="fa fa-search me-2"></i>
+                    </button>
+                </div>
+            </div>
+        
+            <div id="brand-list" class="form-row p-3 d-flex justify-content-start">
+            </div>
+        </div>
+    </section>
+
+    {% comment %} Section for choosing the address {% endcomment %}
+    <section id="address-section" style="display: none">
+        <div class="p-4">
+            <form id="address-filter-form" onsubmit="onAddressFormSubmitted(event)">
+                <input name="id" type="hidden">
+                {% csrf_token %}
+                <div class="form-row mb-2">
+                    <div class="col-md-6">
+                        <select 
+                            name="country"
+                            class="custom-select"
+                            onChange="onAssignAddressInputChanged(event)"
+                        >
+                            {% for country in countries %}
+                                <option value="{{ country.pk }}">{{ country.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <input 
+                            class="form-control"
+                            type="text"
+                            name="city"
+                            placeholder="City"
+                            onkeyup="onAssignAddressInputChanged(event)"
+                        >
+                    </div>
+                </div>
+                <div class="form-row mb-2">
+                    <div class="col-md-6">
+                        <input
+                            class="form-control"
+                            type="text"
+                            name="region"
+                            placeholder="Region"
+                            onkeyup="onAssignAddressInputChanged(event)"
+                        >
+                    </div>
+                    <div class="col-md-6">
+                        <input
+                            class="form-control"
+                            type="text"
+                            name="postal_code"
+                            placeholder="Postleitzahl"
+                            onkeyup="onAssignAddressInputChanged(event)"
+                        >
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md">
+                        <button 
+                            class="btn btn-primary"
+                            onclick="onUpdateAddressesClicked(event)"
+                        >
+                            <i class="fa fa-undo mr-2"></i>
+                            {% trans 'Update' %}
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <div class="form-row mb-2 mt-4">
+                <div class="col-md">
+                    <div id="no-addresses-hint" class="alert alert-warning text-center p-3" style="display: none">
+                    {% trans 'No address matches the search parameters' %}
+                    </div>
+                </div>
+            </div>
+
+            <form id="choose-address-form" onsubmit="onSelectAddressFormSubmitted(event)">
+                <div class="row">
+                    <div class="col-md">
+                        <select name="available-addresses" class="custom-select" required>
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+</main>
+
+<footer id="main-footer">
+    <button class="btn btn-primary" form="create-template-form" type="submit">
+        <i class="fa fa-save mr-2"></i>
+        {% trans 'Save' %}
+    </button>
+    <button class="btn btn-danger" type="cancel" onclick="onAbortAddTemplateClicked(event)">
+        <i class="fa fa-xmark mr-2"></i>
+        {% trans 'Cancel' %}
+    </button>
+</footer>
+
+<footer id="brand-footer" style="display: none">
+    <button class="btn btn-primary" form="create-group-form" type="submit">
+        <i class="fa fa-check mr-2"></i>
+        {% trans 'Choose brand' %}
+    </button>
+    <button class="btn btn-danger" type="cancel" onclick="onAbortChooseGroupClicked(event)">
+        <i class="fa fa-xmark mr-2"></i>
+        {% trans 'Cancel' %}
+    </button>
+</footer>
+
+<footer id="address-footer" style="display: none">
+    <button class="btn btn-primary" form="choose-address-form" type="submit">
+        <i class="fa fa-check mr-2"></i>
+        {% trans 'Choose address' %}
+    </button>
+    <button class="btn btn-danger" type="cancel" onclick="onAbortChooseAddressClicked(event)">
+        <i class="fa fa-xmark mr-2"></i>
+        {% trans 'Cancel' %}
+    </button>
+</footer>

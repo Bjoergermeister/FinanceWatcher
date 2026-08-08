@@ -48,6 +48,19 @@ class BillAPI {
   }
 }
 
+class BillTemplateAPI {
+    /**
+     * @function create
+     * Create a new bill template
+     * @param {FormData} data 
+     * @returns 
+     */
+    static async create(data){
+        const options = getOptions("POST", data);
+        return await makeRequest(CREATE_BILL_TEMPLATE_URL, options)
+    } 
+}
+
 class GroupAPI {
   static async create(data) {
     const options = getOptions("POST", data, { "Content-Type": CONTENT_TYPE_FORM_DATA });

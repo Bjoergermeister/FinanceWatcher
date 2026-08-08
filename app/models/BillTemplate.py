@@ -8,9 +8,9 @@ from app.models.Group import Group
 
 class BillTemplate(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bill_templates")
-    brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True)
-    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True)
-    group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True)
+    brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, blank=True, null=True)
+    address = models.ForeignKey(Address, on_delete=models.SET_NULL, blank=True, null=True)
+    group = models.ForeignKey(Group, on_delete=models.SET_NULL, blank=True, null=True)
 
     name = models.CharField(max_length=100)
 

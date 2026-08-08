@@ -4,7 +4,7 @@
 {% load i18n %}
 
 {% block css %}
-  <link rel="stylesheet" type="text/css" href="{% static 'css/templates.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/bill.css' %}">
 {% endblock %}
 
 {% block js %}
@@ -31,7 +31,7 @@
 </div>
 
 <div class="table-responsive">
-  <table id="bills-table" class="table table-bordered">
+  <table id="template-table" class="table table-bordered">
     <thead>
       <tr>
         <th data-width="5%"><input type="checkbox"></th>
@@ -69,7 +69,7 @@
         <td>{{ template.name }}</td>
         <td>{{ template.brand }}</td>
         <td>{{ template.address }}</td>
-        <td>{{ template.group }}</td>        
+        <td>{{ template.group|default_if_none:"" }}</td>
         <td>
         </td>
       </tr>
@@ -92,6 +92,10 @@
     <i class="fa fa-plus"></i>
     {% trans 'Add template'%}
 </button>
+
+<dialog id="bill-template-dialog">
+  <div class="content" style="--height: 600px">{% include "bill_templates/create.html" %}</div>
+</dialog>
 
 <dialog id="confirm-template-deletion-dialog" name="template-deletion">
   <div class="content">
@@ -116,7 +120,19 @@
   </div>
 </dialog>
 
+<template id="select-brand-template">
+  <div class="select-brand-option card shadow">
+    <img>
+    <div class="select-brand-name">
+      <h4></h4>
+    </div>
+  </div>
+</template>
+
 <script>
+  const SEARCH_BRANDS_URL = "{% url 'search_brands' %}";
+  const SEARCH_ADDRESSES_URL = "{% url 'search_addresses' %}";
+  const CREATE_BILL_TEMPLATE_URL = "{% url 'bill_templates' %}";
 </script>
 
 {% endblock %}

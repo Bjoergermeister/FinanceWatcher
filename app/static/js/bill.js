@@ -460,29 +460,29 @@ function onSearchBrandsClicked(event){
 
 async function searchBrands(query){
   const result = await BrandAPI.search(query);
-    if (result.success === false){
-      sendNotification(
-        "Laden fehlgeschlagen",
-        "Marken konnte nicht geladen werden",
-        NOTIFICATION_TYPE_ERROR
-      );
-      return;
-    }
+  if (result.success === false){
+    sendNotification(
+      "Laden fehlgeschlagen",
+      "Marken konnte nicht geladen werden",
+      NOTIFICATION_TYPE_ERROR
+    );
+    return;
+  }
 
-    const images = result.content.map(brand => {
-      const template = getTemplate("select-brand");
-      if (template === null) return;
-      template.classList.add("clickable");
-      template.querySelector("img").src = brand.icon;
-      template.querySelector("h4").innerText = brand.name;
-      template.dataset.id = brand.pk;
-      template.dataset.name = brand.name;
-      template.addEventListener("click", onBrandSelected);
-      return template;
-    });
+  const images = result.content.map(brand => {
+    const template = getTemplate("select-brand");
+    if (template === null) return;
+    template.classList.add("clickable");
+    template.querySelector("img").src = brand.icon;
+    template.querySelector("h4").innerText = brand.name;
+    template.dataset.id = brand.pk;
+    template.dataset.name = brand.name;
+    template.addEventListener("click", onBrandSelected);
+    return template;
+  });
 
-    const imageContainer = document.getElementById("brand-list");
-    imageContainer.replaceChildren(...images);
+  const imageContainer = document.getElementById("brand-list");
+  imageContainer.replaceChildren(...images);
 }
 
 function onBrandSelected(event){
