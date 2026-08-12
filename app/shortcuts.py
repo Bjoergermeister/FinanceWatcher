@@ -5,6 +5,7 @@ Custom versions of Django's shortcut functions.
 from typing import (
     Any,
     cast,
+    List,
     Type
 )
 
@@ -37,7 +38,11 @@ def get_object_or_404(klass: Type[Model], *args, **kwargs) -> Model:
             f"or QuerySet, not '{klass__name}'."
         )
     try:
-        return queryset.get(*args, **kwargs)
+        select_related = cast(List[str] | None, kwargs.pop("select_related", None))
+        if select_related is not None:
+            return queryset.select_related(*select_related).get(*args, **kwargs) 
+        else:
+            return queryset.get(*args, **kwargs)
     except queryset.model.DoesNotExist as exception:
         if error_message is None:
             error_message = f"No {queryset.model._meta.object_name} matches the given query."

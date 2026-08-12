@@ -1,4 +1,8 @@
+from __future__ import annotations
+from typing import Any
+
 from django.db import models
+from django.forms.models import model_to_dict
 
 from app.models.Address import Address
 from app.models.Brand import Brand
@@ -14,6 +18,18 @@ class BillTemplate(models.Model):
 
     name = models.CharField(max_length=100)
 
+    def to_dict(self: BillTemplate, include_brand: bool = False, include_address: bool = False, include_group: bool = False) -> dict[str, Any]:
+        template = model_to_dict(self)
+
+        if include_brand and self.brand is not None:
+            template["brand"] = self.brand.to_json()
+        if include_address and self.address is not None:
+            template["address"] = self.address.to_dict()
+        if include_group and self.group is not None:
+            template["group"] = model_to_dict(self.group)
+
+        return template
+        
     class Meta:
         db_table = "BillTemplate"
         constraints = [

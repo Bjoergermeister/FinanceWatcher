@@ -15,6 +15,48 @@ function onAddTemplateClicked(event){
     dialog.showModal();
 }
 
+/**
+ * @function onEditTemplateClicked
+ * @param {PointerEvent} event 
+ */
+async function onEditTemplateClicked(event){
+    event.preventDefault();
+
+    const templateId = event.target.dataset.id;
+    const getTemplateResult = await BillTemplateAPI.get(templateId);
+    if (getTemplateResult.success === false){
+        sendNotification("Loading template failed", `Loading the template failed: ${getTemplateResult.errors}`, NOTIFICATION_TYPE_ERROR);
+        return;
+    }
+    const template = getTemplateResult.content;
+
+    const dialog = document.getElementById("bill-template-dialog");
+
+    dialog.querySelector("input[name='id']").value = template.id;
+    dialog.querySelector("input[name='name']").value = template.name;
+
+    if (template.brand !== null){
+        const brandSelect = dialog.querySelector("select[name='brand']");
+        brandSelect.children[0].value = parseInt(template.brand.pk);
+        brandSelect.children[0].innerText = template.brand.name;
+        brandSelect.value = parseInt(template.brand.pk);
+
+        // Since a brand is selected, enable address selection
+        const chooseAddressButton = document.getElementById("choose-address-button");
+        chooseAddressButton.disabled = false;
+        chooseAddressButton.title = "";
+    }
+
+    if (template.address !== null){
+        const addressSelect = dialog.querySelector("select[name='address']");
+        addressSelect.children[0].value = parseInt(template.address.id);
+        addressSelect.children[0].innerText = `${template.address.street} ${template.address.number}, ${template.address.city}, ${template.address.country.name}`;
+        addressSelect.value = parseInt(template.address.id);
+    }
+
+    dialog.showModal();
+}
+
 function activateSection(sectionName){
     const mainSection = document.getElementById("main-section");
     const brandSection = document.getElementById("brand-section");
@@ -43,8 +85,15 @@ async function onTemplateFormSubmitted(event){
     formData.append("brand", form.brand.value);
     formData.append("address", form.address.value);
 
+    const id = formData.get("id");
+    const isEdit = id !== undefined;
+
     removeFormErrors(form);
-    const result = await BillTemplateAPI.create(formData);
+
+    const result = (isEdit)
+        ? await BillTemplateAPI.update(id, formData)
+        : await BillTemplateAPI.create(formData);
+
     if (result.success === false){
         if (result.errors instanceof Object && "form_errors" in result.errors){
             displayFormErrors(form, result.errors["form_errors"]);
@@ -53,7 +102,10 @@ async function onTemplateFormSubmitted(event){
         return;
     }
 
-    alert("success");
+    const dialog = findParentElement(form, "DIALOG");
+    dialog.close();
+
+    window.location.reload();
 }
 
 /**

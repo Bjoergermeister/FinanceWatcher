@@ -67,10 +67,11 @@
       <tr data-id="{{ template.pk }}">
         <td><input type="checkbox"></td>
         <td>{{ template.name }}</td>
-        <td>{{ template.brand }}</td>
-        <td>{{ template.address }}</td>
+        <td>{{ template.brand|default_if_none:"" }}</td>
+        <td>{{ template.address|default_if_none:"" }}</td>
         <td>{{ template.group|default_if_none:"" }}</td>
         <td>
+          <i class="fa fa-pen" onclick="onEditTemplateClicked(event)" data-id="{{ template.id }}"></i>
         </td>
       </tr>
       {% empty %}
@@ -133,6 +134,9 @@
   const SEARCH_BRANDS_URL = "{% url 'search_brands' %}";
   const SEARCH_ADDRESSES_URL = "{% url 'search_addresses' %}";
   const CREATE_BILL_TEMPLATE_URL = "{% url 'bill_templates' %}";
+  const GET_BILL_TEMPLATE_URL = "{% url 'bill_template' 0 %}"
+  const UPDATE_BILL_TEMPLATE_URL = GET_BILL_TEMPLATE_URL;
+  const CSRF_MIDDLEWARE_TOKEN = "{{ csrf_token }}";
 </script>
 
 {% endblock %}
