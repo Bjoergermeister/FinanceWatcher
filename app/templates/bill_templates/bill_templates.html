@@ -95,7 +95,7 @@
 </button>
 
 <dialog id="bill-template-dialog">
-  <div class="content" style="--height: 600px">{% include "bill_templates/create.html" %}</div>
+  <div class="content" style="--height: 800px">{% include "bill_templates/create.html" %}</div>
 </dialog>
 
 <dialog id="confirm-template-deletion-dialog" name="template-deletion">
@@ -136,6 +136,7 @@
   const CREATE_BILL_TEMPLATE_URL = "{% url 'bill_templates' %}";
   const GET_BILL_TEMPLATE_URL = "{% url 'bill_template' 0 %}"
   const UPDATE_BILL_TEMPLATE_URL = GET_BILL_TEMPLATE_URL;
+  const ALL_GROUPS_URL = "{% url 'all_groups' %}";
   const CSRF_MIDDLEWARE_TOKEN = "{{ csrf_token }}";
 </script>
 

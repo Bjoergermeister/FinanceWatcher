@@ -114,8 +114,8 @@ class GroupAPI {
   }
 
   /**
-   *
-   * @param {*} alreadyChoosenGroups
+   * @function getAll
+   * @param {Array} alreadyChoosenGroups
    * @returns
    */
   static async getAll(alreadyChosenGroups) {

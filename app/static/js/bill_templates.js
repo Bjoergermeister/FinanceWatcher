@@ -1,7 +1,8 @@
 const SECTIONS = {
     main: "main",
     brand: "brand",
-    address: "address"
+    address: "address",
+    group: "group"
 }
 
 /**
@@ -54,6 +55,13 @@ async function onEditTemplateClicked(event){
         addressSelect.value = parseInt(template.address.id);
     }
 
+    if (template.group !== null){
+        const addressSelect = dialog.querySelector("select[name='group']");
+        addressSelect.children[0].value = parseInt(template.group.id);
+        addressSelect.children[0].innerText = template.group.name;
+        addressSelect.value = parseInt(template.group.id);
+    }
+
     dialog.showModal();
 }
 
@@ -61,9 +69,11 @@ function activateSection(sectionName){
     const mainSection = document.getElementById("main-section");
     const brandSection = document.getElementById("brand-section");
     const addressSection = document.getElementById("address-section");
+    const groupSection = document.getElementById("group-section");
     const mainFooter = document.getElementById("main-footer");
     const brandFooter = document.getElementById("brand-footer");
     const addressFooter = document.getElementById("address-footer");
+    const groupFooter = document.getElementById("group-footer");
 
     mainSection.style.display = (sectionName === "main") ? "block" : "none";
     mainFooter.style.display = (sectionName === "main") ? "flex" : "none";
@@ -71,6 +81,8 @@ function activateSection(sectionName){
     brandFooter.style.display = (sectionName === "brand") ? "flex" : "none";
     addressSection.style.display = (sectionName === "address") ? "block" : "none";
     addressFooter.style.display = (sectionName === "address") ? "flex" : "none";
+    groupSection.style.display = (sectionName === "group") ? "block" : "none";
+    groupFooter.style.display = (sectionName === "group") ? "flex" : "none";
 }
 
 /**
@@ -84,9 +96,10 @@ async function onTemplateFormSubmitted(event){
     const formData = new FormData(form);
     formData.append("brand", form.brand.value);
     formData.append("address", form.address.value);
+    formData.append("group", form.group.value);
 
     const id = formData.get("id");
-    const isEdit = id !== undefined;
+    const isEdit = id !== undefined && id !== "";
 
     removeFormErrors(form);
 
@@ -124,6 +137,42 @@ function onSelectBrandClicked(event){
 function onSelectAddressClicked(event){
     event.preventDefault();
     activateSection(SECTIONS.address)
+}
+
+/**
+ * @function onSelectGroupClicked
+ * @param {PointerEvent} event 
+ */
+async function onSelectGroupClicked(event){
+    event.preventDefault();
+    activateSection(SECTIONS.group);
+
+    event.preventDefault();
+
+    const userGroupList = document.getElementById("user-group-list");
+    const globalGroupList = document.getElementById("global-group-list");
+    removeAllChildren(userGroupList);
+    removeAllChildren(globalGroupList);
+
+    const result = await GroupAPI.getAll();
+    if (result.success === false) {
+        sendNotification(
+        "Gruppen abfragen fehlgeschlagen",
+        `Konnte keine Gruppen abfragen: ${result.errors}`,
+        NOTIFICATION_TYPE_ERROR
+        );
+        return;
+    }
+
+    for (const userGroup of result.content.user_groups) {
+        const groupElement = createGroupElement(userGroup);
+        userGroupList.appendChild(groupElement);
+    }
+
+    for (const globalGroup of result.content.global_groups) {
+        const groupElement = createGroupElement(globalGroup);
+        globalGroupList.appendChild(groupElement);
+    }
 }
 
 /**
@@ -227,10 +276,10 @@ function onBrandSelected(event){
 }
 
  /**
-  * @function onAbortChooseGroupClicked
+  * @function onAbortChooseBrandClicked
   * @param {PointerEvent} event 
   */
-function onAbortChooseGroupClicked(event){
+function onAbortChooseBrandClicked(event){
     event.preventDefault();    
     clearBrandForm();
     activateSection(SECTIONS.main);
@@ -337,7 +386,6 @@ function onSelectAddressFormSubmitted(event){
     const selectedAddressOption = availableAddressesSelect.querySelector(`option[value='${availableAddressesSelect.value}']`);
     if (selectedAddressOption === null) return;
 
-
     const targetSelect = document.querySelector("#create-template-form select[name='address']");
     const targetOption = targetSelect.querySelector("option");
     targetOption.innerText = selectedAddressOption.innerText;
@@ -365,4 +413,52 @@ function clearAddressForm(){
     while (addressSelect.firstChild){
         addressSelect.removeChild(addressSelect.lastChild);
     }
+}
+
+ /**
+  * @function onAbortChooseBrandClicked
+  * @param {PointerEvent} event 
+  */
+function onAbortChooseGroupClicked(event){
+    event.preventDefault();
+    activateSection(SECTIONS.main);
+}
+
+function createGroupElement(group) {
+    const groupTemplate = document.getElementById("group-template");
+    const container = groupTemplate.content.cloneNode(true);
+    container.children[0].dataset.id = group.id;
+    container.children[0].dataset.name = group.name;
+    container.children[0].dataset.icon = group.icon;
+
+    const image = container.querySelector("img");
+    image.src = group.icon;
+    image.alt = `${group.name} Logo`;
+
+    container.querySelector("h2").innerText = group.name;
+
+    return container;
+}
+
+/**
+ * @function onGroupSelected
+ * @param {PointerEvent} event 
+ */
+function onGroupSelected(event){
+    event.preventDefault();
+
+    console.log(event.target.dataset.name);
+
+    const targetSelect = document.querySelector("#create-template-form select[name='group']");
+    const targetOption = targetSelect.querySelector("option");
+    targetOption.innerText = event.target.dataset.name;
+    targetOption.value = event.target.dataset.id;
+    targetSelect.value = event.target.dataset.id;
+
+    activateSection(SECTIONS.main);
+
+    const userGroupList = document.getElementById("user-group-list");
+    const globalGroupList = document.getElementById("global-group-list");
+    removeAllChildren(userGroupList);
+    removeAllChildren(globalGroupList);
 }

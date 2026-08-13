@@ -26,7 +26,7 @@ class BillTemplate(models.Model):
         if include_address and self.address is not None:
             template["address"] = self.address.to_dict()
         if include_group and self.group is not None:
-            template["group"] = model_to_dict(self.group)
+            template["group"] = self.group.to_dict()
 
         return template
         

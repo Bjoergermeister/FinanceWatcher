@@ -53,24 +53,46 @@
             {% comment %} Select for address {% endcomment %}
             <div class="form-row">
                 <div class="col-md">
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                    <button 
-                        id="choose-address-button"
-                        class="btn btn-outline-secondary" 
-                        type="button"
-                        onclick="onSelectAddressClicked(event)"
-                        title="{% trans 'Please choose a brand first' %}"
-                        disabled
-                    >
-                        <i class="fa-solid fa-location-dot mr-2"></i>
-                        {% trans 'Choose address' %}
-                    </button>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                        <button 
+                            id="choose-address-button"
+                            class="btn btn-outline-secondary" 
+                            type="button"
+                            onclick="onSelectAddressClicked(event)"
+                            title="{% trans 'Please choose a brand first' %}"
+                            disabled
+                        >
+                            <i class="fa-solid fa-location-dot mr-2"></i>
+                            {% trans 'Choose address' %}
+                        </button>
+                        </div>
+                        <select class="custom-select" name="address" disabled>                            
+                            <option></option>
+                        </select>
                     </div>
-                    <select class="custom-select" name="address" disabled>
-                        <option></option>
-                    </select>
                 </div>
+            </div>
+
+            {% comment %} Select for groups {% endcomment %}
+            <div class="form-row">
+                <div class="col-md">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                        <button 
+                            id="choose-group-button"
+                            class="btn btn-outline-secondary" 
+                            type="button"
+                            onclick="onSelectGroupClicked(event)"
+                        >
+                            <i class="fa-solid fa-tag mr-2"></i>
+                            {% trans 'Choose group' %}
+                        </button>
+                        </div>
+                        <select class="custom-select" name="group" disabled>
+                            <option></option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </form>
@@ -181,6 +203,20 @@
             </form>
         </div>
     </section>
+
+    {% comment %} Section for choosing a group {% endcomment %}
+    <section id="group-section" style="display: none">
+        <div class="body" style="overflow-y: auto; display: block; height: calc(750px - 160px)">
+            <div>
+                <h2>{% trans 'Global categories' %}</h2>
+                <ul id="global-group-list" class="d-flex flex-row flex-wrap" style="gap: 10px"></ul>
+            </div>
+            <div>
+                <h2 class="mt-3">{% trans 'Your categories' %}</h2>
+                <ul id="user-group-list" class="d-flex flex-row flex-wrap" style="gap: 10px"></ul>
+            </div>
+        </div>
+    </section>
 </main>
 
 <footer id="main-footer">
@@ -199,7 +235,7 @@
         <i class="fa fa-check mr-2"></i>
         {% trans 'Choose brand' %}
     </button>
-    <button class="btn btn-danger" type="cancel" onclick="onAbortChooseGroupClicked(event)">
+    <button class="btn btn-danger" type="cancel" onclick="onAbortChooseBrandClicked(event)">
         <i class="fa fa-xmark mr-2"></i>
         {% trans 'Cancel' %}
     </button>
@@ -215,3 +251,19 @@
         {% trans 'Cancel' %}
     </button>
 </footer>
+
+<footer id="group-footer" style="display: none">    
+    <button class="btn btn-danger" type="cancel" onclick="onAbortChooseGroupClicked(event)">
+        <i class="fa fa-xmark mr-2"></i>
+        {% trans 'Cancel' %}
+    </button>
+</footer>
+
+<template id="group-template">
+  <div class="group small" onclick="onGroupSelected(event)">
+    <img class="no-events" />
+    <div class="group-information no-events">
+      <h2></h2>
+    </div>
+  </div>
+</template>

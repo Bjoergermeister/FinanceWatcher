@@ -51,7 +51,7 @@ class BillTemplateListView(View):
             transaction.rollback()
             return HttpResponse(_("An error occured"), status=500)
 
-        return JsonResponse(model_to_dict(bill_template), status=400)
+        return JsonResponse(model_to_dict(bill_template), status=200)
 
 class BillTemplateDetailView(View):
     def get(self: BillTemplateDetailView, request: WSGIRequest, template_id: int) -> JsonResponse:
