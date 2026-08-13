@@ -44,6 +44,8 @@
               <select name="brand" class="custom-select" disabled>
                 {% if bill_form.instance.brand %}
                   <option value="{{ bill_form.instance.brand.pk }}">{{ bill_form.instance.brand.name }}</option>
+                {% elif bill_form.initial.brand %}
+                  <option value="{{ bill_form.initial.brand.pk }}">{{ bill_form.initial.brand.name }}</option>
                 {% else %}
                   <option></option>
                 {% endif %}
@@ -72,6 +74,8 @@
               <select class="custom-select" name="address" disabled>
                 {% if bill_form.instance.address %}
                   <option value="{{ bill_form.instance.address.pk }}">{{ bill_form.instance.address }}</option>
+                {% elif bill_form.initial.address %}
+                  <option value="{{ bill_form.initial.address.pk }}">{{ bill_form.initial.address }}</option>
                 {% else %}
                   <option></option>
                 {% endif %}

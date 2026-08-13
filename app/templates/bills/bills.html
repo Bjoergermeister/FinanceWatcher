@@ -118,7 +118,19 @@
 
 
 <div class="d-flex justify-content-center">
-  <a class="btn btn-primary" href="{% url 'create_bill' %}"><i class="fa fa-plus fa-lg mr-3"></i>{% trans 'New bill' %}</a>
+  <div class="btn-group" role="group">
+    <a class="btn btn-primary" href="{% url 'create_bill' %}"><i class="fa fa-plus fa-lg mr-3"></i>{% trans 'New bill' %}</a>
+    <div class="btn-group" role="group">
+      <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fa fa-down-arrow"></i>
+      </button>
+      <ul class="dropdown-menu">
+        {% for template in templates %}
+          <li><a class="dropdown-item btn btn-primary" href="{% url 'create_bill' %}?template={{template.pk}}">{{ template.name }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
 </div>
 
 <dialog id="confirm-bill-deletion-dialog" name="bill-deletion">

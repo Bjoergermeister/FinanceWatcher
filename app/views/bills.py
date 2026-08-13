@@ -12,19 +12,27 @@ from django.views import View
 
 from app.models.Brand import Brand
 from app.models.Bill import Bill
+from app.models.BillTemplate import BillTemplate
 from app.models.Country import Country
 from app.models.Group import Group
 from app.models.Position import Position
 
-from ..forms.bills import CreateBillForm, EditBillForm
-from ..forms.positions import CreatePositionForm, EditPositionForm
-from ..enums import Http
-from ..shortcuts import get_object_or_404
+from app.forms.bills import CreateBillForm, EditBillForm
+from app.forms.positions import CreatePositionForm, EditPositionForm
+from app.enums import Http
+from app.shortcuts import get_object_or_404
 
 
 class CreateBillView(View):
     def get(self: CreateBillView, request: WSGIRequest) -> HttpResponse:
         initial_form_values = { "user": request.user.pk }
+        template_id = request.GET.get("template", None)
+        if template_id is not None:
+            template = BillTemplate.objects.filter(user=request.user, id=template_id).select_related("brand", "address", "group").first()
+            if template:
+                initial_form_values["brand"] = template.brand
+                initial_form_values["address"] = template.address
+        
         bill_form = CreateBillForm(request.user, initial=initial_form_values)
 
         PositionFormSet = modelformset_factory(Position, form=CreatePositionForm, extra=5, can_delete=True)
@@ -227,10 +235,13 @@ def bills(request: WSGIRequest):
     page = paginator.get_page(page_index)
     pages = paginator.get_elided_page_range(page_index, on_each_side=1, on_ends=1)
 
+    templates = BillTemplate.objects.filter(user=request.user)
+
     context = {
         "paginator": paginator,
         "pages": pages,
         "bills": page,
+        "templates": templates,
         'total_bill_count': Bill.objects.filter(user=request.user.pk).count(),
         "bill_groups": bill_groups
     }

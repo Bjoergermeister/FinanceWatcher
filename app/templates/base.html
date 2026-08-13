@@ -6,11 +6,7 @@
 
     <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'css/financewatcher.css' %}" />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="{% static 'css/fontawesome.min.css' %}"
-    />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/fontawesome.min.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'css/all.min.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'css/navigation.css' %}"/>
     <link rel="stylesheet" type="text/css" href="{% static 'css/notifications.css' %}"/>
@@ -21,6 +17,9 @@
       // any other script has the chance to reference it.
       const setupCallbacks = [];
     </script>
+
+    <script src="{% static 'js/vendor/popper.js' %}"></script>
+    <script src="{% static 'js/vendor/bootstrap.bundle.min.js' %}"></script>
 
     <script src="{% static 'js/api.js' %}"></script>
     <script src="{% static 'js/utils.js' %}"></script>
