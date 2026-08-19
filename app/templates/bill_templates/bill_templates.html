@@ -71,7 +71,8 @@
         <td>{{ template.address|default_if_none:"" }}</td>
         <td>{{ template.group|default_if_none:"" }}</td>
         <td>
-          <i class="fa fa-pen" onclick="onEditTemplateClicked(event)" data-id="{{ template.id }}"></i>
+          <i class="fa fa-pen clickable mr-2" onclick="onEditTemplateClicked(event)" data-id="{{ template.id }}"></i>
+          <i class="fa fa-trash clickable" onclick="onDeleteTemplateClicked(event)" data-id="{{ template.id }}" data-name="{{ template.name }}"></i>
         </td>
       </tr>
       {% empty %}
@@ -99,7 +100,7 @@
 </dialog>
 
 <dialog id="confirm-template-deletion-dialog" name="template-deletion">
-  <div class="content">
+  <div class="content" style="--height: 260px">
     <header>
       <h1>{% trans 'Delete template?' %}</h1>
     </header>
@@ -112,9 +113,11 @@
     </div>
     <footer>
       <button type="submit" class="btn btn-primary pl-5 pr-5" onclick="onTemplateDeletionConfirmClicked(event)">
+        <i class="fa fa-trash mr-2"></i>
         {% trans 'Yes, delete' %}
       </button>
-      <button type="cancel" class="btn btn-danger pl-4 pr-4" onclick="onTempalteDeletionAbortClicked(event)">
+      <button type="cancel" class="btn btn-danger pl-4 pr-4" onclick="onTemplateDeletionAbortClicked(event)">
+        <i class="fa fa-xmark mr-2"></i>
         {% trans 'No, cancel' %}
       </button>
     </footer>

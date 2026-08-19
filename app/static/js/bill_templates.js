@@ -65,6 +65,45 @@ async function onEditTemplateClicked(event){
     dialog.showModal();
 }
 
+/**
+ * 
+ * @param {PointerEvent} event 
+ */
+function onDeleteTemplateClicked(event){
+    event.preventDefault();
+
+    const confirmDeletionDialog = document.getElementById("confirm-template-deletion-dialog");
+
+    confirmDeletionDialog.querySelector("button[type='submit']").dataset.id = event.target.dataset.id;
+
+    confirmDeletionDialog.showModal();
+}
+
+function anAbortDeleteTemplateClicked(event){
+    event.preventDefault();
+
+    const confirmDeletionDialog = document.getElementById("confirm-template-deletion-dialog");
+    confirmDeletionDialog.close();
+}
+
+async function onTemplateDeletionConfirmClicked(event){
+    event.preventDefault();
+
+    const templateId = event.target.dataset.id;
+
+    const result = await BillTemplateAPI.delete(templateId);
+    if (result.success === false){
+        sendNotification(
+            "Template deletion failed",
+            `Deleting the template has failed: ${result.errors}`,
+            NOTIFICATION_TYPE_ERROR
+        );
+        return;
+    }
+
+    window.location.reload();
+}
+
 function activateSection(sectionName){
     const mainSection = document.getElementById("main-section");
     const brandSection = document.getElementById("brand-section");

@@ -83,6 +83,18 @@ class BillTemplateAPI {
       const options = getOptions("PUT", data, { "X-CSRFToken": CSRF_MIDDLEWARE_TOKEN });
       return await makeRequest(url, options);
     }
+
+    /**
+     * @function delete
+     * Deletes a template
+     * @param {number} id The ID of the template to delete
+     * @returns 
+     */
+    static async delete(id){
+      const url = UPDATE_BILL_TEMPLATE_URL.replace(/\d+/g, id);
+      const options = getOptions("DELETE", null, { "X-CSRFToken": CSRF_MIDDLEWARE_TOKEN });
+      return await makeRequest(url, options);
+    }
 }
 
 class GroupAPI {

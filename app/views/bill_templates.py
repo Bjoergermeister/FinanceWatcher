@@ -92,5 +92,15 @@ class BillTemplateDetailView(View):
         return JsonResponse(template.to_dict(include_brand=True, include_address=True, include_group=True))
 
     def delete(self: BillTemplateDetailView, request: WSGIRequest, template_id: int) -> HttpResponse:
-        pass
+        template = get_object_or_404(
+            BillTemplate, pk=template_id, user=request.user,
+            error_message=_("Template not found")
+        )
+
+        result, deleted = template.delete();
+
+        if result < 1 or "app.BillTemplate" not in deleted or deleted["app.BillTemplate"] < 1:
+            return HttpResponse(_("Template not found"), status=404)
+
+        return HttpResponse()
 
