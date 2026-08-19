@@ -24,7 +24,7 @@
     <div class="form-row">
       <div class="col-md-6">
         <div class="form-group">
-          <label class="requiredField">Bild</label>
+          <label class="requiredField">{% trans 'Image' %}</label>
           <div>
             <input
               id="id_icon"
@@ -37,7 +37,7 @@
             />
             <label for="id_icon">
               <h3>{% trans 'Choose image' %}</h3>
-              <img src="{% static 'images/upload.png' %}" alt="Bild auswählen" />
+              <img src="{% static 'images/upload.png' %}" alt="{% trans 'Choose an image' %}" />
             </label>
           </div>
         </div>
@@ -53,9 +53,11 @@
 </main>
 <footer>
   <button class="btn btn-primary" form="create-group-form" type="submit">
+    <i class="fa fa-save mr-2"></i>
     {% trans 'Save' %}
   </button>
   <button class="btn btn-danger" type="cancel" onclick="onGroupAbortClicked(event)">
+    <i class="fa fa-xmark mr-2"></i>
     {% trans 'Cancel' %}
   </button>
 </footer>

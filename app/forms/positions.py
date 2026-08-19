@@ -35,8 +35,8 @@ class CreatePositionForm(forms.ModelForm):
 class EditPositionForm(forms.ModelForm):
     id = forms.IntegerField(widget=forms.HiddenInput())
     name = forms.CharField(label="", min_length=1, widget=forms.TextInput(attrs={ 'required': True }))
-    price = forms.DecimalField(label="", decimal_places=2)
-    quantity = forms.DecimalField(label="", decimal_places=2)
+    price = forms.DecimalField(label="", decimal_places=3)
+    quantity = forms.DecimalField(label="", decimal_places=3)
     note = forms.CharField(label="", required=False, widget=forms.HiddenInput())
     group = forms.ModelChoiceField(label="", required=False, queryset=Group.objects.none(), widget=forms.HiddenInput())
 
