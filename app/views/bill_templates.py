@@ -57,7 +57,7 @@ class BillTemplateDetailView(View):
     def get(self: BillTemplateDetailView, request: WSGIRequest, template_id: int) -> JsonResponse:
         template = cast(BillTemplate, get_object_or_404(
             BillTemplate, pk=template_id, user=request.user.pk,
-            error_message=_("This template does not exist"),
+            error_message=_("Template not found"),
             select_related=["brand", "group", "address", "address__country"]
         ))
 
@@ -67,7 +67,7 @@ class BillTemplateDetailView(View):
     def put(self: BillTemplateDetailView, request: WSGIRequest, template_id: int) -> JsonResponse:
         template = cast(BillTemplate, get_object_or_404(
             BillTemplate, pk=template_id, user=request.user.pk,
-            error_message=_("This template does not exist"),
+            error_message=_("Ttemplate not found"),
             select_related=["brand", "group", "address", "address__country"]
         ))
 

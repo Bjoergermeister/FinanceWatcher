@@ -102,7 +102,7 @@ class EditBillView(View):
     def get(self: EditBillView, request: WSGIRequest, bill_id: int) -> HttpResponse:
         bill = get_object_or_404(
             Bill, pk=bill_id, user=request.user.pk,
-            error_message=_("Die Rechnung wurde nicht gefunden")
+            error_message=_("Bill not found")
         )
         
         bill_form = EditBillForm(instance=bill)
@@ -258,7 +258,7 @@ def bills(request: WSGIRequest):
 def preview(request: WSGIRequest, bill_id: int) -> HttpResponse:
     bill = get_object_or_404(
         Bill, pk=bill_id, user=request.user.pk,
-        error_message="Die Rechnung wurde nicht gefunden.",
+        error_message=_("Bill not found"),
         json=True
     )
     bill_positions = Position.objects.filter(bill=bill).select_related("group")

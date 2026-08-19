@@ -91,7 +91,7 @@ class EditGroupView(View):
     def post(self: EditGroupView, request: WSGIRequest, group_id: int) -> HttpResponse:
         group = get_object_or_404(
             Group, pk=group_id, user=request.user,
-            error_message="Gruppe wurde nicht gefunden",
+            error_message=_("Group not found"),
             json=True
         )
         
@@ -120,7 +120,7 @@ class EditGroupView(View):
     def delete(self: EditGroupView, request: WSGIRequest, group_id: int) -> HttpResponse:
         group = get_object_or_404(
             Group, pk=group_id, user=request.user,
-            error_message="Gruppe wurde nicht gefunden"
+            error_message=_("Group not found")
         )
 
         if group.user != request.user.pk and request.user.is_superuser == False:
