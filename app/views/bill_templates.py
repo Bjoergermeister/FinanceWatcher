@@ -20,7 +20,7 @@ from app.shortcuts import get_object_or_404
 
 class BillTemplateListView(View):
     def get(self: BillTemplateListView, request: WSGIRequest) -> HttpResponse:
-        templates = BillTemplate.objects.all()
+        templates = BillTemplate.objects.filter(user=request.user)
 
         countries = Country.objects.all()
 

@@ -144,7 +144,10 @@ class EditBillView(View):
         return render(request, "bills/new.html", context)
 
     def post(self: EditBillView, request: WSGIRequest, bill_id: int) -> JsonResponse:
-        bill = Bill.objects.get(pk=bill_id)
+        bill = get_object_or_404(
+            Bill, pk=bill_id, user=request.user,
+            error_message=_("Bill not found")
+        )
 
         PositionFormSet = inlineformset_factory(
             Bill,
