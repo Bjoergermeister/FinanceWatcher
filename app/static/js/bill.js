@@ -198,7 +198,7 @@ async function onBillFormSubmitted(event) {
     NOTIFICATION_TYPE_SUCCESS
   );
 
-  window.location.href = "/";
+  window.location.href = BILLS_URL;
 }
 
 async function onDeletePositionClicked(event) {
