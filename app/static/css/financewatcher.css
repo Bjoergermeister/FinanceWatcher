@@ -26,6 +26,10 @@ header {
   pointer-events: none;
 }
 
+.clickable:hover {
+  cursor: pointer;
+}
+
 .display-on-hover {
   opacity: 0;
 }
@@ -79,7 +83,7 @@ dialog::backdrop {
 
 dialog .content {
   display: grid;
-  grid-template-columns: var(--width, 600px);
+  grid-template-columns: var(--width, 25vw);
   grid-template-rows: 100px calc(var(--height, 75vh) - 160px) 60px;
   grid-template-areas: "header" "content" "footer";
 
@@ -90,7 +94,7 @@ dialog .content {
 
   min-height: 250px;
   max-height: 75vh;
-  width: var(--width, 600px);
+  width: var(--width, 25vw);
 }
 
 dialog header {
@@ -163,18 +167,17 @@ button.loading:after {
 .group {
   position: relative;
   display: block;
-  width: 250px;
-  height: 250px;
+  width: 10vw;
+  height: 10vw;
   border-radius: 10px;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
+  margin-bottom: 1vh;
 
   overflow: hidden;
 }
 
 .group.small {
-  width: 150px;
-  height: 150px;
+  width: 30%;
+  height: 30%;
   cursor: pointer;
 }
 
@@ -186,14 +189,13 @@ button.loading:after {
 
 .group img {
   display: block;
-  margin: 0px auto 5px auto;
-  width: 250px;
-  height: 250px;
+  width: 10vw;
+  height: 10vw;
 }
 
 .group.small img {
-  width: 150px;
-  height: 150px;
+  width: 100%;
+  height: 100%;
 }
 
 .group-information {
@@ -225,6 +227,7 @@ button.loading:after {
   line-height: 50px;
   font-size: 1.5rem;
   margin: 0;
+  max-width: 90%;
 }
 
 input[type="file"] ~ label {
