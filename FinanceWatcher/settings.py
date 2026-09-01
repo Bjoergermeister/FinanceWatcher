@@ -139,6 +139,15 @@ class RequestContextFilter(logging.Filter):
         record.user_id = context.get("user_id")
         return True
 
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+    },
+}
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,

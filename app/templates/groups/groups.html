@@ -16,7 +16,7 @@
                 <div class="group card shadow">
                     <img src="{{ group.get_url }}" alt="Gruppenlogo" />
                     <div class="group-information">
-                        <h2 class="mb-3">{{ group.name }}</h2>
+                        <h2>{{ group.name }}</h2>
                     </div>
                 </div>
             {% endfor %}
@@ -30,7 +30,7 @@
                 <div class="group card shadow" data-id="{{ user_group.id }}">
                     <img src="{{ user_group.get_url }}" />
                     <div class="group-information">
-                        <h2 class="mb-3">{{ user_group.name }}</h2>
+                        <h2>{{ user_group.name }}</h2>
                         <div>
                             <button
                                 class="btn btn-danger pl-3 pr-3 pt-2 pb-2"
@@ -55,7 +55,7 @@
             
             <div
                 id="add-group-button"
-                class="group card shadow"
+                class="group card shadow clickable"
                 onclick="onAddGroupClicked(event)"
             >
                 +
@@ -102,7 +102,7 @@
         <div class="group card shadow">
             <img src="" />
             <div class="group-information">
-                <h2 class="mb-3"></h2>
+                <h2></h2>
                 <div>
                     <button class="btn btn-danger" onclick="onDeleteGroupClicked(event)"><i class="fa-solid fa-trash no-events"></i></button>
                     <button class="btn btn-primary" onclick="onEditGroupClicked(event)"><i class="fa-solid fa-pen no-events"></i></button>

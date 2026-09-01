@@ -4,11 +4,12 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models.fields.files import ImageFieldFile
+from django.utils.translation import gettext as _
 
 from app.models.Group import Group
 
 class CreateGroupForm(forms.ModelForm):
-    icon = forms.ImageField(label="Bild", required=False)
+    icon = forms.ImageField(label=_("Image"), required=False)
     is_global = forms.BooleanField(required=False, widget=forms.HiddenInput(), initial=False)
 
     def __init__(self, user, *args, **kwargs):
@@ -31,7 +32,7 @@ class CreateGroupForm(forms.ModelForm):
         assert self.groups is not None
 
         if name in self.groups:
-            raise ValidationError("Du hast schon eine Gruppe mit dem Namen \"%(group_name)s\"", params={ 'group_name': name })
+            raise ValidationError(_("You already have a group with the name \"%(group_name)s\"") % { 'group_name': name })
         
         return name
 
@@ -61,7 +62,7 @@ class CreateGroupForm(forms.ModelForm):
         exclude = ['user']
 
 class EditGroupForm(forms.ModelForm):
-    icon = forms.ImageField(label="Bild", required=False)
+    icon = forms.ImageField(label=_("Image"), required=False)
     is_global = forms.BooleanField(required=False, widget=forms.HiddenInput(), initial=False)
 
     def __init__(self, user, *args, **kwargs):
@@ -85,7 +86,7 @@ class EditGroupForm(forms.ModelForm):
     def clean_name(self):
         name = self.cleaned_data.get("name", None)
         if name in self.groups:
-            raise ValidationError("Du hast schon eine Gruppe mit dem Namen %(group_name)s", params={ 'group_name': name })
+            raise ValidationError(_("You already have a group with the name \"%(group_name)s\"") % { 'group_name': name })
         
         return name
             

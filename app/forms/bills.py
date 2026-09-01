@@ -6,6 +6,7 @@ import datetime
 
 from django import forms
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.utils.translation import gettext as _
 
 from app.models.Bill import Bill
 from app.models.User import User
@@ -14,11 +15,11 @@ class CreateBillForm(forms.ModelForm):
     id = forms.IntegerField(required=False, widget=forms.HiddenInput())
     name = forms.CharField(label="Name")
     user = forms.ModelChoiceField(User.objects.none(), widget=forms.HiddenInput())
-    date = forms.DateField(label="Datum", widget=forms.DateInput(attrs={'type': 'date'}))
+    date = forms.DateField(label=_("Date"), widget=forms.DateInput(attrs={'type': 'date'}))
     total = forms.DecimalField(widget=forms.HiddenInput(), initial=0.0)
-    description = forms.CharField(label="Beschreibung (optional)", required=False, widget=forms.Textarea(attrs={'rows': 3}))
-    receipt = forms.ImageField(label="Kassenzettel (optional)", required=False)
-    paid = forms.BooleanField(label="Bezahlt", required=False)
+    description = forms.CharField(label=_("Description (optional)"), required=False, widget=forms.Textarea(attrs={'rows': 3}))
+    receipt = forms.ImageField(label=_("Receipt (optional)"), required=False)
+    paid = forms.BooleanField(label=_("Paid"), required=False)
 
     def __init__(
         self: CreateBillForm,
@@ -58,12 +59,12 @@ class CreateBillForm(forms.ModelForm):
 
 class EditBillForm(forms.ModelForm):
     id = forms.IntegerField(widget=forms.HiddenInput())
-    name = forms.CharField(label="Name")
-    date = forms.DateField(label="Datum", widget=forms.DateInput(attrs={'type': 'date'}))
+    name = forms.CharField(label=_("Name"))
+    date = forms.DateField(label=_("Date"), widget=forms.DateInput(attrs={'type': 'date'}))
     total = forms.DecimalField(widget=forms.HiddenInput())
-    description = forms.CharField(label="Beschreibung (optional)", required=False, widget=forms.Textarea(attrs={'rows': 3}))
-    receipt = forms.FileField(label="Kassenzettel (optional)", required=False)
-    paid = forms.BooleanField(label="Bezahlt", required=False)
+    description = forms.CharField(label=_("Description (optional)"), required=False, widget=forms.Textarea(attrs={'rows': 3}))
+    receipt = forms.FileField(label=_("Receipt (optional)"), required=False)
+    paid = forms.BooleanField(label=_("Paid"), required=False)
 
     def __init__(self, *args, **kwargs):
         super(EditBillForm, self).__init__(*args, **kwargs)

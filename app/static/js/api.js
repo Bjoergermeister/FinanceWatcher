@@ -48,6 +48,55 @@ class BillAPI {
   }
 }
 
+class BillTemplateAPI {
+    /**
+     * @function get
+     * Retrieves the bill template with the given id 
+     * @param {number} templateId 
+     * @returns 
+     */
+    static async get(templateId){
+      const url = GET_BILL_TEMPLATE_URL.replace(/\d+/g, templateId);
+      return await makeRequest(url);
+    }
+
+    /**
+     * @function create
+     * Create a new bill template
+     * @param {FormData} data 
+     * @returns 
+     */
+    static async create(data){
+        const options = getOptions("POST", data);
+        return await makeRequest(CREATE_BILL_TEMPLATE_URL, options)
+    } 
+
+    /**
+     * @function update
+     * Updates a bill template by sending a PUT request with the passed form data to the backend
+     * @param {number} id The ID of the bill template to update
+     * @param {FormData} data The current form data
+     * @returns 
+     */
+    static async update(id, data){
+      const url = UPDATE_BILL_TEMPLATE_URL.replace(/\d+/g, id);
+      const options = getOptions("PUT", data, { "X-CSRFToken": CSRF_MIDDLEWARE_TOKEN });
+      return await makeRequest(url, options);
+    }
+
+    /**
+     * @function delete
+     * Deletes a template
+     * @param {number} id The ID of the template to delete
+     * @returns 
+     */
+    static async delete(id){
+      const url = UPDATE_BILL_TEMPLATE_URL.replace(/\d+/g, id);
+      const options = getOptions("DELETE", null, { "X-CSRFToken": CSRF_MIDDLEWARE_TOKEN });
+      return await makeRequest(url, options);
+    }
+}
+
 class GroupAPI {
   static async create(data) {
     const options = getOptions("POST", data, { "Content-Type": CONTENT_TYPE_FORM_DATA });
@@ -77,8 +126,8 @@ class GroupAPI {
   }
 
   /**
-   *
-   * @param {*} alreadyChoosenGroups
+   * @function getAll
+   * @param {Array} alreadyChoosenGroups
    * @returns
    */
   static async getAll(alreadyChosenGroups) {
@@ -283,8 +332,8 @@ function getQueryStringUrl(baseUrl, parameters){
 /**
  *
  * @param {string} method
- * @param {*} data
- * @param {*} headers
+ * @param {Object | FormData} data
+ * @param {Object} headers
  * @returns
  */
 function getOptions(method, data, headers) {

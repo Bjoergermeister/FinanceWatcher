@@ -2,46 +2,62 @@ from __future__ import annotations
 
 from typing import Dict, List
 
-from django.db.models import Count, F, Sum
+from django.db.models import Count
 from django.core.paginator import Paginator
 from django.core.handlers.wsgi import WSGIRequest
 from django.forms import inlineformset_factory, modelformset_factory
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.shortcuts import render
+from django.utils.translation import gettext as _
 from django.views import View
 
-from app.models.Brand import Brand
 from app.models.Bill import Bill
+from app.models.BillTemplate import BillTemplate
 from app.models.Country import Country
 from app.models.Group import Group
 from app.models.Position import Position
 
-from ..forms.bills import CreateBillForm, EditBillForm
-from ..forms.positions import CreatePositionForm, EditPositionForm
-from ..enums import Http
-from ..shortcuts import get_object_or_404
+from app.forms.bills import CreateBillForm, EditBillForm
+from app.forms.positions import CreatePositionForm, EditPositionForm, PositionFormSet
+from app.enums import Http
+from app.shortcuts import get_object_or_404
 
+from app.utils.request import get_int_from_request
 
 class CreateBillView(View):
     def get(self: CreateBillView, request: WSGIRequest) -> HttpResponse:
         initial_form_values = { "user": request.user.pk }
-        bill_form = CreateBillForm(request.user, initial=initial_form_values)
 
-        PositionFormSet = modelformset_factory(Position, form=CreatePositionForm, extra=5, can_delete=True)
+        template = BillTemplate.objects.filter(
+            user=request.user,
+            id=get_int_from_request(request, "template")
+        ).select_related("brand", "address", "group").first()
+
+        if template is not None:
+            initial_form_values["brand"] = template.brand
+            initial_form_values["address"] = template.address
+
+        default_group: Group | None = None
+
+        # The default group is None ("Uncategorized") anyway, so if no group is selected in the template, it's the same thing
+        if template is not None:
+            default_group = template.group
+
+        bill_form = CreateBillForm(request.user, initial=initial_form_values)
+        
         position_formset = PositionFormSet(
             queryset=Position.objects.none(),
             prefix="position",
-            form_kwargs={ "user": request.user }
+            form_kwargs={ "user": request.user, "group": default_group }
         )
 
         group_positions = {
-            None: position_formset
+            default_group: position_formset
         }
 
         countries = Country.objects.all()
 
         context = {
-            'group_ids': [None],
             'countries': countries,
             'bill_form': bill_form,
             'position_formset': position_formset,
@@ -86,14 +102,12 @@ class EditBillView(View):
     def get(self: EditBillView, request: WSGIRequest, bill_id: int) -> HttpResponse:
         bill = get_object_or_404(
             Bill, pk=bill_id, user=request.user.pk,
-            error_message="Die Rechnung wurde nicht gefunden"
+            error_message=_("Bill not found")
         )
         
         bill_form = EditBillForm(instance=bill)
 
         positions = Position.objects.filter(bill=bill).select_related("group")
-        group_ids = positions.distinct().values_list("group", flat=True)
-        groups = { group.pk: group for group in Group.objects.filter(pk__in=group_ids)}
 
         PositionFormSet = modelformset_factory(
             Position,
@@ -111,11 +125,11 @@ class EditBillView(View):
 
         group_positions: Dict[int | None, List[EditPositionForm]] = {}
         for position_form in position_formset:
-            group_id = position_form.instance.group.pk if position_form.instance.group is not None else None
-            if group_id not in group_positions:
-                group_positions[group_id] = []
+            group = position_form.instance.group if position_form.instance.group is not None else None
+            if group not in group_positions:
+                group_positions[group] = []
 
-            group_positions[group_id].append(position_form)
+            group_positions[group].append(position_form)
 
         countries = Country.objects.all()
 
@@ -124,15 +138,16 @@ class EditBillView(View):
             'bill_id': bill_id,
             'bill_form': bill_form,
             'position_formset': position_formset,
-            'group_positions': group_positions,
-            'groups': groups,
-            'group_ids': group_ids
+            'group_positions': group_positions
         }
 
         return render(request, "bills/new.html", context)
 
     def post(self: EditBillView, request: WSGIRequest, bill_id: int) -> JsonResponse:
-        bill = Bill.objects.get(pk=bill_id)
+        bill = get_object_or_404(
+            Bill, pk=bill_id, user=request.user,
+            error_message=_("Bill not found")
+        )
 
         PositionFormSet = inlineformset_factory(
             Bill,
@@ -227,10 +242,13 @@ def bills(request: WSGIRequest):
     page = paginator.get_page(page_index)
     pages = paginator.get_elided_page_range(page_index, on_each_side=1, on_ends=1)
 
+    templates = BillTemplate.objects.filter(user=request.user)
+
     context = {
         "paginator": paginator,
         "pages": pages,
         "bills": page,
+        "templates": templates,
         'total_bill_count': Bill.objects.filter(user=request.user.pk).count(),
         "bill_groups": bill_groups
     }
@@ -240,7 +258,7 @@ def bills(request: WSGIRequest):
 def preview(request: WSGIRequest, bill_id: int) -> HttpResponse:
     bill = get_object_or_404(
         Bill, pk=bill_id, user=request.user.pk,
-        error_message="Die Rechnung wurde nicht gefunden.",
+        error_message=_("Bill not found"),
         json=True
     )
     bill_positions = Position.objects.filter(bill=bill).select_related("group")

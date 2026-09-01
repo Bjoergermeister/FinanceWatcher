@@ -4,15 +4,16 @@ import json
 
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models import Q
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound, JsonResponse
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import render
+from django.utils.translation import gettext as _
 from django.views import View
 
-from ..enums import Http
-from ..forms.groups import CreateGroupForm, EditGroupForm
+from app.enums import Http
+from app.forms.groups import CreateGroupForm, EditGroupForm
 
-from ..models.Group import Group
-from ..shortcuts import get_object_or_404
+from app.models.Group import Group
+from app.shortcuts import get_object_or_404
 
 def list_all(request: WSGIRequest) -> HttpResponse:
 
@@ -89,8 +90,8 @@ class GroupsView(View):
 class EditGroupView(View):
     def post(self: EditGroupView, request: WSGIRequest, group_id: int) -> HttpResponse:
         group = get_object_or_404(
-            Group, pk=group_id, 
-            error_message="Gruppe wurde nicht gefunden",
+            Group, pk=group_id, user=request.user,
+            error_message=_("Group not found"),
             json=True
         )
         
@@ -118,8 +119,8 @@ class EditGroupView(View):
     
     def delete(self: EditGroupView, request: WSGIRequest, group_id: int) -> HttpResponse:
         group = get_object_or_404(
-            Group, pk=group_id,
-            error_message="Gruppe wurde nicht gefunden"
+            Group, pk=group_id, user=request.user,
+            error_message=_("Group not found")
         )
 
         if group.user != request.user.pk and request.user.is_superuser == False:

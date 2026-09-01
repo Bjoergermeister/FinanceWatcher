@@ -9,6 +9,18 @@ from app.exceptions import HttpBadRequestException
 
 logger = logging.getLogger(__name__)
 
+def get_int_from_request(request: HttpRequest, key: str, default: int | None = None) -> int | None:
+    request_data = get_data_from_request(request)
+
+    if key not in request_data:
+        return default
+
+    value = request_data.get(key)
+    try:
+        return int(value)
+    except:
+        return default
+
 def get_date_from_request(request: HttpRequest, key: str, default: date | None = None) -> date | None:
     request_data = get_data_from_request(request)
 

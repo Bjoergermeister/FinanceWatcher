@@ -26,6 +26,10 @@ from app.views import (
     dashboard,
     groups,
     recurrent_payments,
+    bill_templates,
+    brands,
+    dashboard,
+    groups,
     test
 )
 
@@ -37,6 +41,9 @@ urlpatterns = [
     path("bill/new", bills.CreateBillView.as_view(), name="create_bill"),
     path("bill/<int:bill_id>", bills.EditBillView.as_view(), name="edit_bill"),
     path("bill/<int:bill_id>/preview", bills.preview, name="preview_bill"),
+
+    path("bill-templates", bill_templates.BillTemplateListView.as_view(), name="bill_templates"),
+    path("bill-templates/<int:template_id>", bill_templates.BillTemplateDetailView.as_view(), name="bill_template"),
 
     path("groups", groups.GroupsView.as_view(), name="groups"),
     path("group/<int:group_id>", groups.EditGroupView.as_view(), name="edit_group"),

@@ -24,6 +24,9 @@ class Group(models.Model):
     user = models.ForeignKey(User, db_column="user", on_delete=models.CASCADE, null=True)
     icon = models.ImageField(db_column="icon", null=True, upload_to="groups")
 
+    def __str__(self: Group) -> str:
+        return self.name
+
     def to_dict(self) -> Dict[str, Any]:
         group = {
             "id": self.pk,
