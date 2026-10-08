@@ -63,6 +63,12 @@
         <td>{{ recurrent_payment.prices.first.price }}&nbsp;&euro;</td>
         <td>{{ recurrent_payment.start_date|date:"d.m.Y" }}</td>
         <td>
+          <i
+            class="fa fa-dollar-sign mr-2 clickable"
+            title="{% trans 'Change price' %}"
+            onclick="onChangeRecurrentPaymentPriceClicked(event)"
+            data-id="{{ recurrent_payment.id }}"
+            ></i>
         </td>
       </tr>
       {% empty %}
@@ -130,8 +136,58 @@
   </div>
 </dialog>
 
+<dialog id="change-recurrent-payment-price-dialog">
+  <div class="content">
+    <header>
+      <h1>{% trans 'Change recurrent payment price' %}</h1>
+    </header>
+    <div class="body">
+      <form id="change-recurrent-payment-price-form" onsubmit="onChangeRecurrentPaymentPriceFormSubmitted(event)">
+        {% csrf_token %}
+        <input type="hidden" name="id">
+        <div class="form-row">
+          <div class="col-md-6">
+            {{ change_recurrent_payment_price_form.date|as_crispy_field }}
+          </div>
+          <div class="col-md-6">
+            {{ change_recurrent_payment_price_form.price|as_crispy_field }}
+          </div>
+        </div>
+      </form>
+
+      <div>
+        <h5>{% trans 'Price History' %}</h5>
+        <table id="prices-history-table" class="table">
+          <thead>
+            <tr>
+              <th>{% trans 'Price' %}</th>
+              <th>{% trans 'Valid from' %}</th>
+              <th>{% trans 'Valid through' %}</th>
+            </tr>
+          </thead>
+          <tbody>
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <footer>
+      <button class="btn btn-primary" form="change-recurrent-payment-price-form">
+        <i class="fa fa-save mr-2"></i>
+        {% trans 'Save' %}
+      </button>
+      <button class="btn btn-secondary">
+        <i class="fa fa-xmark mr-2"></i>
+        {% trans 'Cancel' %}
+      </button>
+    </footer>
+  </div>
+</dialog>
+
 <script>
   const CREATE_RECURRENT_PAYMENT_URL = "{% url 'recurrent_payments' %}";
+  const GET_RECURRENT_PAYMENT_URL = "{% url 'recurrent_payment' 0 %}";
+  const CHANGE_RECURRENT_PAYMENT_PRICE_URL = "{% url 'change_recurrent_payment_price' 0 %}";
   const CSRF_MIDDLEWARE_TOKEN = "{{ csrf_token }}";
 
   function onCreateRecurrentPaymentClicked(event){

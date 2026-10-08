@@ -302,6 +302,31 @@ class RecurrentPaymentAPI {
     const options = getOptions("POST", data);
     return await makeRequest(CREATE_RECURRENT_PAYMENT_URL, options);
   }
+
+  static async get(recurrentPaymentId){
+    const processCallback = function(data){
+      if (data.prices.length > 0){
+        data.prices = data.prices.map(price => {
+          price.valid_from = new Date(Date.parse(price.valid_from));
+
+          if (price.valid_through !== null){
+            price.valid_through = Date.parse(price.valid_through);
+          }
+          return price;
+        });
+      }
+
+      return data;
+    }
+
+    const url = GET_RECURRENT_PAYMENT_URL.replace(/\d+/g, recurrentPaymentId);
+    return await makeRequest(url, null, processCallback);
+  }
+  static async changePrice(recurrentPaymentId, data){
+    const url = CHANGE_RECURRENT_PAYMENT_PRICE_URL.replace(/\d+/g, recurrentPaymentId);
+    const options = getOptions("POST", data);
+    return await makeRequest(url, options);
+  }
 }
 
 // ####################################################################################
@@ -364,9 +389,10 @@ function getOptions(method, data, headers) {
  * Makes a request to an external API
  * @param {string} url - Die URL of the request
  * @param {*} options - The Options of the request
+ * @param {*} processCallback - A function to apply to the result before returning it
  * @returns - An API response
  */
-async function makeRequest(url, options) {
+async function makeRequest(url, options, processCallback) {
   const response = await fetch(url, options);
   const success = response.status < 300;
 
@@ -377,6 +403,10 @@ async function makeRequest(url, options) {
         content = "Forbidden";
     }else if (isJsonResponse(response)){
         content = await response.json();
+        if (processCallback !== null){
+          content = processCallback(content);
+        }
+
     }else if (isHTMLResponse(response) && response.status === HTTP_NOT_FOUND){
         content = `Die angeforderte Seite wurde nicht gefunden: ${response.url}`;
     }else if (isHTMLResponse(response)){

@@ -38,3 +38,17 @@ class CreateRecurrentPaymentForm(forms.ModelForm):
     class Meta:
         model = RecurrentPayment
         exclude = []
+class ChangeRecurrentPaymentPriceForm(forms.Form):
+    price = forms.DecimalField(label=_("New price"), max_digits=13, decimal_places=3, min_value=0)
+    date = forms.DateField(label=_("Start date"), help_text=_("The day when the updated price takes effect"), widget=forms.DateInput(attrs={ "type": "date", "class": "form-control dateinput" }))
+
+    def __init__(self: ChangeRecurrentPaymentPriceForm, *args, **kwargs) -> None:
+        instance: RecurrentPayment = kwargs.pop("instance", None)
+        super(ChangeRecurrentPaymentPriceForm, self).__init__(*args, **kwargs)
+
+        self.instance = instance
+
+        self.fields["date"].widget.attrs.update({ "min": datetime.today().date() })
+
+    def clean_date(self: ChangeRecurrentPaymentPriceForm) -> date:
+        return self.cleaned_data["date"]

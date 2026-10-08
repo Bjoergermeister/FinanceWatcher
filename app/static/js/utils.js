@@ -98,3 +98,21 @@ function tableHasDataRows(table){
   const tableRows = table.querySelectorAll("tr:not(.dummy):not(.no-data)");
   return tableRows.length > 0;
 }
+
+/**
+ * @function createTableRow
+ * creates a table row which contains the given table cells
+ * @param {HTMLTableCellElement[]} cells 
+ * @returns 
+ */
+function createTableRow(cells){
+    const tableRow = document.createElement("TR");
+    tableRow.replaceChildren(...cells);
+    return tableRow;
+}
+
+function createDataTableCell(tableCellData){
+    const tableCell = document.createElement("TD");
+    tableCell.innerText = tableCellData;
+    return tableCell;
+}

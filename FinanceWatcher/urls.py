@@ -63,6 +63,7 @@ urlpatterns = [
     path("address/<int:address_id>", addresses.EditAddress.as_view(), name="edit_address"),
 
     path("recurrent_payments", recurrent_payments.RecurrentPaymentListView.as_view(), name="recurrent_payments"),
+    path("recurrent_payment/<int:recurrent_payment_id>/change", recurrent_payments.change_recurrent_payment_price, name="change_recurrent_payment_price"),
 
     # Admin
     path("test/bugsink", test.bugsink, name="admin_bugsink_test"),
