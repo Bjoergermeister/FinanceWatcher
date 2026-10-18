@@ -322,6 +322,18 @@ class RecurrentPaymentAPI {
     const url = GET_RECURRENT_PAYMENT_URL.replace(/\d+/g, recurrentPaymentId);
     return await makeRequest(url, null, processCallback);
   }
+
+  /**
+   * 
+   * @param {number} recurrentPaymentId 
+   * @param {FormData} data 
+   */
+  static async edit(recurrentPaymentId, data){
+    const url = EDIT_RECURRENT_PAYMENT_URL.replace(/\d+/g, recurrentPaymentId);
+    const options = getOptions("PUT", data, { "X-CSRFToken": CSRF_MIDDLEWARE_TOKEN });
+    return await makeRequest(url, options);
+  }
+
   static async changePrice(recurrentPaymentId, data){
     const url = CHANGE_RECURRENT_PAYMENT_PRICE_URL.replace(/\d+/g, recurrentPaymentId);
     const options = getOptions("POST", data);
@@ -403,7 +415,7 @@ async function makeRequest(url, options, processCallback) {
         content = "Forbidden";
     }else if (isJsonResponse(response)){
         content = await response.json();
-        if (processCallback !== null){
+        if (processCallback instanceof Function){
           content = processCallback(content);
         }
 

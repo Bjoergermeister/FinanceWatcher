@@ -69,6 +69,12 @@
             onclick="onChangeRecurrentPaymentPriceClicked(event)"
             data-id="{{ recurrent_payment.id }}"
             ></i>
+          <i
+            class="fa fa-pen clickable"
+            title="Edit recurrent payment"
+            onclick="onEditRecurrentPaymentClicked(event)"
+            data-id="{{ recurrent_payment.id }}"
+          ></i>
         </td>
       </tr>
       {% empty %}
@@ -184,9 +190,68 @@
   </div>
 </dialog>
 
+<dialog id="edit-recurrent-payment-dialog">
+  <div class="content">
+    <header>
+      <h1>{% trans 'Edit recurrent payment' %}</h1>
+    </header>
+    <div class="body">
+      <form id="edit-recurrent-payment-form" onsubmit="onEditRecurrentPaymentFormSubmitted(event)">
+        {% csrf_token %}
+        <input name="id" type="hidden">
+        <div class="form-row">
+          <div class="col-md">
+            {{ edit_recurrent_payment_form.name|as_crispy_field }}
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="col-md-4">
+            {{ edit_recurrent_payment_form.frequency|as_crispy_field }}
+          </div>
+          <div class="col-md-4">
+            {{ edit_recurrent_payment_form.brand|as_crispy_field }}
+          </div>
+          <div class="col-md-4">
+            {{ edit_recurrent_payment_form.start_date|as_crispy_field }}
+          </div>
+        </div>
+
+        {{ recurrent_payment_prices_formset.management_form }}
+        <div>
+          <h5>{% trans 'Price History' %}</h5>
+          <table id="prices-history-table" class="table">
+            <thead>
+              <tr>
+                <th>{% trans 'Price' %}</th>
+                <th>{% trans 'Valid from' %}</th>
+                <th>{% trans 'Valid through' %}</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+          </table>
+        </div>
+      </form>
+    </div>
+    <footer>
+      <button class="btn btn-primary" form="edit-recurrent-payment-form">
+        <i class="fa fa-save mr-2"></i>
+        {% trans 'Save' %}
+      </button>
+      <button class="btn btn-secondary">
+        <i class="fa fa-xmark mr-2"></i>
+        {% trans 'Cancel' %}
+      </button>
+    </footer>
+  </div>
+</dialog>
+
 <script>
   const CREATE_RECURRENT_PAYMENT_URL = "{% url 'recurrent_payments' %}";
   const GET_RECURRENT_PAYMENT_URL = "{% url 'recurrent_payment' 0 %}";
+  const EDIT_RECURRENT_PAYMENT_URL = "{% url 'recurrent_payment' 0 %}";
   const CHANGE_RECURRENT_PAYMENT_PRICE_URL = "{% url 'change_recurrent_payment_price' 0 %}";
   const CSRF_MIDDLEWARE_TOKEN = "{{ csrf_token }}";
 

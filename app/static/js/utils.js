@@ -83,10 +83,10 @@ function hideNoDataTableRow(table){
  * @param {HTMLTableElement} table - The table who's no data table row should be displayed
  */
 function showNoDataTableRow(table){
-  const noDataTableRow = table.querySelector("tr.no-data");
-  if (noDataTableRow){
-    noDataTableRow.style.display = "table-row";
-  }
+    const noDataTableRow = table.querySelector("tr.no-data");
+    if (noDataTableRow){
+        noDataTableRow.style.display = "table-row";
+    }
 }
 
 /**
@@ -95,8 +95,8 @@ function showNoDataTableRow(table){
  * @returns True if the table has at least one row with actual data, otherwise false
  */
 function tableHasDataRows(table){
-  const tableRows = table.querySelectorAll("tr:not(.dummy):not(.no-data)");
-  return tableRows.length > 0;
+    const tableRows = table.querySelectorAll("tr:not(.dummy):not(.no-data)");
+    return tableRows.length > 0;
 }
 
 /**
@@ -105,9 +105,14 @@ function tableHasDataRows(table){
  * @param {HTMLTableCellElement[]} cells 
  * @returns 
  */
-function createTableRow(cells){
+function createTableRow(cells, options){
     const tableRow = document.createElement("TR");
     tableRow.replaceChildren(...cells);
+
+    for (const key of Object.keys(options)){
+      tableRow.setAttribute(key, options[key]);
+    }
+
     return tableRow;
 }
 
@@ -115,4 +120,63 @@ function createDataTableCell(tableCellData){
     const tableCell = document.createElement("TD");
     tableCell.innerText = tableCellData;
     return tableCell;
+}
+
+function createDateInputTableCell(name, tableCellData){
+    const dateInput = document.createElement("INPUT");
+    dateInput.type = "date";
+    dateInput.name = name;
+    dateInput.classList.add("dateinput", "form-control");
+    dateInput.value = tableCellData;
+ 
+    const containerDiv = document.createElement("DIV");
+    containerDiv.appendChild(dateInput);
+
+    const tableCell = document.createElement("TD");
+    tableCell.appendChild(containerDiv);
+    return tableCell;
+}
+
+/**
+ * @function createNumberInputTableCell
+ * @param {string} name The name of the input element
+ * @param {any} tableCellData the initial date of the input element
+ * @param {boolean} wrapInDiv
+ * @returns {HTMLTableCellElement}
+ */
+function createNumberInputTableCell(name, tableCellData, wrapInDiv){
+    const numberInput = document.createElement("INPUT");
+    numberInput.type = "number";
+    numberInput.name = name;
+    numberInput.step = 0.001;
+    numberInput.classList.add("numberinput", "form-control");
+    numberInput.value = tableCellData;
+
+    const containerDiv = document.createElement("DIV");
+    containerDiv.appendChild(numberInput);
+
+    const tableCell = document.createElement("TD");
+    tableCell.appendChild(containerDiv);
+    return tableCell;
+}
+
+function createHiddenInputTableCell(name, value){
+  const hiddenInput = document.createElement("INPUT");
+  hiddenInput.type = "hidden";
+  hiddenInput.name = name;
+  hiddenInput.value = value;
+
+  const tableCell = document.createElement("TD");
+  tableCell.appendChild(hiddenInput);
+  return tableCell;
+}
+
+/**
+ * @function formatDate
+ * Formats a given date into the provided format (e.g. yyyy-mm-dd or dd.mm.yyyy)
+ * @param {Date} date 
+ * @param {string} format 
+ */
+function formatDate(date, format){
+
 }

@@ -18,7 +18,12 @@ from django.shortcuts import render
 from django.views import View
 
 
-from app.forms.recurrent_payments import CreateRecurrentPaymentForm, ChangeRecurrentPaymentPriceForm
+from app.forms.recurrent_payments import (
+    CreateRecurrentPaymentForm,
+    ChangeRecurrentPaymentPriceForm,
+    EditRecurrentPaymentForm,
+    RecurrentPaymentPriceFormset
+)
 
 from app.models.RecurrentPayment import RecurrentPayment
 from app.models.RecurrentPaymentPrice import RecurrentPaymentPrice
@@ -33,6 +38,8 @@ class RecurrentPaymentListView(View):
             "recurrent_payments": recurrent_payments,
             "create_recurrent_payment_form": CreateRecurrentPaymentForm(request.user),
             "change_recurrent_payment_price_form": ChangeRecurrentPaymentPriceForm(),
+            "edit_recurrent_payment_form": EditRecurrentPaymentForm(),
+            "recurrent_payment_prices_formset": RecurrentPaymentPriceFormset(prefix="recurrent_payment_price", queryset=RecurrentPaymentPrice.objects.none())
         }
 
         return render(request, "recurrent_payments/list.html", context) 
@@ -69,6 +76,35 @@ class RecurrentPaymentDetailView(View):
         return JsonResponse(
             recurrent_payment.to_json()
         )
+
+    def put(self: RecurrentPaymentDetailView, request: WSGIRequest, recurrent_payment_id: int) -> HttpResponse:
+        recurrent_payment = RecurrentPayment.objects.filter(pk=recurrent_payment_id, user=request.user).prefetch_related("prices").first()
+        if recurrent_payment is None:
+            return HttpResponseNotFound()
+
+        request_data = QueryDict(request.body)
+
+        recurrent_payment_form = EditRecurrentPaymentForm(request_data, instance=recurrent_payment)
+        if recurrent_payment_form.is_valid() is False:
+            content = {
+                "form_errors": recurrent_payment_form.errors,
+            }
+            return HttpResponseBadRequest()
+
+        price_formset = RecurrentPaymentPriceFormset(request_data, queryset=recurrent_payment.prices.all(), prefix="recurrent_payment_price")
+        if price_formset.is_valid() is False:
+            content = {
+                "form_errors": price_formset.errors,
+                "formset_errors": price_formset.non_form_errors()
+            }
+            return JsonResponse(content, status=400)
+
+        recurrent_payment_form.save()
+        price_formset.save()
+
+        return HttpResponse()
+
+
 def change_recurrent_payment_price(request: WSGIRequest, recurrent_payment_id: int) -> HttpResponse:
     recurrent_payment = RecurrentPayment.objects.filter(pk=recurrent_payment_id, user=request.user).prefetch_related("prices").first()
     if recurrent_payment is None:

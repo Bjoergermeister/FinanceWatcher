@@ -97,7 +97,6 @@ function decreaseFormCount(container) {
 function displayFormErrors(form, formErrors){
     // First, display all errors for specific inputs
     for (fieldName in formErrors){
-        // 
         if (fieldName === "__all__") continue;
 
         let field = form.querySelector(`[name$='${fieldName}']`);
@@ -105,8 +104,7 @@ function displayFormErrors(form, formErrors){
 
         field.classList.add("is-invalid");
 
-        const fieldContainer = form.querySelector(`div[id$='${fieldName}']`);
-        if (fieldContainer == null) continue;
+        const fieldContainer = field.parentElement;
 
         const errorParagraph = `<p class="invalid-feedback" style="display: block;"><strong>${formErrors[fieldName]}</strong></p>`;
         fieldContainer.insertAdjacentHTML("beforeend", errorParagraph);
@@ -117,6 +115,25 @@ function displayFormErrors(form, formErrors){
         const errors = formErrors["__all__"];
         const errorAlert = createErrorAlert(errors);
         form.insertAdjacentElement("beforeend", errorAlert);
+    }
+}
+
+/**
+ * Display form validation errors on their respective form elements
+ * @param {HTMLFormElement} form 
+ * @param {string} formsetName 
+ * @param {Object} formsetErrors 
+ */
+function displayFormsetErrors(form, formsetName, formsetErrors){
+    const formRows = form.getElementsByClassName(`${formsetName}-form-row`);
+
+    if ("form_errors" in formsetErrors){
+        for (let i = 0; i < formRows.length; i++){
+            const formRow = formRows[i];
+            const errors = formsetErrors.form_errors[i];            
+        
+            displayFormErrors(formRow, errors);
+        }
     }
 }
 

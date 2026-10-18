@@ -69,6 +69,24 @@ function sendNotification(title, text, type) {
   notifications[id] = removeTimeout;
 }
 
+/**
+ * Shows an error notification to the user
+ * @param {string} title - The title of the notification
+ * @param {string} text - The message that should be displayed to the user
+ */
+function sendErrorNotification(title, text){
+  sendNotification(title, text, NOTIFICATION_TYPE_ERROR);
+}
+
+/**
+ * Shows an success notification to the user
+ * @param {string} title - The title of the notification
+ * @param {string} text - The message that should be displayed to the user
+ */
+function sendSuccessNotification(title, text){
+  sendNotification(title, text, NOTIFICATION_TYPE_SUCCESS);
+}
+
 function createNotification(title, text, type) {
   const notification = document.createElement("div");
   notification.classList.add("notification", "alert", type);

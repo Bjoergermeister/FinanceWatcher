@@ -1,3 +1,5 @@
+const RECURRENT_PAYMENT_PRICE_FORMSET_PREFIX = "recurrent_payment_price";
+
 /**
  * 
  * @param {SubmitEvent} event 
@@ -80,4 +82,78 @@ async function onChangeRecurrentPaymentPriceFormSubmitted(event){
     }
 
     window.location.reload();
+}
+
+/**
+ * @function onEditRecurrentPaymentClicked
+ * @param {PointerEvent} event 
+ */
+async function onEditRecurrentPaymentClicked(event){
+    event.preventDefault();
+
+    const recurrentPaymentId = event.target.dataset.id;
+
+    const result = await RecurrentPaymentAPI.get(recurrentPaymentId);
+    const recurrentPayment = result.content;
+
+    const dialog = document.getElementById("edit-recurrent-payment-dialog");
+    const form = dialog.querySelector("form");
+
+    form.elements["id"].value = recurrentPayment.id;
+    form.elements["name"].value = recurrentPayment.name;
+    form.elements["start_date"].value = new Date(recurrentPayment.start_date).toLocaleDateString();
+    form.elements["brand"].value = recurrentPayment.brand;
+    form.elements["frequency"].value = recurrentPayment.frequency;
+
+    form.elements[`${RECURRENT_PAYMENT_PRICE_FORMSET_PREFIX}-TOTAL_FORMS`].value = recurrentPayment.prices.length;
+    form.elements[`${RECURRENT_PAYMENT_PRICE_FORMSET_PREFIX}-INITIAL_FORMS`].value = recurrentPayment.prices.length;
+
+    // fill table with price history
+    const pricesTable = dialog.querySelector("#prices-history-table");
+    const tableRows = recurrentPayment.prices.map((price, index) => {
+        const validFrom = (price.valid_from !== null) ? new Date(price.valid_from).toISOString().substring(0, 10) : "";
+        const validThrough = (price.valid_through !== null) ? new Date(price.valid_through).toISOString().substring(0, 10) : "";
+
+        const tableCells = [
+            createNumberInputTableCell(`${RECURRENT_PAYMENT_PRICE_FORMSET_PREFIX}-${index}-price`, price.price),
+            createDateInputTableCell(`${RECURRENT_PAYMENT_PRICE_FORMSET_PREFIX}-${index}-valid_from`, validFrom),
+            createDateInputTableCell(`${RECURRENT_PAYMENT_PRICE_FORMSET_PREFIX}-${index}-valid_through`, validThrough),
+            createHiddenInputTableCell(`${RECURRENT_PAYMENT_PRICE_FORMSET_PREFIX}-${index}-id`, price.id)
+        ]
+
+        return createTableRow(tableCells, { "class": "recurrent-payment-price-form-row" });
+    });
+    pricesTable.querySelector("tbody").replaceChildren(...tableRows);
+
+    dialog.showModal();
+}
+
+/**
+ * @function onEditRecurrentPaymentFormSubmitted
+ * @param {FormEvent} event 
+ */
+async function onEditRecurrentPaymentFormSubmitted(event){
+    event.preventDefault();
+
+    const form = event.target;
+    const formData = new FormData(form);
+
+    const recurrentPaymentId = formData.get("id");
+
+    removeFormErrors(form);
+    const result = await RecurrentPaymentAPI.edit(recurrentPaymentId, formData);
+    if (result.success === false){
+        if (result.errors instanceof Object){
+            const hasFormErrors = "form_errors" in result.errors;
+            const hasFormsetErrors = "formset_errors" in result.errors;
+            if (hasFormErrors || hasFormsetErrors){
+                displayFormsetErrors(form, "recurrent-payment-price", result.errors);
+            }
+        }
+
+        sendErrorNotification("Saving failed", "The recurrent payment couldn't be saved");
+        return;
+    }
+
+    sendSuccessNotification("Saving successful", "The recurrent payment was saved successfully");
 }
