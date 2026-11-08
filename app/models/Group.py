@@ -20,7 +20,7 @@ class GroupEvents(StrEnum):
 
 
 class Group(models.Model):
-    name = models.CharField(db_column="name")
+    name = models.CharField(db_column="name", max_length=100)
     user = models.ForeignKey(User, db_column="user", on_delete=models.CASCADE, null=True)
     icon = models.ImageField(db_column="icon", null=True, upload_to="groups")
 

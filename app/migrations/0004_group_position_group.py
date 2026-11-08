@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("name", models.CharField(db_column="name")),
+                ("name", models.CharField(db_column="name", max_length=100)),
                 ("user", models.UUIDField(db_column="user", null=True)),
                 ("icon", models.ImageField(db_column="icon", null=True, upload_to="")),
             ],

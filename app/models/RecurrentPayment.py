@@ -19,9 +19,9 @@ class RecurrentPaymentFrequencies(StrEnum):
 class RecurrentPayment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, db_column="fk_user", related_name="recurrent_payments")
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, db_column="fk_brand", null=True, related_name="recurrent_payments")
-    name = models.CharField(db_column="name")
+    name = models.CharField(db_column="name", max_length=100)
     start_date = models.DateField(db_column="start_date")
-    frequency = models.CharField(db_column="frequency")
+    frequency = models.CharField(db_column="frequency", max_length=20)
     interval = models.IntegerField(db_column="interval")
 
     def to_json(self: RecurrentPayment) -> Dict[str, Any]:

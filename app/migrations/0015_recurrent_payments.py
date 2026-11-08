@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("app", "0013_alter_position_price_alter_position_quantity"),
+        ("app", "0014_billtemplate_billtemplate_user_name_unique"),
     ]
 
     operations = [
@@ -24,9 +24,9 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("name", models.CharField(db_column="name")),
+                ("name", models.CharField(db_column="name", max_length=100)),
                 ("start_date", models.DateField(db_column="start_date")),
-                ("frequency", models.CharField(db_column="frequency")),
+                ("frequency", models.CharField(db_column="frequency", max_length=20)),
                 ("interval", models.IntegerField(db_column="interval")),
                 (
                     "brand",
