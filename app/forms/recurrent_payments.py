@@ -1,15 +1,16 @@
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import cast, List
 
 
 from django import forms
-from django.core.exceptions import ValidationError
+from django.db.models import Q
 from django.utils.translation import gettext as _
 
 from django.forms import modelformset_factory, BaseModelFormSet
 
+from app.models.Brand import Brand
 from app.models.RecurrentPayment import RecurrentPayment, RecurrentPaymentFrequencies
 from app.models.RecurrentPaymentPrice import RecurrentPaymentPrice
 from app.models.User import User
@@ -23,6 +24,7 @@ FREQUENCY_CHOICES = [
 
 class CreateRecurrentPaymentForm(forms.ModelForm):
     user = forms.ModelChoiceField(queryset=User.objects.none(), disabled=True)
+    brand = forms.ModelChoiceField(label=_("Brand"), queryset=Brand.objects.none(), required=False)
     price = forms.DecimalField(max_digits=13, decimal_places=3)
     frequency = forms.ChoiceField(choices=FREQUENCY_CHOICES)
     start_date = forms.DateField(label=_('First payment date'), widget=forms.DateInput(attrs={ "type": "date", "class": "form-control dateinput" }))
@@ -33,9 +35,10 @@ class CreateRecurrentPaymentForm(forms.ModelForm):
         self.fields["user"].queryset = User.objects.filter(pk=user.pk)
         self.fields["user"].initial = user
 
+        self.fields["brand"].queryset = Brand.objects.all()
+
         self.fields["frequency"].initial = RecurrentPaymentFrequencies.MONTHLY
-        self.fields["start_date"].initial = datetime.today().strftime("%Y-%m-%d")
-        self.fields["start_date"].widget.attrs.update({"min": datetime.today().strftime("%Y-%m-%d")})
+        self.fields["start_date"].initial = (datetime.today() + timedelta(days=1)).strftime("%Y-%m-%d")
 
     def save(self: CreateRecurrentPaymentForm, commit: bool = True) -> RecurrentPayment:
         return cast(RecurrentPayment, super(CreateRecurrentPaymentForm, self).save())

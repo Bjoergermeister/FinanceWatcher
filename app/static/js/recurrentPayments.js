@@ -1,5 +1,23 @@
 const RECURRENT_PAYMENT_PRICE_FORMSET_PREFIX = "recurrent_payment_price";
 
+setupCallbacks.push(() => {
+    const createRecurrentPaymentForm = document.getElementById("create-recurrent-payment-form");
+    const dateInput = createRecurrentPaymentForm["start_date"];
+    dateInput.addEventListener("change", (event) => {
+        const [year, month, day] = dateInput.value.split("-").map(Number);
+        const selectedDate = new Date(year, month - 1, day);
+
+        const today = new Date(new Date().toDateString());
+
+        const isInFuture = today < selectedDate;
+        console.log(isInFuture);
+        const displayValue = (isInFuture) ? "none" : "block";
+
+        const warning = document.getElementById("start-date-not-in-future-warning");
+        warning.style.display = displayValue;
+    });
+});
+
 /**
  * 
  * @param {SubmitEvent} event 

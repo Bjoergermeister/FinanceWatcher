@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta
-
+from datetime import date, datetime, timedelta
 
 from django.core.handlers.wsgi import WSGIRequest
 from django.db import transaction
 from django.db.models import Prefetch, Q
-from django.forms.models import model_to_dict
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
@@ -25,8 +23,12 @@ from app.forms.recurrent_payments import (
     RecurrentPaymentPriceFormset
 )
 
+
 from app.models.RecurrentPayment import RecurrentPayment
 from app.models.RecurrentPaymentPrice import RecurrentPaymentPrice
+
+from app.services import create_recurrent_payment_bills
+from app.utils.request import get_bool_from_request
 
 class RecurrentPaymentListView(View):
     def get(self: RecurrentPaymentListView, request: WSGIRequest) -> HttpResponse:
@@ -45,6 +47,7 @@ class RecurrentPaymentListView(View):
         return render(request, "recurrent_payments/list.html", context) 
 
     def post(self: RecurrentPaymentListView, request: WSGIRequest) -> HttpResponse:
+        create_bills_retroactively = get_bool_from_request(request, "create-retroactively", False)
         
         create_recurrent_payment_form = CreateRecurrentPaymentForm(request.user, request.POST)
         if create_recurrent_payment_form.is_valid() is False:
@@ -57,12 +60,17 @@ class RecurrentPaymentListView(View):
             recurrent_payment.user = request.user
             recurrent_payment.save()
 
+            price = create_recurrent_payment_form.cleaned_data["price"]
+
             RecurrentPaymentPrice.objects.create(
                 recurrent_payment=recurrent_payment,
                 valid_from=recurrent_payment.start_date,
                 valid_through=None,
-                price=create_recurrent_payment_form.cleaned_data["price"]
+                price=price
             )
+
+            if recurrent_payment.start_date < date.today() and create_bills_retroactively:
+                create_recurrent_payment_bills(recurrent_payment, price, recurrent_payment.start_date)
 
         return HttpResponse(recurrent_payment)
 

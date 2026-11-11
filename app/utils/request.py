@@ -1,6 +1,7 @@
 import logging
 
 from datetime import date, datetime
+from typing import overload
 
 from django.http import HttpRequest
 from django.http.request import QueryDict
@@ -42,6 +43,23 @@ def get_date_from_request_or_bad_request(request: HttpRequest, key: str) -> date
         raise HttpBadRequestException(f"{key} is missing")
     
     return date
+
+@overload
+def get_bool_from_request(request: HttpRequest, key: str) -> bool | None: ...
+@overload
+def get_bool_from_request(request: HttpRequest, key: str, default: bool) -> bool: ...
+
+def get_bool_from_request(request: HttpRequest, key: str, default: bool | None = None) -> bool:
+    data = get_data_from_request(request)
+
+    if key not in data:
+        return default
+
+    value = data[key]
+
+    # We incldue "on" here since checked checkboxes in HTML forms are often represented by the value "on"
+    return value.lower() in ["true", "on"]
+
 
 # Helper methods
 def get_data_from_request(request: HttpRequest) -> QueryDict:
