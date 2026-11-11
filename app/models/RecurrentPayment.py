@@ -8,6 +8,7 @@ from django.forms.models import model_to_dict
 
 from app.models.User import User
 from app.models.Brand import Brand
+from app.models.Group import Group
 
 class RecurrentPaymentFrequencies(StrEnum):
     DAILY = "daily"
@@ -18,11 +19,12 @@ class RecurrentPaymentFrequencies(StrEnum):
 
 class RecurrentPayment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, db_column="fk_user", related_name="recurrent_payments")
-    brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, db_column="fk_brand", null=True, related_name="recurrent_payments")
+    brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, db_column="fk_brand", blank=True, null=True, related_name="recurrent_payments")
+    group = models.ForeignKey(Group, on_delete=models.SET_NULL, db_column="fk_group", blank=True, null=True, related_name="recurrent_payments")
     name = models.CharField(db_column="name", max_length=100)
     start_date = models.DateField(db_column="start_date")
     frequency = models.CharField(db_column="frequency", max_length=20)
-    interval = models.IntegerField(db_column="interval")
+    interval = models.IntegerField(db_column="interval", default=1)
 
     def to_json(self: RecurrentPayment) -> Dict[str, Any]:
         result = model_to_dict(self)

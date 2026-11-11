@@ -46,6 +46,7 @@ def create_recurrent_payment_bills(recurrent_payment: RecurrentPayment, price: D
     bill_positions = [
         Position(
             bill_id=bills[i].pk,
+            group_id=recurrent_payment.group_id,
             name=recurrent_payment.name,
             price=price,
             quantity=1.0

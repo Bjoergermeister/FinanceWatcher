@@ -51,7 +51,7 @@ class RecurrentPaymentListView(View):
         
         create_recurrent_payment_form = CreateRecurrentPaymentForm(request.user, request.POST)
         if create_recurrent_payment_form.is_valid() is False:
-            return JsonResponse(create_recurrent_payment_form.errors, status_code=400)
+            return JsonResponse(create_recurrent_payment_form.errors, status=400)
 
 
         with transaction.atomic():

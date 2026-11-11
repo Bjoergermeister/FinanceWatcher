@@ -11,6 +11,7 @@ from django.utils.translation import gettext as _
 from django.forms import modelformset_factory, BaseModelFormSet
 
 from app.models.Brand import Brand
+from app.models.Group import Group
 from app.models.RecurrentPayment import RecurrentPayment, RecurrentPaymentFrequencies
 from app.models.RecurrentPaymentPrice import RecurrentPaymentPrice
 from app.models.User import User
@@ -25,17 +26,20 @@ FREQUENCY_CHOICES = [
 class CreateRecurrentPaymentForm(forms.ModelForm):
     user = forms.ModelChoiceField(queryset=User.objects.none(), disabled=True)
     brand = forms.ModelChoiceField(label=_("Brand"), queryset=Brand.objects.none(), required=False)
+    group = forms.ModelChoiceField(label=_("Group"), queryset=Group.objects.none(), required=False)
     price = forms.DecimalField(max_digits=13, decimal_places=3)
-    frequency = forms.ChoiceField(choices=FREQUENCY_CHOICES)
+    frequency = forms.ChoiceField(choices=FREQUENCY_CHOICES, required=False)   
     start_date = forms.DateField(label=_('First payment date'), widget=forms.DateInput(attrs={ "type": "date", "class": "form-control dateinput" }))
 
     def __init__(self: CreateRecurrentPaymentForm, user: User, *args, **kwargs):
         super(CreateRecurrentPaymentForm, self).__init__(*args, **kwargs)
+        self.fields["interval"].required = False
 
         self.fields["user"].queryset = User.objects.filter(pk=user.pk)
         self.fields["user"].initial = user
 
         self.fields["brand"].queryset = Brand.objects.all()
+        self.fields["group"].queryset = Group.objects.filter(Q(user=None) | Q(user=user))
 
         self.fields["frequency"].initial = RecurrentPaymentFrequencies.MONTHLY
         self.fields["start_date"].initial = (datetime.today() + timedelta(days=1)).strftime("%Y-%m-%d")
